@@ -1,10 +1,13 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract GoTLandsNFT is ERC1155, Ownable {
+  string public collectionName;
+  mapping(uint256 => address) private _tokenOwners;
+
   uint256 public constant WESTEROS = 0;
   uint256 public constant THE_NORTH = 1;
   uint256 public constant THE_VALE = 2;
@@ -15,7 +18,11 @@ contract GoTLandsNFT is ERC1155, Ownable {
   uint256 public constant THE_REACH = 7;
   uint256 public constant KINGS_LANDING = 8;
 
-  constructor() ERC1155("https://westeros.example/api/land/{id}.json") {
+  constructor(
+    string memory _collectionName
+  ) ERC1155("https://westeros.example/api/land/{id}.json") {
+    collectionName = _collectionName;
+
     _mint(msg.sender, WESTEROS, 1, "");
     _mint(msg.sender, THE_NORTH, 5000, "");
     _mint(msg.sender, THE_VALE, 20000, "");
@@ -27,10 +34,18 @@ contract GoTLandsNFT is ERC1155, Ownable {
     _mint(msg.sender, KINGS_LANDING, 10, "");
   }
 
-  function mint(address account, uint256 id, uint256 amount) public onlyOwner {
-    _mint(account, id, amount, "");
+  // get the owner of a token
+  function ownerOf(uint256 id) public view returns (address) {
+    return _tokenOwners[id];
   }
 
+  // mint tokens to an address (only callable by the owner)
+  function mint(address account, uint256 id, uint256 amount) public onlyOwner {
+    _mint(account, id, amount, "");
+    _tokenOwners[id] = account;
+  }
+
+  // mintbatch tokens to an address (only callable by the owner)
   function mintBatch(
     address to,
     uint256[] memory ids,
@@ -39,7 +54,28 @@ contract GoTLandsNFT is ERC1155, Ownable {
     _mintBatch(to, ids, amounts, "");
   }
 
+  // set the URI for all token types
   function setURI(string memory newURI) external onlyOwner {
     _setURI(newURI);
+  }
+
+  // safe transfer tokens
+  function safeTransfer(
+    address from,
+    address to,
+    uint256 id,
+    uint256 amount
+  ) public onlyOwner {
+    safeTransferFrom(from, to, id, amount, "");
+  }
+
+  // safe batch transfer tokens
+  function safeBatchTransfer(
+    address from,
+    address to,
+    uint256[] memory ids,
+    uint256[] memory amount
+  ) public virtual {
+    safeBatchTransferFrom(from, to, ids, amount, "");
   }
 }

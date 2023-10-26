@@ -19,28 +19,26 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface NFTMarketplaceInterface extends ethers.utils.Interface {
+interface NFTAuctionMarketplaceInterface extends ethers.utils.Interface {
   functions: {
-    "cancelListing(uint256)": FunctionFragment;
+    "auctions(uint256)": FunctionFragment;
     "commissionPercentage()": FunctionFragment;
-    "getActiveListings()": FunctionFragment;
-    "listNFT(uint256,uint256,uint256)": FunctionFragment;
-    "listings(uint256)": FunctionFragment;
-    "nextListingId()": FunctionFragment;
-    "nftContract()": FunctionFragment;
+    "createAuction(uint256,uint256,uint256)": FunctionFragment;
+    "endAuction(uint256)": FunctionFragment;
+    "nftToken()": FunctionFragment;
     "owner()": FunctionFragment;
-    "purchaseNFT(uint256)": FunctionFragment;
+    "placeBid(uint256,uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "setNFTContract(address)": FunctionFragment;
     "setSiliquaCoin(address)": FunctionFragment;
-    "siliquaCoinContract()": FunctionFragment;
+    "siliquaCoin()": FunctionFragment;
     "totalCommissionEarned()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "updateCommissionPercentage(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "cancelListing",
+    functionFragment: "auctions",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -48,29 +46,18 @@ interface NFTMarketplaceInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getActiveListings",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "listNFT",
+    functionFragment: "createAuction",
     values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "listings",
+    functionFragment: "endAuction",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "nextListingId",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "nftContract",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "nftToken", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "purchaseNFT",
-    values: [BigNumberish]
+    functionFragment: "placeBid",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -85,7 +72,7 @@ interface NFTMarketplaceInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "siliquaCoinContract",
+    functionFragment: "siliquaCoin",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -101,33 +88,19 @@ interface NFTMarketplaceInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "cancelListing",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "auctions", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "commissionPercentage",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getActiveListings",
+    functionFragment: "createAuction",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "listNFT", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "listings", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "nextListingId",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "nftContract",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "endAuction", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nftToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "purchaseNFT",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "placeBid", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -141,7 +114,7 @@ interface NFTMarketplaceInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "siliquaCoinContract",
+    functionFragment: "siliquaCoin",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -158,49 +131,39 @@ interface NFTMarketplaceInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "NFTListed(uint256,address,uint256,uint256,uint256,string)": EventFragment;
-    "NFTListingCancelled(uint256,address,uint256,uint256,uint256,string)": EventFragment;
-    "NFTPurchased(uint256,address,address,uint256,uint256,uint256,string)": EventFragment;
+    "AuctionCreated(uint256,uint256,uint256)": EventFragment;
+    "AuctionEnded(uint256,address,uint256)": EventFragment;
+    "BidPlaced(uint256,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "NFTListed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTListingCancelled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTPurchased"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "AuctionCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "AuctionEnded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "BidPlaced"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
 
-export type NFTListedEvent = TypedEvent<
-  [BigNumber, string, BigNumber, BigNumber, BigNumber, string] & {
-    listingId: BigNumber;
-    seller: string;
+export type AuctionCreatedEvent = TypedEvent<
+  [BigNumber, BigNumber, BigNumber] & {
     tokenId: BigNumber;
-    amount: BigNumber;
-    price: BigNumber;
-    status: string;
+    startingPrice: BigNumber;
+    auctionEndTime: BigNumber;
   }
 >;
 
-export type NFTListingCancelledEvent = TypedEvent<
-  [BigNumber, string, BigNumber, BigNumber, BigNumber, string] & {
-    listingId: BigNumber;
-    seller: string;
+export type AuctionEndedEvent = TypedEvent<
+  [BigNumber, string, BigNumber] & {
     tokenId: BigNumber;
-    amount: BigNumber;
-    price: BigNumber;
-    status: string;
+    winner: string;
+    winningBid: BigNumber;
   }
 >;
 
-export type NFTPurchasedEvent = TypedEvent<
-  [BigNumber, string, string, BigNumber, BigNumber, BigNumber, string] & {
-    listingId: BigNumber;
-    buyer: string;
-    seller: string;
+export type BidPlacedEvent = TypedEvent<
+  [BigNumber, string, BigNumber] & {
     tokenId: BigNumber;
-    amount: BigNumber;
-    price: BigNumber;
-    status: string;
+    bidder: string;
+    bidAmount: BigNumber;
   }
 >;
 
@@ -208,7 +171,7 @@ export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
 >;
 
-export class NFTMarketplace extends BaseContract {
+export class NFTAuctionMarketplace extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -249,76 +212,45 @@ export class NFTMarketplace extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: NFTMarketplaceInterface;
+  interface: NFTAuctionMarketplaceInterface;
 
   functions: {
-    cancelListing(
-      _listingId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    commissionPercentage(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    getActiveListings(
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        ([BigNumber, string, BigNumber, BigNumber, BigNumber, boolean] & {
-          listingId: BigNumber;
-          seller: string;
-          tokenId: BigNumber;
-          amount: BigNumber;
-          price: BigNumber;
-          isActive: boolean;
-        })[]
-      ] & {
-        activeListings: ([
-          BigNumber,
-          string,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          boolean
-        ] & {
-          listingId: BigNumber;
-          seller: string;
-          tokenId: BigNumber;
-          amount: BigNumber;
-          price: BigNumber;
-          isActive: boolean;
-        })[];
-      }
-    >;
-
-    listNFT(
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _price: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    listings(
+    auctions(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, boolean] & {
-        listingId: BigNumber;
+      [string, BigNumber, BigNumber, BigNumber, string, BigNumber, boolean] & {
         seller: string;
         tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        isActive: boolean;
+        startingPrice: BigNumber;
+        highestBid: BigNumber;
+        highestBidder: string;
+        auctionEndTime: BigNumber;
+        ended: boolean;
       }
     >;
 
-    nextListingId(overrides?: CallOverrides): Promise<[BigNumber]>;
+    commissionPercentage(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    nftContract(overrides?: CallOverrides): Promise<[string]>;
+    createAuction(
+      tokenId: BigNumberish,
+      startingPrice: BigNumberish,
+      duration: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    endAuction(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    nftToken(overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
-    purchaseNFT(
-      _listingId: BigNumberish,
+    placeBid(
+      tokenId: BigNumberish,
+      bidAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -336,7 +268,7 @@ export class NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    siliquaCoinContract(overrides?: CallOverrides): Promise<[string]>;
+    siliquaCoin(overrides?: CallOverrides): Promise<[string]>;
 
     totalCommissionEarned(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -351,55 +283,42 @@ export class NFTMarketplace extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  cancelListing(
-    _listingId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  commissionPercentage(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getActiveListings(
-    overrides?: CallOverrides
-  ): Promise<
-    ([BigNumber, string, BigNumber, BigNumber, BigNumber, boolean] & {
-      listingId: BigNumber;
-      seller: string;
-      tokenId: BigNumber;
-      amount: BigNumber;
-      price: BigNumber;
-      isActive: boolean;
-    })[]
-  >;
-
-  listNFT(
-    _tokenId: BigNumberish,
-    _amount: BigNumberish,
-    _price: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  listings(
+  auctions(
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, string, BigNumber, BigNumber, BigNumber, boolean] & {
-      listingId: BigNumber;
+    [string, BigNumber, BigNumber, BigNumber, string, BigNumber, boolean] & {
       seller: string;
       tokenId: BigNumber;
-      amount: BigNumber;
-      price: BigNumber;
-      isActive: boolean;
+      startingPrice: BigNumber;
+      highestBid: BigNumber;
+      highestBidder: string;
+      auctionEndTime: BigNumber;
+      ended: boolean;
     }
   >;
 
-  nextListingId(overrides?: CallOverrides): Promise<BigNumber>;
+  commissionPercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
-  nftContract(overrides?: CallOverrides): Promise<string>;
+  createAuction(
+    tokenId: BigNumberish,
+    startingPrice: BigNumberish,
+    duration: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  endAuction(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  nftToken(overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
-  purchaseNFT(
-    _listingId: BigNumberish,
+  placeBid(
+    tokenId: BigNumberish,
+    bidAmount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -417,7 +336,7 @@ export class NFTMarketplace extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  siliquaCoinContract(overrides?: CallOverrides): Promise<string>;
+  siliquaCoin(overrides?: CallOverrides): Promise<string>;
 
   totalCommissionEarned(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -432,55 +351,39 @@ export class NFTMarketplace extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    cancelListing(
-      _listingId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    commissionPercentage(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getActiveListings(
-      overrides?: CallOverrides
-    ): Promise<
-      ([BigNumber, string, BigNumber, BigNumber, BigNumber, boolean] & {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        isActive: boolean;
-      })[]
-    >;
-
-    listNFT(
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _price: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    listings(
+    auctions(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, boolean] & {
-        listingId: BigNumber;
+      [string, BigNumber, BigNumber, BigNumber, string, BigNumber, boolean] & {
         seller: string;
         tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        isActive: boolean;
+        startingPrice: BigNumber;
+        highestBid: BigNumber;
+        highestBidder: string;
+        auctionEndTime: BigNumber;
+        ended: boolean;
       }
     >;
 
-    nextListingId(overrides?: CallOverrides): Promise<BigNumber>;
+    commissionPercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
-    nftContract(overrides?: CallOverrides): Promise<string>;
+    createAuction(
+      tokenId: BigNumberish,
+      startingPrice: BigNumberish,
+      duration: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    endAuction(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    nftToken(overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
-    purchaseNFT(
-      _listingId: BigNumberish,
+    placeBid(
+      tokenId: BigNumberish,
+      bidAmount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -496,7 +399,7 @@ export class NFTMarketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    siliquaCoinContract(overrides?: CallOverrides): Promise<string>;
+    siliquaCoin(overrides?: CallOverrides): Promise<string>;
 
     totalCommissionEarned(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -512,122 +415,66 @@ export class NFTMarketplace extends BaseContract {
   };
 
   filters: {
-    "NFTListed(uint256,address,uint256,uint256,uint256,string)"(
-      listingId?: BigNumberish | null,
-      seller?: string | null,
+    "AuctionCreated(uint256,uint256,uint256)"(
       tokenId?: BigNumberish | null,
-      amount?: null,
-      price?: null,
-      status?: null
+      startingPrice?: null,
+      auctionEndTime?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, string],
+      [BigNumber, BigNumber, BigNumber],
       {
-        listingId: BigNumber;
-        seller: string;
         tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
+        startingPrice: BigNumber;
+        auctionEndTime: BigNumber;
       }
     >;
 
-    NFTListed(
-      listingId?: BigNumberish | null,
-      seller?: string | null,
+    AuctionCreated(
       tokenId?: BigNumberish | null,
-      amount?: null,
-      price?: null,
-      status?: null
+      startingPrice?: null,
+      auctionEndTime?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, string],
+      [BigNumber, BigNumber, BigNumber],
       {
-        listingId: BigNumber;
-        seller: string;
         tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
+        startingPrice: BigNumber;
+        auctionEndTime: BigNumber;
       }
     >;
 
-    "NFTListingCancelled(uint256,address,uint256,uint256,uint256,string)"(
-      listingId?: BigNumberish | null,
-      seller?: string | null,
+    "AuctionEnded(uint256,address,uint256)"(
       tokenId?: BigNumberish | null,
-      amount?: null,
-      price?: null,
-      status?: null
+      winner?: string | null,
+      winningBid?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string, BigNumber],
+      { tokenId: BigNumber; winner: string; winningBid: BigNumber }
     >;
 
-    NFTListingCancelled(
-      listingId?: BigNumberish | null,
-      seller?: string | null,
+    AuctionEnded(
       tokenId?: BigNumberish | null,
-      amount?: null,
-      price?: null,
-      status?: null
+      winner?: string | null,
+      winningBid?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string, BigNumber],
+      { tokenId: BigNumber; winner: string; winningBid: BigNumber }
     >;
 
-    "NFTPurchased(uint256,address,address,uint256,uint256,uint256,string)"(
-      listingId?: BigNumberish | null,
-      buyer?: string | null,
-      seller?: string | null,
-      tokenId?: null,
-      amount?: null,
-      price?: null,
-      status?: null
+    "BidPlaced(uint256,address,uint256)"(
+      tokenId?: BigNumberish | null,
+      bidder?: string | null,
+      bidAmount?: null
     ): TypedEventFilter<
-      [BigNumber, string, string, BigNumber, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        buyer: string;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string, BigNumber],
+      { tokenId: BigNumber; bidder: string; bidAmount: BigNumber }
     >;
 
-    NFTPurchased(
-      listingId?: BigNumberish | null,
-      buyer?: string | null,
-      seller?: string | null,
-      tokenId?: null,
-      amount?: null,
-      price?: null,
-      status?: null
+    BidPlaced(
+      tokenId?: BigNumberish | null,
+      bidder?: string | null,
+      bidAmount?: null
     ): TypedEventFilter<
-      [BigNumber, string, string, BigNumber, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        buyer: string;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string, BigNumber],
+      { tokenId: BigNumber; bidder: string; bidAmount: BigNumber }
     >;
 
     "OwnershipTransferred(address,address)"(
@@ -648,32 +495,29 @@ export class NFTMarketplace extends BaseContract {
   };
 
   estimateGas: {
-    cancelListing(
-      _listingId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    auctions(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     commissionPercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getActiveListings(overrides?: CallOverrides): Promise<BigNumber>;
-
-    listNFT(
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _price: BigNumberish,
+    createAuction(
+      tokenId: BigNumberish,
+      startingPrice: BigNumberish,
+      duration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    listings(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+    endAuction(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
-    nextListingId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    nftContract(overrides?: CallOverrides): Promise<BigNumber>;
+    nftToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    purchaseNFT(
-      _listingId: BigNumberish,
+    placeBid(
+      tokenId: BigNumberish,
+      bidAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -691,7 +535,7 @@ export class NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    siliquaCoinContract(overrides?: CallOverrides): Promise<BigNumber>;
+    siliquaCoin(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalCommissionEarned(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -707,37 +551,34 @@ export class NFTMarketplace extends BaseContract {
   };
 
   populateTransaction: {
-    cancelListing(
-      _listingId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    auctions(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     commissionPercentage(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getActiveListings(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    listNFT(
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _price: BigNumberish,
+    createAuction(
+      tokenId: BigNumberish,
+      startingPrice: BigNumberish,
+      duration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    listings(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
+    endAuction(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    nextListingId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    nftContract(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    nftToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    purchaseNFT(
-      _listingId: BigNumberish,
+    placeBid(
+      tokenId: BigNumberish,
+      bidAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -755,9 +596,7 @@ export class NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    siliquaCoinContract(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    siliquaCoin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalCommissionEarned(
       overrides?: CallOverrides

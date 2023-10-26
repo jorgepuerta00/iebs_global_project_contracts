@@ -15,7 +15,7 @@ async function main() {
 
   // Desplegamos el contrato Token
   console.log('Desplegando SiliquaCoin...');
-  const siliquaCoin = await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', 18, ethers.utils.parseEther('1000000'));
+  const siliquaCoin = await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('100000000000000'));
   await siliquaCoin.deployed();
   console.log('SiliquaCoin desplegado en:', siliquaCoin.address);
 
@@ -27,13 +27,13 @@ async function main() {
 
   // Desplegamos el contrato GoTLandsNFT
   console.log('Desplegando GoTLandsNFT...');
-  const gotLandsNFT = await GoTLandsNFT.deploy();
+  const gotLandsNFT = await GoTLandsNFT.deploy('game of thrones');
   await gotLandsNFT.deployed();
   console.log('GoTLandsNFT desplegado en:', gotLandsNFT.address);
 
   // Desplegamos el contrato NFTMarketplace, pasando las direcciones de los contratos necesarios como argumentos al constructor
   console.log('Desplegando NFTMarketplace...');
-  const marketplace = await NFTMarketplace.deploy(siliquaCoin.address, artNFT.address, gotLandsNFT.address);
+  const marketplace = await NFTMarketplace.deploy(siliquaCoin.address, gotLandsNFT.address, 1);
   await marketplace.deployed();
   console.log('NFTMarketplace desplegado en:', marketplace.address);
 

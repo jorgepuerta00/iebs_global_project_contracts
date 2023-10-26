@@ -14,7 +14,7 @@ describe('SiliquaCoin', () => {
   beforeEach(async () => {
     [owner, addr1, addr2, addr3] = await ethers.getSigners();
     SiliquaCoin = await ethers.getContractFactory('SiliquaCoin');
-    siliquaCoin = (await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', 18, ethers.utils.parseEther('1000000'))) as SiliquaCoin;
+    siliquaCoin = (await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('1000000'))) as SiliquaCoin;
     await siliquaCoin.deployed();
   });
 
