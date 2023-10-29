@@ -28,20 +28,24 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
     _mint(msg.sender, initialSupply);
   }
 
-  // Mint tokens to an address (only callable by the owner)
-  function mint(address to, uint256 amount) external onlyOwner {
-    _mint(to, amount);
-  }
-
   // exchange eth for tokens
+  /*
   receive() external payable {
     // Calculate the amount of tokens to mint based on the ETH sent
     uint256 ethAmount = msg.value;
     uint256 tokenAmount = ethAmount * TOKEN_TO_ETH_RATE;
     // Mint tokens and send them to the buyer
-    _mint(msg.sender, tokenAmount);
+    //_mint(msg.sender, tokenAmount);
+    // transfer tokens and send them to the buyer
+    safeTransfer(msg.sender, tokenAmount);
     // Emit event
     emit TokensPurchased(msg.sender, ethAmount, tokenAmount);
+  }
+  */
+
+  // Mint tokens to an address (only callable by the owner)
+  function mint(address to, uint256 amount) external onlyOwner {
+    _mint(to, amount);
   }
 
   // Claim tokens from the faucet
@@ -56,8 +60,24 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
     require(balanceOf(address(this)) >= amount, "Faucet out of tokens");
 
     // Use SafeERC20 to safely transfer tokens
-    IERC20(address(this)).safeTransfer(msg.sender, amount);
+    safeTransfer(msg.sender, amount);
 
     lastClaimedTimestamp[msg.sender] = block.timestamp;
+  }
+
+  // safe transfer function to avoid ERC20 transfer errors
+  function safeTransfer(address to, uint256 amount) public returns (bool) {
+    transfer(to, amount);
+    return true;
+  }
+
+  // safe transfer from function to avoid ERC20 transfer errors
+  function safeTransferFrom(
+    address from,
+    address to,
+    uint256 amount
+  ) public returns (bool) {
+    transferFrom(from, to, amount);
+    return true;
   }
 }

@@ -32,6 +32,7 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
     "WESTEROS()": FunctionFragment;
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
+    "batchTransferFrom(address,address,uint256[],uint256[])": FunctionFragment;
     "collectionName()": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "mint(address,uint256,uint256)": FunctionFragment;
@@ -39,13 +40,12 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "safeBatchTransfer(address,address,uint256[],uint256[])": FunctionFragment;
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
-    "safeTransfer(address,address,uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setURI(string)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
+    "transferFrom(address,address,uint256,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "uri(uint256)": FunctionFragment;
   };
@@ -83,6 +83,10 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
     values: [string[], BigNumberish[]]
   ): string;
   encodeFunctionData(
+    functionFragment: "batchTransferFrom",
+    values: [string, string, BigNumberish[], BigNumberish[]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "collectionName",
     values?: undefined
   ): string;
@@ -108,16 +112,8 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "safeBatchTransfer",
-    values: [string, string, BigNumberish[], BigNumberish[]]
-  ): string;
-  encodeFunctionData(
     functionFragment: "safeBatchTransferFrom",
     values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "safeTransfer",
-    values: [string, string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
@@ -131,6 +127,10 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferFrom",
+    values: [string, string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -168,6 +168,10 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "batchTransferFrom",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "collectionName",
     data: BytesLike
   ): Result;
@@ -184,15 +188,7 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "safeBatchTransfer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "safeBatchTransferFrom",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "safeTransfer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -206,6 +202,10 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "setURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -339,6 +339,14 @@ export class GoTLandsNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
 
+    batchTransferFrom(
+      from: string,
+      to: string,
+      ids: BigNumberish[],
+      amount: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     collectionName(overrides?: CallOverrides): Promise<[string]>;
 
     isApprovedForAll(
@@ -369,28 +377,12 @@ export class GoTLandsNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    safeBatchTransfer(
-      from: string,
-      to: string,
-      ids: BigNumberish[],
-      amount: BigNumberish[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     safeBatchTransferFrom(
       from: string,
       to: string,
       ids: BigNumberish[],
       amounts: BigNumberish[],
       data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    safeTransfer(
-      from: string,
-      to: string,
-      id: BigNumberish,
-      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -418,6 +410,14 @@ export class GoTLandsNFT extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      id: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     transferOwnership(
       newOwner: string,
@@ -457,6 +457,14 @@ export class GoTLandsNFT extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
+  batchTransferFrom(
+    from: string,
+    to: string,
+    ids: BigNumberish[],
+    amount: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   collectionName(overrides?: CallOverrides): Promise<string>;
 
   isApprovedForAll(
@@ -487,28 +495,12 @@ export class GoTLandsNFT extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  safeBatchTransfer(
-    from: string,
-    to: string,
-    ids: BigNumberish[],
-    amount: BigNumberish[],
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   safeBatchTransferFrom(
     from: string,
     to: string,
     ids: BigNumberish[],
     amounts: BigNumberish[],
     data: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  safeTransfer(
-    from: string,
-    to: string,
-    id: BigNumberish,
-    amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -536,6 +528,14 @@ export class GoTLandsNFT extends BaseContract {
     interfaceId: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  transferFrom(
+    from: string,
+    to: string,
+    id: BigNumberish,
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   transferOwnership(
     newOwner: string,
@@ -575,6 +575,14 @@ export class GoTLandsNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
+    batchTransferFrom(
+      from: string,
+      to: string,
+      ids: BigNumberish[],
+      amount: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     collectionName(overrides?: CallOverrides): Promise<string>;
 
     isApprovedForAll(
@@ -603,28 +611,12 @@ export class GoTLandsNFT extends BaseContract {
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    safeBatchTransfer(
-      from: string,
-      to: string,
-      ids: BigNumberish[],
-      amount: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     safeBatchTransferFrom(
       from: string,
       to: string,
       ids: BigNumberish[],
       amounts: BigNumberish[],
       data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    safeTransfer(
-      from: string,
-      to: string,
-      id: BigNumberish,
-      amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -649,6 +641,14 @@ export class GoTLandsNFT extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      id: BigNumberish,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     transferOwnership(
       newOwner: string,
@@ -803,6 +803,14 @@ export class GoTLandsNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    batchTransferFrom(
+      from: string,
+      to: string,
+      ids: BigNumberish[],
+      amount: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     collectionName(overrides?: CallOverrides): Promise<BigNumber>;
 
     isApprovedForAll(
@@ -833,28 +841,12 @@ export class GoTLandsNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    safeBatchTransfer(
-      from: string,
-      to: string,
-      ids: BigNumberish[],
-      amount: BigNumberish[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     safeBatchTransferFrom(
       from: string,
       to: string,
       ids: BigNumberish[],
       amounts: BigNumberish[],
       data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    safeTransfer(
-      from: string,
-      to: string,
-      id: BigNumberish,
-      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -881,6 +873,14 @@ export class GoTLandsNFT extends BaseContract {
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      id: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     transferOwnership(
@@ -922,6 +922,14 @@ export class GoTLandsNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    batchTransferFrom(
+      from: string,
+      to: string,
+      ids: BigNumberish[],
+      amount: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     collectionName(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isApprovedForAll(
@@ -955,28 +963,12 @@ export class GoTLandsNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    safeBatchTransfer(
-      from: string,
-      to: string,
-      ids: BigNumberish[],
-      amount: BigNumberish[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     safeBatchTransferFrom(
       from: string,
       to: string,
       ids: BigNumberish[],
       amounts: BigNumberish[],
       data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    safeTransfer(
-      from: string,
-      to: string,
-      id: BigNumberish,
-      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1003,6 +995,14 @@ export class GoTLandsNFT extends BaseContract {
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      id: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     transferOwnership(

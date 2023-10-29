@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/SiliquaCoin.sol": {
-      "lastModificationDate": 1698354945739,
-      "contentHash": "8c8a0870c36c89657cb442732c3cfa31",
+      "lastModificationDate": 1698588035772,
+      "contentHash": "cf4097093ad08ab7c05fd312b635f775",
       "sourceName": "contracts/SiliquaCoin.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -306,8 +306,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/NFTMarketplace.sol": {
-      "lastModificationDate": 1698359224185,
-      "contentHash": "59f13f6926191b016b0771d9e43debdd",
+      "lastModificationDate": 1698597103820,
+      "contentHash": "27bda14e5750e104821c43198cd40e0c",
       "sourceName": "contracts/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -335,10 +335,11 @@
       },
       "imports": [
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
         "@openzeppelin/contracts/security/ReentrancyGuard.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
-        "./GoTLandsNFT.sol"
+        "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
+        "./GoTLandsNFT.sol",
+        "./SiliquaCoin.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
@@ -1074,8 +1075,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/GoTLandsNFT.sol": {
-      "lastModificationDate": 1698354688301,
-      "contentHash": "6196c4c1eee2dc09e0a1ea88090a8c2c",
+      "lastModificationDate": 1698587131652,
+      "contentHash": "401765ff416e47e3cc4ecf93b4d15b40",
       "sourceName": "contracts/GoTLandsNFT.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1103,6 +1104,7 @@
       },
       "imports": [
         "@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
+        "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol",
         "@openzeppelin/contracts/access/Ownable.sol"
       ],
       "versionPragmas": [
@@ -1377,8 +1379,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1698359194540,
-      "contentHash": "7d17b6e47076ad4779cc1f53c220a549",
+      "lastModificationDate": 1698599118742,
+      "contentHash": "d23dcc7920733a7cf948ec26f56ecf3e",
       "sourceName": "contracts/NFTAuctionMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1407,6 +1409,7 @@
       "imports": [
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
         "./GoTLandsNFT.sol"
       ],
       "versionPragmas": [
@@ -1414,6 +1417,83 @@
       ],
       "artifacts": [
         "NFTAuctionMarketplace"
+      ]
+    },
+    "/Users/jorgepuerta/repos/iebs_sprint_3/node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol": {
+      "lastModificationDate": 1697997398591,
+      "contentHash": "55b180cf664783e9a2baac20e82683fb",
+      "sourceName": "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol",
+      "solcConfig": {
+        "version": "0.8.21",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IERC1155Receiver.sol",
+        "../../../utils/introspection/ERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC1155Receiver"
+      ]
+    },
+    "/Users/jorgepuerta/repos/iebs_sprint_3/node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol": {
+      "lastModificationDate": 1697997398583,
+      "contentHash": "88079762e28b246888129028f757e047",
+      "sourceName": "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
+      "solcConfig": {
+        "version": "0.8.21",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ERC1155Receiver.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC1155Holder"
       ]
     }
   }

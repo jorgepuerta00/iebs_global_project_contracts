@@ -3,17 +3,20 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "./GoTLandsNFT.sol";
 
-contract NFTAuctionMarketplace is Ownable {
+contract NFTAuctionMarketplace is Ownable, ERC1155Holder {
   GoTLandsNFT public nftToken;
-  IERC20 public siliquaCoin;
+  IERC20 public token;
   uint256 public commissionPercentage;
   uint256 public totalCommissionEarned;
 
   struct Auction {
+    uint256 auctionId;
     address seller;
     uint256 tokenId;
+    uint256 amount;
     uint256 startingPrice;
     uint256 highestBid;
     address highestBidder;
@@ -22,20 +25,25 @@ contract NFTAuctionMarketplace is Ownable {
   }
 
   mapping(uint256 => Auction) public auctions;
+  uint256 public auctionId = 0;
 
   event AuctionCreated(
-    uint256 indexed tokenId,
+    uint256 indexed auctionId,
+    address seller,
+    uint256 tokenId,
+    uint256 amount,
     uint256 startingPrice,
-    uint256 auctionEndTime
+    uint256 duration
   );
 
   event BidPlaced(
-    uint256 indexed tokenId,
+    uint256 indexed auctionId,
     address indexed bidder,
     uint256 bidAmount
   );
+
   event AuctionEnded(
-    uint256 indexed tokenId,
+    uint256 indexed auctionId,
     address indexed winner,
     uint256 winningBid
   );
@@ -46,12 +54,13 @@ contract NFTAuctionMarketplace is Ownable {
     uint256 _commissionPercentage
   ) {
     nftToken = GoTLandsNFT(_nftContractAddress);
-    siliquaCoin = IERC20(_siliquaCoinContractAddress);
+    token = IERC20(_siliquaCoinContractAddress);
     commissionPercentage = _commissionPercentage;
   }
 
   function createAuction(
     uint256 tokenId,
+    uint256 amount,
     uint256 startingPrice,
     uint256 duration
   ) external {
@@ -59,11 +68,16 @@ contract NFTAuctionMarketplace is Ownable {
       nftToken.ownerOf(tokenId) == msg.sender,
       "You don't own this token"
     );
-    require(!auctions[tokenId].ended, "Auction for this token already exists");
+    require(
+      nftToken.balanceOf(msg.sender, tokenId) >= amount,
+      "Insufficient balance"
+    );
 
-    auctions[tokenId] = Auction({
+    auctions[auctionId] = Auction({
+      auctionId: auctionId,
       seller: msg.sender,
       tokenId: tokenId,
+      amount: amount,
       startingPrice: startingPrice,
       highestBid: startingPrice,
       highestBidder: address(0),
@@ -71,17 +85,20 @@ contract NFTAuctionMarketplace is Ownable {
       ended: false
     });
 
-    nftToken.safeTransfer(msg.sender, address(this), tokenId, 1);
+    nftToken.transferFrom(msg.sender, address(this), tokenId, amount);
 
     emit AuctionCreated(
+      auctionId,
+      msg.sender,
       tokenId,
+      amount,
       startingPrice,
-      auctions[tokenId].auctionEndTime
+      duration
     );
   }
 
-  function placeBid(uint256 tokenId, uint256 bidAmount) external {
-    Auction storage auction = auctions[tokenId];
+  function placeBid(uint256 _auctionId, uint256 bidAmount) external {
+    Auction storage auction = auctions[_auctionId];
     require(!auction.ended, "Auction already ended");
     require(block.timestamp < auction.auctionEndTime, "Auction has ended");
     require(
@@ -91,19 +108,19 @@ contract NFTAuctionMarketplace is Ownable {
 
     // Refund the previous highest bidder
     if (auction.highestBidder != address(0)) {
-      siliquaCoin.transfer(auction.highestBidder, auction.highestBid);
+      token.transfer(auction.highestBidder, auction.highestBid);
     }
 
     // Place the new bid
-    siliquaCoin.transferFrom(msg.sender, address(this), bidAmount);
+    token.transferFrom(msg.sender, address(this), bidAmount);
     auction.highestBid = bidAmount;
     auction.highestBidder = msg.sender;
 
-    emit BidPlaced(tokenId, msg.sender, bidAmount);
+    emit BidPlaced(auction.auctionId, msg.sender, bidAmount);
   }
 
-  function endAuction(uint256 tokenId) external onlyOwner {
-    Auction storage auction = auctions[tokenId];
+  function endAuction(uint256 _auctionId) external onlyOwner {
+    Auction storage auction = auctions[_auctionId];
     require(!auction.ended, "Auction already ended");
     require(
       block.timestamp >= auction.auctionEndTime,
@@ -117,20 +134,42 @@ contract NFTAuctionMarketplace is Ownable {
       uint256 feeAmount = (auction.highestBid * commissionPercentage) / 100;
       uint256 total = auction.highestBid - feeAmount;
 
-      // Transfer commission to the contract owner
-      siliquaCoin.transferFrom(auction.highestBidder, owner(), feeAmount);
-
       // Transfer the remaining amount to the seller
-      siliquaCoin.transfer(auction.seller, total);
+      token.transfer(auction.seller, total);
+
+      // Update total commission earned
+      totalCommissionEarned += feeAmount;
 
       // Transfer NFT to the highest bidder
-      nftToken.safeTransfer(address(this), auction.highestBidder, tokenId, 1);
-      emit AuctionEnded(tokenId, auction.highestBidder, auction.highestBid);
+      nftToken.transferFrom(
+        address(this),
+        auction.highestBidder,
+        auction.tokenId,
+        auction.amount
+      );
+      emit AuctionEnded(
+        auction.auctionId,
+        auction.highestBidder,
+        auction.highestBid
+      );
     } else {
       // If no bids were placed, transfer the NFT back to the seller
-      nftToken.safeTransfer(address(this), auction.seller, tokenId, 1);
-      emit AuctionEnded(tokenId, address(0), 0);
+      nftToken.transferFrom(
+        address(this),
+        auction.seller,
+        auction.tokenId,
+        auction.amount
+      );
+      emit AuctionEnded(auction.auctionId, address(0), 0);
     }
+  }
+
+  function approveSeller(address seller) external onlyOwner {
+    nftToken.setApprovalForAll(seller, true);
+  }
+
+  function revokeSellerApproval(address seller) external onlyOwner {
+    nftToken.setApprovalForAll(seller, false);
   }
 
   function setNFTContract(address _nftContractAddress) external onlyOwner {
@@ -138,7 +177,7 @@ contract NFTAuctionMarketplace is Ownable {
   }
 
   function setSiliquaCoin(address _siliquaCoinAddress) external onlyOwner {
-    siliquaCoin = IERC20(_siliquaCoinAddress);
+    token = IERC20(_siliquaCoinAddress);
   }
 
   function updateCommissionPercentage(

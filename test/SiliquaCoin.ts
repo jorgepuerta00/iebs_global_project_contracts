@@ -31,7 +31,7 @@ describe('SiliquaCoin', () => {
     });
   });
 
-  describe('Transactions', () => {
+  describe('Transactions trasnfer', () => {
     it('Should transfer tokens between accounts', async () => {
       await siliquaCoin.transfer(await addr1.getAddress(), ethers.utils.parseEther('100'));
       const addr1Balance = await siliquaCoin.balanceOf(await addr1.getAddress());
@@ -46,7 +46,7 @@ describe('SiliquaCoin', () => {
       const initialOwnerBalance = await siliquaCoin.balanceOf(await owner.getAddress());
       await expect(
         siliquaCoin.connect(addr1).transfer(await owner.getAddress(), ethers.utils.parseEther('1'))
-      ).to.be.revertedWith('Insufficient balance');
+      ).to.be.revertedWith('ERC20: transfer amount exceeds balance');
 
       expect(await siliquaCoin.balanceOf(await owner.getAddress())).to.equal(initialOwnerBalance);
     });
@@ -68,7 +68,7 @@ describe('SiliquaCoin', () => {
     });
   });
 
-  describe('TransferFrom', () => {
+  describe('Transactions transferFrom', () => {
     it('Should allow approved spender to transfer tokens from owner', async () => {
       const amountToTransfer = ethers.utils.parseEther('50');
 
@@ -94,6 +94,22 @@ describe('SiliquaCoin', () => {
       expect(allowance).to.equal(0);
     });
 
+    it('Should revert if spender doesnt have allowance', async () => {
+      const amountToTransfer = ethers.utils.parseEther('60');
+
+      // owner transfiere 1000 tokens a addr1 de su cuenta
+      await siliquaCoin.connect(owner).transfer(await addr1.getAddress(), ethers.utils.parseEther('1000'));
+
+      // Intenta transferir 60 tokens, debería revertir
+      await expect(
+        siliquaCoin.connect(addr2).transferFrom(await addr1.getAddress(), await addr3.getAddress(), amountToTransfer)
+      ).to.be.revertedWith('ERC20: insufficient allowance');
+
+      // Verifica que el balance de addr3 sigue siendo 0
+      const addr3Balance = await siliquaCoin.balanceOf(await addr3.getAddress());
+      expect(addr3Balance).to.equal(0);
+    });
+
     it('Should revert if spender tries to transfer more tokens than allowed', async () => {
       const amountToTransfer = ethers.utils.parseEther('60');
 
@@ -106,7 +122,7 @@ describe('SiliquaCoin', () => {
       // Intenta transferir 60 tokens, debería revertir
       await expect(
         siliquaCoin.connect(addr2).transferFrom(await addr1.getAddress(), await addr3.getAddress(), amountToTransfer)
-      ).to.be.revertedWith('Insufficient allowance');
+      ).to.be.revertedWith('ERC20: insufficient allowance');
 
       // Verifica que el balance de addr3 sigue siendo 0
       const addr3Balance = await siliquaCoin.balanceOf(await addr3.getAddress());

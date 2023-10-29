@@ -2,16 +2,15 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "./GoTLandsNFT.sol";
+import "./SiliquaCoin.sol";
 
-contract NFTMarketplace is Ownable, ReentrancyGuard {
-  using SafeERC20 for IERC20;
-
-  GoTLandsNFT public nftContract;
-  IERC20 public siliquaCoinContract;
+contract NFTMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
+  GoTLandsNFT public nftToken;
+  SiliquaCoin public token;
   uint256 public commissionPercentage;
   uint256 public totalCommissionEarned;
 
@@ -25,7 +24,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
   }
 
   mapping(uint256 => Listing) public listings;
-  uint256 public nextListingId;
+  uint256 public listingId = 0;
 
   event NFTListed(
     uint256 indexed listingId,
@@ -55,13 +54,17 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
     string status
   );
 
+  event NFTContractUpdated(address indexed newNFTContractAddress);
+  event SiliquaCoinUpdated(address indexed newSiliquaCoinAddress);
+  event CommissionPercentageUpdated(uint256 newCommissionPercentage);
+
   constructor(
+    address _siliquaCoinAddress,
     address _nftContractAddress,
-    address _siliquaCoinContractAddress,
     uint256 _commissionPercentage
   ) {
-    nftContract = GoTLandsNFT(_nftContractAddress);
-    siliquaCoinContract = IERC20(_siliquaCoinContractAddress);
+    nftToken = GoTLandsNFT(_nftContractAddress);
+    token = SiliquaCoin(_siliquaCoinAddress);
     commissionPercentage = _commissionPercentage;
   }
 
@@ -71,28 +74,25 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
     uint256 _price
   ) external nonReentrant {
     require(
-      nftContract.ownerOf(_tokenId) == msg.sender,
+      nftToken.ownerOf(_tokenId) == msg.sender,
       "You don't own this token"
     );
     require(
-      nftContract.balanceOf(msg.sender, _tokenId) >= _amount,
+      nftToken.balanceOf(msg.sender, _tokenId) >= _amount,
       "Insufficient balance"
     );
 
     // Deduct commission from the listing price
     uint256 feeAmount = (_price * commissionPercentage) / 100;
 
-    // Transfer commission to the contract owner
-    siliquaCoinContract.safeTransferFrom(msg.sender, owner(), feeAmount);
+    // Transfer commission to the contract address
+    token.safeTransferFrom(msg.sender, address(this), feeAmount);
 
     // Transfer the NFT tokens to the contract
-    nftContract.safeTransfer(msg.sender, address(this), _tokenId, _amount);
+    nftToken.transferFrom(msg.sender, address(this), _tokenId, _amount);
 
     // Update total commission earned
     totalCommissionEarned += feeAmount;
-
-    uint256 listingId = nextListingId;
-    nextListingId++;
 
     listings[listingId] = Listing(
       listingId,
@@ -103,10 +103,11 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
       true
     );
     emit NFTListed(listingId, msg.sender, _tokenId, _amount, _price, "listed");
+    listingId++;
   }
 
   function cancelListing(uint256 _listingId) external nonReentrant {
-    require(_listingId < nextListingId, "Invalid listing ID");
+    require(_listingId < listingId, "Invalid listing ID");
     Listing storage listing = listings[_listingId];
     require(
       msg.sender == listing.seller,
@@ -115,7 +116,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
     require(listing.isActive, "Listing is not active");
 
     // Transfer the NFT tokens back to the seller
-    nftContract.safeTransfer(
+    nftToken.transferFrom(
       address(this),
       msg.sender,
       listing.tokenId,
@@ -137,25 +138,21 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
   }
 
   function purchaseNFT(uint256 _listingId) external nonReentrant {
-    require(_listingId < nextListingId, "ID doesn't exist");
+    require(_listingId < listingId, "ID doesn't exist");
     Listing storage listing = listings[_listingId];
     require(listing.isActive, "Listing is not active");
-    require(
-      siliquaCoinContract.balanceOf(msg.sender) >= listing.price,
-      "Insufficient funds"
-    );
 
     // Calculate commission amount
     uint256 feeAmount = (listing.price * commissionPercentage) / 100;
-    uint256 total = listing.price - feeAmount;
 
     // Transfer the remaining amount to the seller
-    siliquaCoinContract.safeTransferFrom(msg.sender, listing.seller, total);
+    token.safeTransferFrom(msg.sender, listing.seller, listing.price);
+    token.safeTransfer(address(this), feeAmount);
 
     // Update total commission earned
     totalCommissionEarned += feeAmount;
 
-    nftContract.safeTransfer(
+    nftToken.transferFrom(
       address(this),
       msg.sender,
       listing.tokenId,
@@ -180,7 +177,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
     returns (Listing[] memory activeListings)
   {
     uint256 activeListingCount = 0;
-    for (uint256 i = 0; i < nextListingId; i++) {
+    for (uint256 i = 0; i < listingId; i++) {
       if (listings[i].isActive) {
         activeListingCount++;
       }
@@ -188,7 +185,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
 
     activeListings = new Listing[](activeListingCount);
     uint256 currentIndex = 0;
-    for (uint256 i = 0; i < nextListingId; i++) {
+    for (uint256 i = 0; i < listingId; i++) {
       if (listings[i].isActive) {
         activeListings[currentIndex] = listings[i];
         currentIndex++;
@@ -198,12 +195,22 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
     return activeListings;
   }
 
-  function setNFTContract(address _nftContractAddress) external onlyOwner {
-    nftContract = GoTLandsNFT(_nftContractAddress);
+  function approveSeller(address seller) external onlyOwner {
+    nftToken.setApprovalForAll(seller, true);
   }
 
-  function setSiliquaCoin(address _siliquaCoinAddress) external onlyOwner {
-    siliquaCoinContract = IERC20(_siliquaCoinAddress);
+  function revokeSellerApproval(address seller) external onlyOwner {
+    nftToken.setApprovalForAll(seller, false);
+  }
+
+  function setNFTContract(address _nftContractAddress) external onlyOwner {
+    nftToken = GoTLandsNFT(_nftContractAddress);
+    emit NFTContractUpdated(_nftContractAddress);
+  }
+
+  function siliquaCoinContract(address _siliquaCoinAddress) external onlyOwner {
+    token = SiliquaCoin(_siliquaCoinAddress);
+    emit SiliquaCoinUpdated(_siliquaCoinAddress);
   }
 
   function updateCommissionPercentage(
@@ -212,5 +219,6 @@ contract NFTMarketplace is Ownable, ReentrancyGuard {
     // Ensure the commission percentage is within a valid range
     require(_newCommissionPercentage <= 100, "Invalid commission percentage");
     commissionPercentage = _newCommissionPercentage;
+    emit CommissionPercentageUpdated(_newCommissionPercentage);
   }
 }

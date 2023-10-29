@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ContractFactory, Signer } from 'ethers';
+import { BigNumber, ContractFactory, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import { GoTLandsNFT } from '../typechain';
 
@@ -63,14 +63,95 @@ describe('GoTLandsNFT', () => {
 
   describe('Token Transfers', () => {
     it('Should allow token transfers between accounts', async () => {
-      await gotLandsNFT.connect(owner).safeTransferFrom(await owner.getAddress(), await addr1.getAddress(), 1, 100, "0x00");
+      await gotLandsNFT.connect(owner).transferFrom(await owner.getAddress(), await addr1.getAddress(), 1, 100);
       expect(await gotLandsNFT.balanceOf(await addr1.getAddress(), 1)).to.equal(100);
     });
 
     it('Should revert if sender doesn’t have enough tokens', async () => {
       await expect(
-        gotLandsNFT.connect(addr1).safeTransferFrom(await addr1.getAddress(), await addr2.getAddress(), 1, 500, "0x00")
+        gotLandsNFT.connect(addr1).transferFrom(await addr1.getAddress(), await addr2.getAddress(), 1, 500)
       ).to.be.revertedWith('ERC1155: insufficient balance for transfer');
+    });
+  });
+
+  describe('Mint Batch', () => {
+    it('Should allow owner to mint batch of tokens', async () => {
+      await gotLandsNFT.connect(owner).mintBatch(await addr1.getAddress(), [1, 2, 3], [100, 200, 300]);
+      const balances = await gotLandsNFT.balanceOfBatch([
+        await addr1.getAddress(),
+        await addr1.getAddress(),
+        await addr1.getAddress()
+      ], [1, 2, 3]);
+      // Convert BigNumber instances to regular numbers for comparison
+      const balancesAsNumbers = balances.map((balance: BigNumber) => balance.toNumber());
+      expect(balancesAsNumbers).to.deep.equal([100, 200, 300]);
+    });
+
+
+    it('Should revert if non-owner tries to mint batch', async () => {
+      await expect(gotLandsNFT.connect(addr1).mintBatch(await addr2.getAddress(), [1, 2], [50, 50])).to.be.revertedWith(
+        'Ownable: caller is not the owner'
+      );
+    });
+  });
+
+  describe('Safe Batch Token Transfers', () => {
+    it('Should allow safe batch token transfers between accounts', async () => {
+      await gotLandsNFT.connect(owner).batchTransferFrom(
+        await owner.getAddress(),
+        await addr1.getAddress(),
+        [1, 2, 3],
+        [100, 200, 300]
+      );
+      const balances = await gotLandsNFT.balanceOfBatch([
+        await addr1.getAddress(),
+        await addr1.getAddress(),
+        await addr1.getAddress()
+      ], [1, 2, 3]);
+      // Convert BigNumber instances to regular numbers for comparison
+      const balancesAsNumbers = balances.map((balance: BigNumber) => balance.toNumber());
+      expect(balancesAsNumbers).to.deep.equal([100, 200, 300]);
+    });
+
+    it('Should revert if sender doesn’t have enough tokens for batch transfer', async () => {
+      await expect(
+        gotLandsNFT.connect(addr1).batchTransferFrom(
+          await addr1.getAddress(),
+          await addr2.getAddress(),
+          [1, 2],
+          [500, 500]
+        )
+      ).to.be.revertedWith('ERC1155: insufficient balance for transfer');
+    });
+  });
+
+  describe('OwnerOf', () => {
+    it('Should return correct owner of a token', async () => {
+      const tokenId = 1;
+      await gotLandsNFT.connect(owner).mint(await addr1.getAddress(), tokenId, 1000);
+      const tokenOwner = await gotLandsNFT.ownerOf(tokenId);
+      expect(tokenOwner).to.equal(await addr1.getAddress());
+    });
+  });
+
+  describe('Safe Transfer', () => {
+    it('Should allow safe transfer of a token', async () => {
+      const tokenId = 1;
+      await gotLandsNFT.connect(owner).transferFrom(await owner.getAddress(), await addr1.getAddress(), tokenId, 1);
+      const balance = await gotLandsNFT.balanceOf(await addr1.getAddress(), tokenId);
+      expect(balance).to.equal(1);
+    });
+
+    it('Should revert if sender is not the owner or approved', async () => {
+      const tokenId = 1;
+
+      // Mint tokens to addr1 so that it has a sufficient balance
+      await gotLandsNFT.connect(owner).mint(await addr1.getAddress(), tokenId, 1);
+
+      // Attempt to transfer the token from addr1 to addr2
+      await expect(
+        gotLandsNFT.connect(owner).transferFrom(await addr1.getAddress(), await addr2.getAddress(), tokenId, 1)
+      ).to.be.revertedWith('ERC1155: caller is not token owner or approved');
     });
   });
 });
