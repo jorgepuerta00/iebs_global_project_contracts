@@ -19,7 +19,8 @@ describe('GoTLandsNFT', () => {
 
   describe('Deployment', () => {
     it('Should set the correct URI for token metadata', async () => {
-      expect(await gotLandsNFT.uri(0)).to.equal('https://westeros.example/api/land/{id}.json');
+      expect(await gotLandsNFT.uri(0)).to.equal('ipfs://QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/0.json');
+      expect(await gotLandsNFT.uri(1)).to.equal('ipfs://QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/1.json');
     });
 
     it('Should mint initial supply of tokens', async () => {
@@ -50,12 +51,12 @@ describe('GoTLandsNFT', () => {
 
   describe('URI Update', () => {
     it('Should allow owner to update token URI', async () => {
-      await gotLandsNFT.connect(owner).setURI('https://new.example.com/api/land/{id}.json');
-      expect(await gotLandsNFT.uri(0)).to.equal('https://new.example.com/api/land/{id}.json');
+      await gotLandsNFT.connect(owner).setURI('ipfs://QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/{id}.json');
+      expect(await gotLandsNFT.uri(0)).to.equal('ipfs://QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/0.json');
     });
 
     it('Should revert if non-owner tries to update URI', async () => {
-      await expect(gotLandsNFT.connect(addr1).setURI('https://new.example.com/api/land/{id}.json')).to.be.revertedWith(
+      await expect(gotLandsNFT.connect(addr1).setURI('ipfs://QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/{id}.json')).to.be.revertedWith(
         'Ownable: caller is not the owner'
       );
     });
