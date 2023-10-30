@@ -22,7 +22,7 @@ describe('NFTMarketplace', () => {
 
     // Deploy the GoTLandsNFT token
     const GoTLandsNFT = await ethers.getContractFactory('GoTLandsNFT');
-    gotLandsNFT = await GoTLandsNFT.deploy('game of thrones');
+    gotLandsNFT = await GoTLandsNFT.deploy();
     await gotLandsNFT.deployed();
 
     // Deploy the NFTMarketplace contract

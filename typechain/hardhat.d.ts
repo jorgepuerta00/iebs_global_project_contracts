@@ -121,6 +121,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.NFTMarketplace__factory>;
     getContractFactory(
+      name: "ISiliquaCoin",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ISiliquaCoin__factory>;
+    getContractFactory(
       name: "SiliquaCoin",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SiliquaCoin__factory>;
@@ -260,6 +264,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.NFTMarketplace>;
+    getContractAt(
+      name: "ISiliquaCoin",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ISiliquaCoin>;
     getContractAt(
       name: "SiliquaCoin",
       address: string,

@@ -28,6 +28,7 @@ export type { ArtNFT } from "./ArtNFT";
 export type { GoTLandsNFT } from "./GoTLandsNFT";
 export type { NFTAuctionMarketplace } from "./NFTAuctionMarketplace";
 export type { NFTMarketplace } from "./NFTMarketplace";
+export type { ISiliquaCoin } from "./ISiliquaCoin";
 export type { SiliquaCoin } from "./SiliquaCoin";
 
 export { Ownable__factory } from "./factories/Ownable__factory";
@@ -57,4 +58,5 @@ export { ArtNFT__factory } from "./factories/ArtNFT__factory";
 export { GoTLandsNFT__factory } from "./factories/GoTLandsNFT__factory";
 export { NFTAuctionMarketplace__factory } from "./factories/NFTAuctionMarketplace__factory";
 export { NFTMarketplace__factory } from "./factories/NFTMarketplace__factory";
+export { ISiliquaCoin__factory } from "./factories/ISiliquaCoin__factory";
 export { SiliquaCoin__factory } from "./factories/SiliquaCoin__factory";

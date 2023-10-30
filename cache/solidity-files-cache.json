@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/SiliquaCoin.sol": {
-      "lastModificationDate": 1698588035772,
-      "contentHash": "cf4097093ad08ab7c05fd312b635f775",
+      "lastModificationDate": 1698680900287,
+      "contentHash": "c846a81fc3a2270cd6d05ce219ba90ee",
       "sourceName": "contracts/SiliquaCoin.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -40,6 +40,7 @@
         "^0.8.20"
       ],
       "artifacts": [
+        "ISiliquaCoin",
         "SiliquaCoin"
       ]
     },
@@ -306,8 +307,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/NFTMarketplace.sol": {
-      "lastModificationDate": 1698597103820,
-      "contentHash": "27bda14e5750e104821c43198cd40e0c",
+      "lastModificationDate": 1698680915419,
+      "contentHash": "81a44956f94691e2e32966ae2bd70d4b",
       "sourceName": "contracts/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1075,8 +1076,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/GoTLandsNFT.sol": {
-      "lastModificationDate": 1698587131652,
-      "contentHash": "401765ff416e47e3cc4ecf93b4d15b40",
+      "lastModificationDate": 1698680356669,
+      "contentHash": "3f71cb4739b8b682238dd011a5ee1bc3",
       "sourceName": "contracts/GoTLandsNFT.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1379,8 +1380,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1698599118742,
-      "contentHash": "d23dcc7920733a7cf948ec26f56ecf3e",
+      "lastModificationDate": 1698680972443,
+      "contentHash": "1ecc673fe7596440eafaf9526fdd4510",
       "sourceName": "contracts/NFTAuctionMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1410,7 +1411,8 @@
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
-        "./GoTLandsNFT.sol"
+        "./GoTLandsNFT.sol",
+        "./SiliquaCoin.sol"
       ],
       "versionPragmas": [
         "^0.8.20"

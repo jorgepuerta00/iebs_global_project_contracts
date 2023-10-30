@@ -27,7 +27,7 @@ async function main() {
 
   // Desplegamos el contrato GoTLandsNFT
   console.log('Desplegando GoTLandsNFT...');
-  const gotLandsNFT = await GoTLandsNFT.deploy('game of thrones');
+  const gotLandsNFT = await GoTLandsNFT.deploy();
   await gotLandsNFT.deployed();
   console.log('GoTLandsNFT desplegado en:', gotLandsNFT.address);
 

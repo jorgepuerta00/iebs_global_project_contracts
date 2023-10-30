@@ -5,10 +5,11 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "./GoTLandsNFT.sol";
+import "./SiliquaCoin.sol";
 
 contract NFTAuctionMarketplace is Ownable, ERC1155Holder {
   GoTLandsNFT public nftToken;
-  IERC20 public token;
+  ISiliquaCoin public token;
   uint256 public commissionPercentage;
   uint256 public totalCommissionEarned;
 
@@ -54,7 +55,7 @@ contract NFTAuctionMarketplace is Ownable, ERC1155Holder {
     uint256 _commissionPercentage
   ) {
     nftToken = GoTLandsNFT(_nftContractAddress);
-    token = IERC20(_siliquaCoinContractAddress);
+    token = ISiliquaCoin(_siliquaCoinContractAddress);
     commissionPercentage = _commissionPercentage;
   }
 
@@ -108,11 +109,11 @@ contract NFTAuctionMarketplace is Ownable, ERC1155Holder {
 
     // Refund the previous highest bidder
     if (auction.highestBidder != address(0)) {
-      token.transfer(auction.highestBidder, auction.highestBid);
+      token.safeTransfer(auction.highestBidder, auction.highestBid);
     }
 
     // Place the new bid
-    token.transferFrom(msg.sender, address(this), bidAmount);
+    token.safeTransferFrom(msg.sender, address(this), bidAmount);
     auction.highestBid = bidAmount;
     auction.highestBidder = msg.sender;
 
@@ -135,7 +136,7 @@ contract NFTAuctionMarketplace is Ownable, ERC1155Holder {
       uint256 total = auction.highestBid - feeAmount;
 
       // Transfer the remaining amount to the seller
-      token.transfer(auction.seller, total);
+      token.safeTransfer(auction.seller, total);
 
       // Update total commission earned
       totalCommissionEarned += feeAmount;
@@ -177,7 +178,7 @@ contract NFTAuctionMarketplace is Ownable, ERC1155Holder {
   }
 
   function setSiliquaCoin(address _siliquaCoinAddress) external onlyOwner {
-    token = IERC20(_siliquaCoinAddress);
+    token = ISiliquaCoin(_siliquaCoinAddress);
   }
 
   function updateCommissionPercentage(

@@ -13,7 +13,7 @@ describe('GoTLandsNFT', () => {
   beforeEach(async () => {
     [owner, addr1, addr2] = await ethers.getSigners();
     GoTLandsNFT = await ethers.getContractFactory('GoTLandsNFT');
-    gotLandsNFT = (await GoTLandsNFT.deploy('')) as GoTLandsNFT;
+    gotLandsNFT = (await GoTLandsNFT.deploy()) as GoTLandsNFT;
     await gotLandsNFT.deployed();
   });
 

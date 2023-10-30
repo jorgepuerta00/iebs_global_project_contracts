@@ -33,7 +33,6 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
     "batchTransferFrom(address,address,uint256[],uint256[])": FunctionFragment;
-    "collectionName()": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "mint(address,uint256,uint256)": FunctionFragment;
     "mintBatch(address,uint256[],uint256[])": FunctionFragment;
@@ -85,10 +84,6 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "batchTransferFrom",
     values: [string, string, BigNumberish[], BigNumberish[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "collectionName",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -169,10 +164,6 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "batchTransferFrom",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "collectionName",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -347,8 +338,6 @@ export class GoTLandsNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    collectionName(overrides?: CallOverrides): Promise<[string]>;
-
     isApprovedForAll(
       account: string,
       operator: string,
@@ -465,8 +454,6 @@ export class GoTLandsNFT extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  collectionName(overrides?: CallOverrides): Promise<string>;
-
   isApprovedForAll(
     account: string,
     operator: string,
@@ -582,8 +569,6 @@ export class GoTLandsNFT extends BaseContract {
       amount: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
-
-    collectionName(overrides?: CallOverrides): Promise<string>;
 
     isApprovedForAll(
       account: string,
@@ -811,8 +796,6 @@ export class GoTLandsNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    collectionName(overrides?: CallOverrides): Promise<BigNumber>;
-
     isApprovedForAll(
       account: string,
       operator: string,
@@ -929,8 +912,6 @@ export class GoTLandsNFT extends BaseContract {
       amount: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    collectionName(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isApprovedForAll(
       account: string,

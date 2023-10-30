@@ -7,6 +7,16 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+interface ISiliquaCoin {
+  function safeTransfer(address to, uint256 value) external returns (bool);
+
+  function safeTransferFrom(
+    address from,
+    address to,
+    uint256 value
+  ) external returns (bool);
+}
+
 contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
   using SafeERC20 for IERC20;
 
@@ -29,19 +39,15 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
   }
 
   // exchange eth for tokens
-  /*
   receive() external payable {
     // Calculate the amount of tokens to mint based on the ETH sent
     uint256 ethAmount = msg.value;
     uint256 tokenAmount = ethAmount * TOKEN_TO_ETH_RATE;
     // Mint tokens and send them to the buyer
-    //_mint(msg.sender, tokenAmount);
-    // transfer tokens and send them to the buyer
-    safeTransfer(msg.sender, tokenAmount);
+    _mint(msg.sender, tokenAmount);
     // Emit event
     emit TokensPurchased(msg.sender, ethAmount, tokenAmount);
   }
-  */
 
   // Mint tokens to an address (only callable by the owner)
   function mint(address to, uint256 amount) external onlyOwner {

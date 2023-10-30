@@ -4,9 +4,9 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract GoTLandsNFT is ERC1155, Ownable {
-  string public collectionName;
   mapping(uint256 => address) private _tokenOwners;
 
   uint256 public constant WESTEROS = 0;
@@ -19,20 +19,18 @@ contract GoTLandsNFT is ERC1155, Ownable {
   uint256 public constant THE_REACH = 7;
   uint256 public constant KINGS_LANDING = 8;
 
-  constructor(
-    string memory _collectionName
-  ) ERC1155("https://westeros.example/api/land/{id}.json") {
-    collectionName = _collectionName;
-
-    _mint(msg.sender, WESTEROS, 1, "");
-    _mint(msg.sender, THE_NORTH, 5000, "");
-    _mint(msg.sender, THE_VALE, 20000, "");
-    _mint(msg.sender, THE_IRON_ISLANDS, 50000, "");
-    _mint(msg.sender, THE_RIVERLANDS, 80000, "");
-    _mint(msg.sender, THE_WESTERLANDS, 2000, "");
-    _mint(msg.sender, THE_STORMLANDS, 30000, "");
-    _mint(msg.sender, THE_REACH, 3000, "");
-    _mint(msg.sender, KINGS_LANDING, 10, "");
+  constructor()
+    ERC1155("ipfs://QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/{id}.json")
+  {
+    mint(msg.sender, WESTEROS, 1);
+    mint(msg.sender, THE_NORTH, 5000);
+    mint(msg.sender, THE_VALE, 20000);
+    mint(msg.sender, THE_IRON_ISLANDS, 50000);
+    mint(msg.sender, THE_RIVERLANDS, 80000);
+    mint(msg.sender, THE_WESTERLANDS, 2000);
+    mint(msg.sender, THE_STORMLANDS, 30000);
+    mint(msg.sender, THE_REACH, 3000);
+    mint(msg.sender, KINGS_LANDING, 10);
   }
 
   // get the owner of a token
@@ -58,6 +56,18 @@ contract GoTLandsNFT is ERC1155, Ownable {
   // set the URI for all token types
   function setURI(string memory newURI) external onlyOwner {
     _setURI(newURI);
+  }
+
+  // set the URI for a token type
+  function uri(uint256 _tokenId) public pure override returns (string memory) {
+    return
+      string(
+        abi.encodePacked(
+          "ipfs://QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/",
+          Strings.toString(_tokenId),
+          ".json"
+        )
+      );
   }
 
   // safe transfer tokens

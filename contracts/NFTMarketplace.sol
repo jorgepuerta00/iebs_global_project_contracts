@@ -10,7 +10,7 @@ import "./SiliquaCoin.sol";
 
 contract NFTMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
   GoTLandsNFT public nftToken;
-  SiliquaCoin public token;
+  ISiliquaCoin public token;
   uint256 public commissionPercentage;
   uint256 public totalCommissionEarned;
 
@@ -64,7 +64,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
     uint256 _commissionPercentage
   ) {
     nftToken = GoTLandsNFT(_nftContractAddress);
-    token = SiliquaCoin(_siliquaCoinAddress);
+    token = ISiliquaCoin(_siliquaCoinAddress);
     commissionPercentage = _commissionPercentage;
   }
 
@@ -209,7 +209,7 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
   }
 
   function siliquaCoinContract(address _siliquaCoinAddress) external onlyOwner {
-    token = SiliquaCoin(_siliquaCoinAddress);
+    token = ISiliquaCoin(_siliquaCoinAddress);
     emit SiliquaCoinUpdated(_siliquaCoinAddress);
   }
 
