@@ -126,15 +126,6 @@ describe('GoTLandsNFT', () => {
     });
   });
 
-  describe('OwnerOf', () => {
-    it('Should return correct owner of a token', async () => {
-      const tokenId = 1;
-      await gotLandsNFT.connect(owner).mint(await addr1.getAddress(), tokenId, 1000);
-      const tokenOwner = await gotLandsNFT.ownerOf(tokenId);
-      expect(tokenOwner).to.equal(await addr1.getAddress());
-    });
-  });
-
   describe('Safe Transfer', () => {
     it('Should allow safe transfer of a token', async () => {
       const tokenId = 1;

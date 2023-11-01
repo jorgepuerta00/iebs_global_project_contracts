@@ -37,7 +37,6 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
     "mint(address,uint256,uint256)": FunctionFragment;
     "mintBatch(address,uint256[],uint256[])": FunctionFragment;
     "owner()": FunctionFragment;
-    "ownerOf(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
@@ -98,10 +97,6 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
     values: [string, BigNumberish[], BigNumberish[]]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "ownerOf",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
@@ -173,7 +168,6 @@ interface GoTLandsNFTInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mintBatch", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -360,8 +354,6 @@ export class GoTLandsNFT extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
-    ownerOf(id: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
-
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -476,8 +468,6 @@ export class GoTLandsNFT extends BaseContract {
 
   owner(overrides?: CallOverrides): Promise<string>;
 
-  ownerOf(id: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -591,8 +581,6 @@ export class GoTLandsNFT extends BaseContract {
     ): Promise<void>;
 
     owner(overrides?: CallOverrides): Promise<string>;
-
-    ownerOf(id: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
@@ -818,8 +806,6 @@ export class GoTLandsNFT extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    ownerOf(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -934,11 +920,6 @@ export class GoTLandsNFT extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    ownerOf(
-      id: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
