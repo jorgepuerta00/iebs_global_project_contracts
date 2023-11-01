@@ -20,7 +20,9 @@ contract GoTLandsNFT is ERC1155, Ownable {
   uint256 public constant KINGS_LANDING = 8;
 
   constructor()
-    ERC1155("ipfs://QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/{id}.json")
+    ERC1155(
+      "https://sapphire-random-bandicoot-179.mypinata.cloud/ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/{id}.json"
+    )
   {
     mint(msg.sender, WESTEROS, 1);
     mint(msg.sender, THE_NORTH, 5000);
@@ -63,7 +65,7 @@ contract GoTLandsNFT is ERC1155, Ownable {
     return
       string(
         abi.encodePacked(
-          "ipfs://QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/",
+          "https://sapphire-random-bandicoot-179.mypinata.cloud/ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/",
           Strings.toString(_tokenId),
           ".json"
         )

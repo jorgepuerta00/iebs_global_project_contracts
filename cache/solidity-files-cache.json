@@ -462,7 +462,7 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/ArtNFT.sol": {
-      "lastModificationDate": 1698272248028,
+      "lastModificationDate": 1698855979982,
       "contentHash": "d2d1b59c69f966a2880b884f1323eeae",
       "sourceName": "contracts/ArtNFT.sol",
       "solcConfig": {
@@ -1076,8 +1076,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/GoTLandsNFT.sol": {
-      "lastModificationDate": 1698682442231,
-      "contentHash": "2b3c36db1965c630ea623488d350a0c2",
+      "lastModificationDate": 1698855243408,
+      "contentHash": "8e9e8f7cc414792bf7a241a12cfbf611",
       "sourceName": "contracts/GoTLandsNFT.sol",
       "solcConfig": {
         "version": "0.8.21",
