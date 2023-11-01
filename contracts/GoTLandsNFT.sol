@@ -7,8 +7,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract GoTLandsNFT is ERC1155, Ownable {
-  mapping(uint256 => address) private _tokenOwners;
-
   uint256 public constant WESTEROS = 0;
   uint256 public constant THE_NORTH = 1;
   uint256 public constant THE_VALE = 2;
@@ -35,15 +33,9 @@ contract GoTLandsNFT is ERC1155, Ownable {
     mint(msg.sender, KINGS_LANDING, 10);
   }
 
-  // get the owner of a token
-  function ownerOf(uint256 id) public view returns (address) {
-    return _tokenOwners[id];
-  }
-
   // mint tokens to an address (only callable by the owner)
   function mint(address account, uint256 id, uint256 amount) public onlyOwner {
     _mint(account, id, amount, "");
-    _tokenOwners[id] = account;
   }
 
   // mintbatch tokens to an address (only callable by the owner)

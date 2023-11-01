@@ -74,10 +74,6 @@ contract NFTMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
     uint256 _price
   ) external nonReentrant {
     require(
-      nftToken.ownerOf(_tokenId) == msg.sender,
-      "You don't own this token"
-    );
-    require(
       nftToken.balanceOf(msg.sender, _tokenId) >= _amount,
       "Insufficient balance"
     );

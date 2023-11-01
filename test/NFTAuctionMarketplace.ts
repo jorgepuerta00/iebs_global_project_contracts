@@ -83,7 +83,7 @@ describe('NFTAuctionMarketplace', () => {
 
       // Attempt to create an auction without owning the token
       await expect(marketplace.connect(bidder1).createAuction(tokenId, amount, startingPrice, auctionDuration))
-        .to.be.revertedWith("You don't own this token");
+        .to.be.revertedWith("Insufficient balance");
     });
 
     it('should revert if seller does not have sufficient balance of the token', async () => {

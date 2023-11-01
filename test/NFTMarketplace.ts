@@ -74,7 +74,7 @@ describe('NFTMarketplace', () => {
       await gotLandsNFT.connect(addr1).setApprovalForAll(marketplace.address, true);
 
       // Try to list the NFT from a different address
-      await expect(marketplace.connect(addr1).listNFT(1, 1, 150)).to.be.revertedWith("You don't own this token");
+      await expect(marketplace.connect(addr1).listNFT(1, 1, 150)).to.be.revertedWith("Insufficient balance");
 
       // Ensure there are no active listings
       const activeListings = await marketplace.getActiveListings();

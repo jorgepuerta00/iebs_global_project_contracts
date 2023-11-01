@@ -66,10 +66,6 @@ contract NFTAuctionMarketplace is Ownable, ERC1155Holder {
     uint256 duration
   ) external {
     require(
-      nftToken.ownerOf(tokenId) == msg.sender,
-      "You don't own this token"
-    );
-    require(
       nftToken.balanceOf(msg.sender, tokenId) >= amount,
       "Insufficient balance"
     );

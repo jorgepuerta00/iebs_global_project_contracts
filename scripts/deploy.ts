@@ -15,7 +15,7 @@ async function main() {
 
   // Desplegamos el contrato Token
   console.log('Desplegando SiliquaCoin...');
-  const siliquaCoin = await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('100000000000000'));
+  const siliquaCoin = await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('10000000'));
   await siliquaCoin.deployed();
   console.log('SiliquaCoin desplegado en:', siliquaCoin.address);
 
