@@ -56,14 +56,13 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
 
   // Claim tokens from the faucet
   function claimTokens() external {
-    uint256 amount = 100 * (10 ** decimals()); // 100 tokens
+    uint256 amount = 100; // 100 tokens
     uint256 oneDay = 1 days;
 
     require(
       lastClaimedTimestamp[msg.sender] + oneDay <= block.timestamp,
       "You can claim tokens once per day"
     );
-    require(balanceOf(address(this)) >= amount, "Faucet out of tokens");
 
     _mint(msg.sender, amount);
 

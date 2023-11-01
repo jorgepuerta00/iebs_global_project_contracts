@@ -151,4 +151,37 @@ describe('SiliquaCoin', () => {
     });
   });
 
+  describe('Claim Tokens', () => {
+    it('Should allow user to claim tokens', async () => {
+      // get user initial balance
+      const initialBalance = await siliquaCoin.balanceOf(await addr1.getAddress());
+
+      // increase time by 1 day
+      await ethers.provider.send('evm_increaseTime', [24 * 60 * 60]); // 24 horas
+
+      // claim tokens
+      await siliquaCoin.connect(addr1).claimTokens();
+
+      // validate user balance has increased by 100 tokens
+      const addr1BalanceAfterClaim = await siliquaCoin.balanceOf(await addr1.getAddress());
+      const claimedTokens = 100;
+      expect(addr1BalanceAfterClaim).to.equal(initialBalance.add(claimedTokens));
+    });
+
+    it("Shouldn't allow user to claim tokens before 1 day", async () => {
+      // claim tokens
+      await siliquaCoin.connect(addr1).claimTokens();
+
+      // get user initial balance
+      const initialBalance = await siliquaCoin.balanceOf(await addr1.getAddress());
+
+      // claim tokens again, should revert
+      await expect(siliquaCoin.connect(addr1).claimTokens()).to.be.revertedWith('You can claim tokens once per day');
+
+      // validate user balance hasn't changed
+      const addr1BalanceAfterFailedClaim = await siliquaCoin.balanceOf(await addr1.getAddress());
+      expect(addr1BalanceAfterFailedClaim).to.equal(initialBalance);
+    });
+  });
+
 });
