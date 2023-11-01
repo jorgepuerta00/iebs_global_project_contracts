@@ -130,4 +130,25 @@ describe('SiliquaCoin', () => {
     });
   });
 
+  describe('Receive Ether', () => {
+    it('SiliquaCoin should receive 0.5 ETH and mint 0.25 SiliquaCoin to addr3 address', async () => {
+      const initialBalance = await siliquaCoin.balanceOf(await addr3.getAddress());
+      expect(initialBalance).to.equal(0);
+
+      // send 100 ETH to the contract
+      await addr3.sendTransaction({
+        to: siliquaCoin.address,
+        value: ethers.utils.parseEther('0.5')
+      });
+
+      // validate contract balance is 100 ETH
+      const contractBalance = await ethers.provider.getBalance(siliquaCoin.address);
+      expect(contractBalance).to.equal(ethers.utils.parseEther('0.5'));
+
+      // validate addr3 balance is initial balance + 50 SiliquaCoin
+      const finalBalance = await siliquaCoin.balanceOf(await addr3.getAddress());
+      expect(finalBalance).to.equal(initialBalance.add(ethers.utils.parseEther('500')));
+    });
+  });
+
 });

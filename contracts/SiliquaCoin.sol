@@ -20,7 +20,7 @@ interface ISiliquaCoin {
 contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
   using SafeERC20 for IERC20;
 
-  uint256 public constant TOKEN_TO_ETH_RATE = 500000000000000000; // 0.5 ETH in wei
+  uint256 public constant TOKEN_TO_ETH_RATE = 1000; // 1 ETH = 1000 SiliquaCoin
 
   mapping(address => uint256) public lastClaimedTimestamp; // Timestamp of the last time the faucet was claimed by an address
 
@@ -65,8 +65,7 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
     );
     require(balanceOf(address(this)) >= amount, "Faucet out of tokens");
 
-    // Use SafeERC20 to safely transfer tokens
-    safeTransfer(msg.sender, amount);
+    _mint(msg.sender, amount);
 
     lastClaimedTimestamp[msg.sender] = block.timestamp;
   }
