@@ -54,9 +54,9 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
     _mint(to, amount);
   }
 
-  // Claim tokens from the faucet
+  // Claim 1 token from the faucet
   function claimTokens() external {
-    uint256 amount = 100; // 100 tokens
+    uint256 amount = 1 * (10 ** decimals()); // 1 token in native units
     uint256 oneDay = 1 days;
 
     require(

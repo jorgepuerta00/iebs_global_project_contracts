@@ -34,7 +34,7 @@ const config: HardhatUserConfig = {
     }
   },
   networks: {
-    localhost: {
+    ganache: {
       url: LOCALHOST_GANACHE_TESTNET_RPC,
       chainId: chainIds.eth_ganache_id,
       accounts: GANACHE_SIGNER_PRIVATE_KEY !== undefined ? [GANACHE_SIGNER_PRIVATE_KEY] : [],
@@ -58,6 +58,9 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 0
+  },
+  paths: {
+    artifacts: "./src/artifacts",
   }
 };
 

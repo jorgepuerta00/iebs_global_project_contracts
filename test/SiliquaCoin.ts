@@ -164,8 +164,7 @@ describe('SiliquaCoin', () => {
 
       // validate user balance has increased by 100 tokens
       const addr1BalanceAfterClaim = await siliquaCoin.balanceOf(await addr1.getAddress());
-      const claimedTokens = 100;
-      expect(addr1BalanceAfterClaim).to.equal(initialBalance.add(claimedTokens));
+      expect(addr1BalanceAfterClaim).to.equal(initialBalance.add(ethers.utils.parseEther('1')));
     });
 
     it("Shouldn't allow user to claim tokens before 1 day", async () => {

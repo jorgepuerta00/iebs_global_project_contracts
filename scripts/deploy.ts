@@ -15,31 +15,31 @@ async function main() {
 
   // Desplegamos el contrato Token
   console.log('Desplegando SiliquaCoin...');
-  const siliquaCoin = await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('10000000'));
+  const siliquaCoin = await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('100000000'));
   await siliquaCoin.deployed();
   console.log('SiliquaCoin desplegado en:', siliquaCoin.address);
 
   // Desplegamos el contrato ArtNFT
-  console.log('Desplegando ArtNFT...');
-  const artNFT = await ArtNFT.deploy();
-  await artNFT.deployed();
-  console.log('ArtNFT desplegado en:', artNFT.address);
+  //console.log('Desplegando ArtNFT...');
+  //const artNFT = await ArtNFT.deploy();
+  //await artNFT.deployed();
+  //console.log('ArtNFT desplegado en:', artNFT.address);
 
   // Desplegamos el contrato GoTLandsNFT
-  console.log('Desplegando GoTLandsNFT...');
-  const gotLandsNFT = await GoTLandsNFT.deploy();
-  await gotLandsNFT.deployed();
-  console.log('GoTLandsNFT desplegado en:', gotLandsNFT.address);
+  //console.log('Desplegando GoTLandsNFT...');
+  //const gotLandsNFT = await GoTLandsNFT.deploy();
+  //await gotLandsNFT.deployed();
+  //console.log('GoTLandsNFT desplegado en:', gotLandsNFT.address);
 
   // Desplegamos el contrato NFTMarketplace, pasando las direcciones de los contratos necesarios como argumentos al constructor
-  console.log('Desplegando NFTMarketplace...');
-  const marketplace = await NFTMarketplace.deploy(siliquaCoin.address, gotLandsNFT.address, 1);
-  await marketplace.deployed();
-  console.log('NFTMarketplace desplegado en:', marketplace.address);
+  //console.log('Desplegando NFTMarketplace...');
+  //const marketplace = await NFTMarketplace.deploy(siliquaCoin.address, gotLandsNFT.address, 1);
+  //await marketplace.deployed();
+  //console.log('NFTMarketplace desplegado en:', marketplace.address);
 
   // Aprobamos el contrato de mercado para gastar los NFT del propietario
-  await artNFT.connect(deployer).setApprovalForAll(marketplace.address, true);
-  await gotLandsNFT.connect(deployer).setApprovalForAll(marketplace.address, true);
+  //await artNFT.connect(deployer).setApprovalForAll(marketplace.address, true);
+  //await gotLandsNFT.connect(deployer).setApprovalForAll(marketplace.address, true);
 
   console.log('Contratos desplegados exitosamente.');
 }
