@@ -36,7 +36,7 @@ interface NFTMarketplaceInterface extends ethers.utils.Interface {
     "renounceOwnership()": FunctionFragment;
     "revokeSellerApproval(address)": FunctionFragment;
     "setNFTContract(address)": FunctionFragment;
-    "siliquaCoinContract(address)": FunctionFragment;
+    "setSiliquaCoin(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "token()": FunctionFragment;
     "totalCommissionEarned()": FunctionFragment;
@@ -96,7 +96,7 @@ interface NFTMarketplaceInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "siliquaCoinContract",
+    functionFragment: "setSiliquaCoin",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -163,7 +163,7 @@ interface NFTMarketplaceInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "siliquaCoinContract",
+    functionFragment: "setSiliquaCoin",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -406,7 +406,7 @@ export class NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    siliquaCoinContract(
+    setSiliquaCoin(
       _siliquaCoinAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -520,7 +520,7 @@ export class NFTMarketplace extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  siliquaCoinContract(
+  setSiliquaCoin(
     _siliquaCoinAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -629,7 +629,7 @@ export class NFTMarketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    siliquaCoinContract(
+    setSiliquaCoin(
       _siliquaCoinAddress: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -881,7 +881,7 @@ export class NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    siliquaCoinContract(
+    setSiliquaCoin(
       _siliquaCoinAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -978,7 +978,7 @@ export class NFTMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    siliquaCoinContract(
+    setSiliquaCoin(
       _siliquaCoinAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

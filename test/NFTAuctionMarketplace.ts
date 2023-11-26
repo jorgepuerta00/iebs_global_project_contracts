@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { BigNumberish, Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import { GoTLandsNFT, NFTAuctionMarketplace, SiliquaCoin } from '../typechain';
+import { HorsesAssetsNFT, AssetsAuctionMarketplace, SiliquaCoin } from '../typechain';
 
 describe('NFTAuctionMarketplace', () => {
   let owner: Signer;
@@ -9,8 +9,8 @@ describe('NFTAuctionMarketplace', () => {
   let bidder1: Signer;
   let bidder2: Signer;
   let siliquaCoin: SiliquaCoin;
-  let gotLandsNFT: GoTLandsNFT;
-  let marketplace: NFTAuctionMarketplace;
+  let nftContract: HorsesAssetsNFT;
+  let marketplace: AssetsAuctionMarketplace;
 
   beforeEach(async () => {
     [owner, seller, bidder1, bidder2] = await ethers.getSigners();
@@ -20,14 +20,14 @@ describe('NFTAuctionMarketplace', () => {
     siliquaCoin = await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('1000000'));
     await siliquaCoin.deployed();
 
-    // Deploy the GoTLandsNFT token
-    const GoTLandsNFT = await ethers.getContractFactory('GoTLandsNFT');
-    gotLandsNFT = await GoTLandsNFT.deploy();
-    await gotLandsNFT.deployed();
+    // Deploy the HorsesAssetsNFT token
+    const HorsesAssetsNFT = await ethers.getContractFactory('HorsesAssetsNFT');
+    nftContract = await HorsesAssetsNFT.deploy();
+    await nftContract.deployed();
 
     // Deploy the NFTMarketplace contract
-    marketplace = await ethers.getContractFactory('NFTAuctionMarketplace', owner)
-      .then(factory => factory.deploy(gotLandsNFT.address, siliquaCoin.address, 15)) // 15% commission
+    marketplace = await ethers.getContractFactory('AssetsAuctionMarketplace', owner)
+      .then(factory => factory.deploy(nftContract.address, siliquaCoin.address, 15)) // 15% commission
       .then(contract => contract.deployed());
   });
 
@@ -41,14 +41,14 @@ describe('NFTAuctionMarketplace', () => {
       await siliquaCoin.connect(seller).approve(marketplace.address, ethers.utils.parseEther('1000'));
 
       // Mint a new NFT for the seller
-      const tokenId = 1;
-      await gotLandsNFT.connect(owner).mint(sellerAddress, tokenId, 100);
+      const tokenId = 0;
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/0.json');
 
       // Ensure the seller has approved the marketplace contract to spend their NFTs
-      await gotLandsNFT.connect(seller).setApprovalForAll(marketplace.address, true);
+      await nftContract.connect(seller).setApprovalForAll(marketplace.address, true);
 
       // Get the initial balance of the marketplace contract for the seller's NFT
-      const balanceBeforeAuction = await gotLandsNFT.balanceOf(marketplace.address, tokenId);
+      const balanceBeforeAuction = await nftContract.balanceOf(marketplace.address, tokenId);
 
       // Create an auction for the NFT
       const startingPrice = ethers.utils.parseEther('1');
@@ -58,7 +58,7 @@ describe('NFTAuctionMarketplace', () => {
         .withArgs(0, sellerAddress, tokenId, 50, startingPrice, auctionDuration);
 
       // Get the initial balance of the marketplace contract for the seller's NFT after auction creation
-      const balanceAfterAuction = await gotLandsNFT.balanceOf(marketplace.address, tokenId);
+      const balanceAfterAuction = await nftContract.balanceOf(marketplace.address, tokenId);
 
       // Verify the auction details
       const auction = await marketplace.auctions(0);
@@ -95,11 +95,11 @@ describe('NFTAuctionMarketplace', () => {
       await siliquaCoin.connect(seller).approve(marketplace.address, ethers.utils.parseEther('1000'));
 
       // Mint a new NFT for the seller
-      const tokenId = 1;
-      await gotLandsNFT.connect(owner).mint(sellerAddress, tokenId, 10);
+      const tokenId = 0;
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 10, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/0.json');
 
       // Ensure the seller has approved the marketplace contract to spend their NFTs
-      await gotLandsNFT.connect(seller).setApprovalForAll(marketplace.address, true);
+      await nftContract.connect(seller).setApprovalForAll(marketplace.address, true);
 
       // Create an auction for the NFT
       const startingPrice = ethers.utils.parseEther('1');
@@ -256,11 +256,11 @@ describe('NFTAuctionMarketplace', () => {
         .withArgs(0, await bidder1.getAddress(), ethers.utils.parseEther('2'));
 
       // Verify NFT is transferred to the highest bidder
-      const bidder1NFTBalance = await gotLandsNFT.balanceOf(await bidder1.getAddress(), tokenId);
+      const bidder1NFTBalance = await nftContract.balanceOf(await bidder1.getAddress(), tokenId);
       expect(bidder1NFTBalance).to.equal(amount);
 
       // Verify NFT is deducted from seller 
-      const sellerBalance = await gotLandsNFT.balanceOf(await seller.getAddress(), tokenId);
+      const sellerBalance = await nftContract.balanceOf(await seller.getAddress(), tokenId);
       expect(sellerBalance).to.equal(amount);
 
       // Verify auction details after ending
@@ -297,7 +297,7 @@ describe('NFTAuctionMarketplace', () => {
         .withArgs(0, ethers.constants.AddressZero, 0);
 
       // Verify NFT is transferred back to the seller
-      const sellerNFTBalance = await gotLandsNFT.balanceOf(await seller.getAddress(), tokenId);
+      const sellerNFTBalance = await nftContract.balanceOf(await seller.getAddress(), tokenId);
       expect(sellerNFTBalance).to.equal(100);
 
       // Verify auction details after ending
@@ -311,10 +311,10 @@ describe('NFTAuctionMarketplace', () => {
     await approveBidder(seller);
 
     // Mint a new NFT for the seller
-    await gotLandsNFT.connect(owner).mint(await seller.getAddress(), tokenId, 100);
+    await nftContract.connect(owner).mint(await seller.getAddress(), tokenId, 100, `https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/${tokenId}.json`);
 
     // Ensure the seller has approved the marketplace contract to spend their NFTs
-    await gotLandsNFT.connect(seller).setApprovalForAll(marketplace.address, true);
+    await nftContract.connect(seller).setApprovalForAll(marketplace.address, true);
 
     // Create an auction for the NFT
     await marketplace.connect(seller).createAuction(tokenId, amount, startingPrice, auctionDuration);
