@@ -28,8 +28,9 @@ export type { AssetsAuctionMarketplace } from "./AssetsAuctionMarketplace";
 export type { AssetsMarketplace } from "./AssetsMarketplace";
 export type { HorsesAuctionMarketplace } from "./HorsesAuctionMarketplace";
 export type { HorsesMarketplace } from "./HorsesMarketplace";
-export type { NFTMarketplace } from "./NFTMarketplace";
 export type { HorsesNFT } from "./HorsesNFT";
+export type { DerbyBettingHub } from "./DerbyBettingHub";
+export type { HorseRacingEvent } from "./HorseRacingEvent";
 export type { ISiliquaCoin } from "./ISiliquaCoin";
 export type { SiliquaCoin } from "./SiliquaCoin";
 
@@ -60,7 +61,8 @@ export { AssetsAuctionMarketplace__factory } from "./factories/AssetsAuctionMark
 export { AssetsMarketplace__factory } from "./factories/AssetsMarketplace__factory";
 export { HorsesAuctionMarketplace__factory } from "./factories/HorsesAuctionMarketplace__factory";
 export { HorsesMarketplace__factory } from "./factories/HorsesMarketplace__factory";
-export { NFTMarketplace__factory } from "./factories/NFTMarketplace__factory";
 export { HorsesNFT__factory } from "./factories/HorsesNFT__factory";
+export { DerbyBettingHub__factory } from "./factories/DerbyBettingHub__factory";
+export { HorseRacingEvent__factory } from "./factories/HorseRacingEvent__factory";
 export { ISiliquaCoin__factory } from "./factories/ISiliquaCoin__factory";
 export { SiliquaCoin__factory } from "./factories/SiliquaCoin__factory";

@@ -1507,6 +1507,84 @@
       "artifacts": [
         "AssetsAuctionMarketplace"
       ]
+    },
+    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/racing/HorseRacingEvent.sol": {
+      "lastModificationDate": 1701035468490,
+      "contentHash": "d66c4077dbbeb774d734f4b41d16c418",
+      "sourceName": "contracts/racing/HorseRacingEvent.sol",
+      "solcConfig": {
+        "version": "0.8.21",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "./../HorsesNFT.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "HorseRacingEvent"
+      ]
+    },
+    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/racing/DerbyBettingHub.sol": {
+      "lastModificationDate": 1701034783704,
+      "contentHash": "a3ce09b47b21ea9643e5058ff180fb13",
+      "sourceName": "contracts/racing/DerbyBettingHub.sol",
+      "solcConfig": {
+        "version": "0.8.21",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "./HorseRacingEvent.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "DerbyBettingHub"
+      ]
     }
   }
 }
