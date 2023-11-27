@@ -2,10 +2,14 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 import "./../HorsesNFT.sol";
 
 contract HorseRacingEvent is Ownable {
   HorsesNFT public horsesNFTContract;
+
+  using Counters for Counters.Counter;
+  Counters.Counter private _nextRaceId;
 
   struct Race {
     uint256 raceId;
@@ -21,7 +25,6 @@ contract HorseRacingEvent is Ownable {
   }
 
   mapping(uint256 => Race) public races;
-  uint256 public nextRaceId = 1;
 
   event RaceCreated(
     uint256 raceId,
@@ -41,34 +44,35 @@ contract HorseRacingEvent is Ownable {
   // function to create a race
   function createRace(
     uint256 entryFee,
-    uint256 numWinners,
     uint256[] memory prizeDistribution
   ) public onlyOwner {
     uint256 totalPercentage;
-    uint prizes = prizeDistribution.length;
-    for (uint256 i = 0; i < prizes; i++) {
+    uint numWinners = prizeDistribution.length;
+    for (uint256 i = 0; i < prizeDistribution.length; i++) {
       totalPercentage += prizeDistribution[i];
     }
     require(totalPercentage <= 100, "Total distribution exceeds 100%");
-    require(prizes == numWinners, "Distribution must match number of winners");
-    require(numWinners * 2 <= 20, "Max participants exceeded");
-    require(numWinners * 2 >= 5, "Min participants not met");
+    require(totalPercentage >= 100, "Total distribution less than 100%");
+    require(numWinners <= 5, "Max 5 winners allowed");
 
-    races[nextRaceId] = Race({
-      raceId: nextRaceId,
+    uint256 raceId = _nextRaceId.current();
+
+    races[raceId] = Race({
+      raceId: raceId,
       entryFee: entryFee,
       totalPrizePool: 0,
       numWinners: numWinners,
       prizeDistribution: prizeDistribution,
-      minParticipants: numWinners * 2,
+      minParticipants: numWinners * 3,
       raceActive: true,
       raceStarted: false,
       winningHorseIds: new uint256[](0),
       participants: new uint256[](0)
     });
 
-    emit RaceCreated(nextRaceId, entryFee, numWinners, prizeDistribution);
-    nextRaceId++;
+    emit RaceCreated(raceId, entryFee, numWinners, prizeDistribution);
+
+    _nextRaceId.increment();
   }
 
   // function to register a horse in a race
@@ -78,11 +82,9 @@ contract HorseRacingEvent is Ownable {
       race.raceActive && !race.raceStarted,
       "Race not active or already started"
     );
-    require(
-      horsesNFTContract.ownerOf(horseId) == msg.sender,
-      "Not the horse owner"
-    );
+    require(getOwnerOfHorse(horseId) == msg.sender, "Not the horse owner");
     require(msg.value == race.entryFee, "Incorrect entry fee");
+    require(race.participants.length < 20, "Max participants exceeded");
 
     race.totalPrizePool += msg.value;
 
@@ -118,10 +120,6 @@ contract HorseRacingEvent is Ownable {
       winningHorseIds.length == race.numWinners,
       "Incorrect number of winners"
     );
-    require(
-      race.participants.length >= race.minParticipants,
-      "Not enough participants"
-    );
 
     race.raceActive = false;
     race.raceStarted = false;
@@ -144,7 +142,7 @@ contract HorseRacingEvent is Ownable {
   }
 
   // function to get horse's owner
-  function getOwnerOfHorse(uint256 horseId) internal view returns (address) {
+  function getOwnerOfHorse(uint256 horseId) public view returns (address) {
     return horsesNFTContract.ownerOf(horseId);
   }
 
@@ -161,9 +159,19 @@ contract HorseRacingEvent is Ownable {
   function getIsActiveRace(
     uint256 raceId
   ) public view returns (bool raceActive) {
-    require(raceId < nextRaceId, "Race does not exist");
+    require(raceId < _nextRaceId.current(), "Race does not exist");
 
     Race storage race = races[raceId];
     return race.raceActive;
+  }
+
+  // function to get the totalPrizePool from a race
+  function getTotalPrizePoolRace(
+    uint256 raceId
+  ) public view returns (uint256 totalPrizePool) {
+    require(raceId < _nextRaceId.current(), "Race does not exist");
+
+    Race storage race = races[raceId];
+    return race.totalPrizePool;
   }
 }

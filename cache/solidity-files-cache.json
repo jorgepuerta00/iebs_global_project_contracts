@@ -1509,8 +1509,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/racing/HorseRacingEvent.sol": {
-      "lastModificationDate": 1701035468490,
-      "contentHash": "d66c4077dbbeb774d734f4b41d16c418",
+      "lastModificationDate": 1701122782278,
+      "contentHash": "e9dd7d274e6309f5856776831d8fbb60",
       "sourceName": "contracts/racing/HorseRacingEvent.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1538,6 +1538,7 @@
       },
       "imports": [
         "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/utils/Counters.sol",
         "./../HorsesNFT.sol"
       ],
       "versionPragmas": [
