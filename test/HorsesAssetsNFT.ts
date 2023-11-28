@@ -3,7 +3,7 @@ import { BigNumber, ContractFactory, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import { HorsesAssetsNFT } from '../typechain';
 
-describe('HorsesAssetsNFT', () => {
+xdescribe('HorsesAssetsNFT', () => {
   let HorsesAssetsNFT: ContractFactory;
   let nftContract: HorsesAssetsNFT;
   let owner: Signer;

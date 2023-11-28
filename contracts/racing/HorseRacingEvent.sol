@@ -18,8 +18,9 @@ contract HorseRacingEvent is Ownable {
     uint256 numWinners;
     uint256[] prizeDistribution;
     uint256 minParticipants;
-    bool raceActive;
-    bool raceStarted;
+    bool active;
+    bool started;
+    bool ended;
     uint256[] winningHorseIds;
     uint256[] participants;
   }
@@ -64,8 +65,9 @@ contract HorseRacingEvent is Ownable {
       numWinners: numWinners,
       prizeDistribution: prizeDistribution,
       minParticipants: numWinners * 3,
-      raceActive: true,
-      raceStarted: false,
+      active: true,
+      started: false,
+      ended: false,
       winningHorseIds: new uint256[](0),
       participants: new uint256[](0)
     });
@@ -78,10 +80,7 @@ contract HorseRacingEvent is Ownable {
   // function to register a horse in a race
   function enterHorseInRace(uint256 raceId, uint256 horseId) public payable {
     Race storage race = races[raceId];
-    require(
-      race.raceActive && !race.raceStarted,
-      "Race not active or already started"
-    );
+    require(getRaceStatus(raceId), "Race not active or already started");
     require(getOwnerOfHorse(horseId) == msg.sender, "Not the horse owner");
     require(msg.value == race.entryFee, "Incorrect entry fee");
     require(race.participants.length < 20, "Max participants exceeded");
@@ -96,16 +95,13 @@ contract HorseRacingEvent is Ownable {
   // function to start a race
   function startRace(uint256 raceId) public onlyOwner {
     Race storage race = races[raceId];
-    require(
-      race.raceActive && !race.raceStarted,
-      "Race not active or already started"
-    );
+    require(getRaceStatus(raceId), "Race not active or already started");
     require(
       race.participants.length >= race.minParticipants,
       "Not enough participants"
     );
 
-    race.raceStarted = true;
+    race.started = true;
     emit RaceStarted(raceId);
   }
 
@@ -115,14 +111,15 @@ contract HorseRacingEvent is Ownable {
     uint256[] memory winningHorseIds
   ) public onlyOwner {
     Race storage race = races[raceId];
-    require(race.raceStarted, "Race not started");
+    require(race.started, "Race not started");
     require(
       winningHorseIds.length == race.numWinners,
       "Incorrect number of winners"
     );
 
-    race.raceActive = false;
-    race.raceStarted = false;
+    race.active = false;
+    race.started = false;
+    race.ended = true;
     race.winningHorseIds = winningHorseIds;
 
     // pizePool = 80% of total prize pool
@@ -142,7 +139,7 @@ contract HorseRacingEvent is Ownable {
   }
 
   // function to get horse's owner
-  function getOwnerOfHorse(uint256 horseId) public view returns (address) {
+  function getOwnerOfHorse(uint256 horseId) private view returns (address) {
     return horsesNFTContract.ownerOf(horseId);
   }
 
@@ -150,25 +147,31 @@ contract HorseRacingEvent is Ownable {
   function getRaceResults(
     uint256 raceId
   ) public view returns (uint256[] memory) {
-    require(races[raceId].raceActive, "Race has not ended yet");
+    require(races[raceId].ended, "Race has not ended yet");
 
     return races[raceId].winningHorseIds;
   }
 
-  // function to get race status
-  function getIsActiveRace(
-    uint256 raceId
-  ) public view returns (bool raceActive) {
+  // function to get if the
+  function getRaceStatus(uint256 raceId) public view returns (bool active) {
     require(raceId < _nextRaceId.current(), "Race does not exist");
 
     Race storage race = races[raceId];
-    return race.raceActive;
+    return race.active && !race.started;
+  }
+
+  // function to get if the race was ended
+  function isEndedRace(uint256 raceId) public view returns (bool active) {
+    require(raceId < _nextRaceId.current(), "Race does not exist");
+
+    Race storage race = races[raceId];
+    return race.ended;
   }
 
   // function to get the totalPrizePool from a race
   function getTotalPrizePoolRace(
     uint256 raceId
-  ) public view returns (uint256 totalPrizePool) {
+  ) private view returns (uint256 totalPrizePool) {
     require(raceId < _nextRaceId.current(), "Race does not exist");
 
     Race storage race = races[raceId];

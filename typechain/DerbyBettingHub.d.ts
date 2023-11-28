@@ -78,8 +78,8 @@ interface DerbyBettingHubInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "BetClaimed(uint256,address,uint256)": EventFragment;
-    "BetPlaced(uint256,address,uint256)": EventFragment;
+    "BetClaimed(uint256,uint256,address,uint256)": EventFragment;
+    "BetPlaced(uint256,uint256,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
@@ -89,16 +89,18 @@ interface DerbyBettingHubInterface extends ethers.utils.Interface {
 }
 
 export type BetClaimedEvent = TypedEvent<
-  [BigNumber, string, BigNumber] & {
+  [BigNumber, BigNumber, string, BigNumber] & {
     raceId: BigNumber;
+    betId: BigNumber;
     bettor: string;
     winnings: BigNumber;
   }
 >;
 
 export type BetPlacedEvent = TypedEvent<
-  [BigNumber, string, BigNumber] & {
+  [BigNumber, BigNumber, string, BigNumber] & {
     raceId: BigNumber;
+    betId: BigNumber;
     bettor: string;
     betAmount: BigNumber;
   }
@@ -157,7 +159,8 @@ export class DerbyBettingHub extends BaseContract {
       arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, string, boolean] & {
+      [BigNumber, BigNumber, BigNumber, string, boolean] & {
+        betId: BigNumber;
         raceId: BigNumber;
         betAmount: BigNumber;
         bettor: string;
@@ -167,7 +170,7 @@ export class DerbyBettingHub extends BaseContract {
 
     claimWinnings(
       raceId: BigNumberish,
-      betIndex: BigNumberish,
+      betId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -196,7 +199,8 @@ export class DerbyBettingHub extends BaseContract {
     arg1: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, string, boolean] & {
+    [BigNumber, BigNumber, BigNumber, string, boolean] & {
+      betId: BigNumber;
       raceId: BigNumber;
       betAmount: BigNumber;
       bettor: string;
@@ -206,7 +210,7 @@ export class DerbyBettingHub extends BaseContract {
 
   claimWinnings(
     raceId: BigNumberish,
-    betIndex: BigNumberish,
+    betId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -235,7 +239,8 @@ export class DerbyBettingHub extends BaseContract {
       arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, string, boolean] & {
+      [BigNumber, BigNumber, BigNumber, string, boolean] & {
+        betId: BigNumber;
         raceId: BigNumber;
         betAmount: BigNumber;
         bettor: string;
@@ -245,7 +250,7 @@ export class DerbyBettingHub extends BaseContract {
 
     claimWinnings(
       raceId: BigNumberish,
-      betIndex: BigNumberish,
+      betId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -268,40 +273,64 @@ export class DerbyBettingHub extends BaseContract {
   };
 
   filters: {
-    "BetClaimed(uint256,address,uint256)"(
+    "BetClaimed(uint256,uint256,address,uint256)"(
       raceId?: BigNumberish | null,
+      betId?: null,
       bettor?: string | null,
       winnings?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber],
-      { raceId: BigNumber; bettor: string; winnings: BigNumber }
+      [BigNumber, BigNumber, string, BigNumber],
+      {
+        raceId: BigNumber;
+        betId: BigNumber;
+        bettor: string;
+        winnings: BigNumber;
+      }
     >;
 
     BetClaimed(
       raceId?: BigNumberish | null,
+      betId?: null,
       bettor?: string | null,
       winnings?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber],
-      { raceId: BigNumber; bettor: string; winnings: BigNumber }
+      [BigNumber, BigNumber, string, BigNumber],
+      {
+        raceId: BigNumber;
+        betId: BigNumber;
+        bettor: string;
+        winnings: BigNumber;
+      }
     >;
 
-    "BetPlaced(uint256,address,uint256)"(
+    "BetPlaced(uint256,uint256,address,uint256)"(
       raceId?: BigNumberish | null,
+      betId?: null,
       bettor?: string | null,
       betAmount?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber],
-      { raceId: BigNumber; bettor: string; betAmount: BigNumber }
+      [BigNumber, BigNumber, string, BigNumber],
+      {
+        raceId: BigNumber;
+        betId: BigNumber;
+        bettor: string;
+        betAmount: BigNumber;
+      }
     >;
 
     BetPlaced(
       raceId?: BigNumberish | null,
+      betId?: null,
       bettor?: string | null,
       betAmount?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber],
-      { raceId: BigNumber; bettor: string; betAmount: BigNumber }
+      [BigNumber, BigNumber, string, BigNumber],
+      {
+        raceId: BigNumber;
+        betId: BigNumber;
+        bettor: string;
+        betAmount: BigNumber;
+      }
     >;
 
     "OwnershipTransferred(address,address)"(
@@ -330,7 +359,7 @@ export class DerbyBettingHub extends BaseContract {
 
     claimWinnings(
       raceId: BigNumberish,
-      betIndex: BigNumberish,
+      betId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -363,7 +392,7 @@ export class DerbyBettingHub extends BaseContract {
 
     claimWinnings(
       raceId: BigNumberish,
-      betIndex: BigNumberish,
+      betId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -1509,8 +1509,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/racing/HorseRacingEvent.sol": {
-      "lastModificationDate": 1701122782278,
-      "contentHash": "e9dd7d274e6309f5856776831d8fbb60",
+      "lastModificationDate": 1701203907421,
+      "contentHash": "1d026e87d28d9d7555faf43033f3804b",
       "sourceName": "contracts/racing/HorseRacingEvent.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1549,8 +1549,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/racing/DerbyBettingHub.sol": {
-      "lastModificationDate": 1701034783704,
-      "contentHash": "a3ce09b47b21ea9643e5058ff180fb13",
+      "lastModificationDate": 1701207073072,
+      "contentHash": "a128227ecc2ec5bc9ef7a3437c5ed33a",
       "sourceName": "contracts/racing/DerbyBettingHub.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1578,6 +1578,7 @@
       },
       "imports": [
         "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/utils/Counters.sol",
         "./HorseRacingEvent.sol"
       ],
       "versionPragmas": [
@@ -1585,6 +1586,42 @@
       ],
       "artifacts": [
         "DerbyBettingHub"
+      ]
+    },
+    "/Users/jorgepuerta/repos/iebs_sprint_3/node_modules/hardhat/console.sol": {
+      "lastModificationDate": 1698871976933,
+      "contentHash": "896f68942c3a20e9ae3c3c5bfd3add54",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.8.21",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
       ]
     }
   }
