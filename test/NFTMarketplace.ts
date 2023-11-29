@@ -2,8 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Signer } from 'ethers';
 import { HorsesAssetsNFT, AssetsMarketplace, SiliquaCoin } from '../typechain';
-
-xdescribe('NFTMarketplace', () => {
+describe('AssetsMarketplace', () => {
   let owner: Signer;
   let addr1: Signer;
   let addr2: Signer;

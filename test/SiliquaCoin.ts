@@ -3,7 +3,7 @@ import { ContractFactory, Signer } from "ethers";
 import { ethers } from 'hardhat';
 import { SiliquaCoin } from '../typechain';
 
-xdescribe('SiliquaCoin', () => {
+describe('SiliquaCoin', () => {
   let SiliquaCoin: ContractFactory;
   let siliquaCoin: SiliquaCoin;
   let owner: Signer;

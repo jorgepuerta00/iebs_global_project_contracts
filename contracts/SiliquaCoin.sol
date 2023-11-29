@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface ISiliquaCoin {
@@ -17,7 +18,7 @@ interface ISiliquaCoin {
   ) external returns (bool);
 }
 
-contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
+contract SiliquaCoin is ERC20, ERC20Burnable, Ownable, Pausable {
   using SafeERC20 for IERC20;
 
   uint256 public constant TOKEN_TO_ETH_RATE = 1000; // 1 ETH = 1000 SiliquaCoin
@@ -39,7 +40,7 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
   }
 
   // exchange eth for tokens
-  receive() external payable {
+  receive() external payable whenNotPaused {
     // Calculate the amount of tokens to mint based on the ETH sent
     uint256 ethAmount = msg.value;
     uint256 tokenAmount = ethAmount * TOKEN_TO_ETH_RATE;
@@ -50,12 +51,12 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
   }
 
   // Mint tokens to an address (only callable by the owner)
-  function mint(address to, uint256 amount) external onlyOwner {
+  function mint(address to, uint256 amount) external onlyOwner whenNotPaused {
     _mint(to, amount);
   }
 
   // Claim 1 token from the faucet
-  function claimTokens() external {
+  function claimTokens() external whenNotPaused {
     uint256 amount = 1 * (10 ** decimals()); // 1 token in native units
     uint256 oneDay = 1 days;
 
@@ -70,7 +71,10 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
   }
 
   // safe transfer function to avoid ERC20 transfer errors
-  function safeTransfer(address to, uint256 amount) public returns (bool) {
+  function safeTransfer(
+    address to,
+    uint256 amount
+  ) public whenNotPaused returns (bool) {
     transfer(to, amount);
     return true;
   }
@@ -80,8 +84,16 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable {
     address from,
     address to,
     uint256 amount
-  ) public returns (bool) {
+  ) public whenNotPaused returns (bool) {
     transferFrom(from, to, amount);
     return true;
+  }
+
+  function pause() public onlyOwner {
+    _pause();
+  }
+
+  function unpause() public onlyOwner {
+    _unpause();
   }
 }

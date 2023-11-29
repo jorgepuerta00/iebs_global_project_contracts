@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
-contract HorsesNFT is ERC721, ERC721URIStorage, AccessControl {
+contract HorsesNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
   using Counters for Counters.Counter;
 
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -17,20 +18,25 @@ contract HorsesNFT is ERC721, ERC721URIStorage, AccessControl {
     _grantRole(MINTER_ROLE, msg.sender);
   }
 
-  function burn(uint256 tokenId) public onlyRole(MINTER_ROLE) {
+  function burn(uint256 tokenId) public onlyRole(MINTER_ROLE) whenNotPaused {
     _burn(tokenId);
   }
 
   function _burn(
     uint256 tokenId
-  ) internal override(ERC721, ERC721URIStorage) onlyRole(MINTER_ROLE) {
+  )
+    internal
+    override(ERC721, ERC721URIStorage)
+    onlyRole(MINTER_ROLE)
+    whenNotPaused
+  {
     super._burn(tokenId);
   }
 
   function safeMint(
     address to,
     string memory uri
-  ) public onlyRole(MINTER_ROLE) {
+  ) public onlyRole(MINTER_ROLE) whenNotPaused {
     uint256 tokenId = _tokenIdCounter.current();
     _tokenIdCounter.increment();
     _safeMint(to, tokenId);
@@ -39,7 +45,13 @@ contract HorsesNFT is ERC721, ERC721URIStorage, AccessControl {
 
   function tokenURI(
     uint256 tokenId
-  ) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+  )
+    public
+    view
+    override(ERC721, ERC721URIStorage)
+    whenNotPaused
+    returns (string memory)
+  {
     return super.tokenURI(tokenId);
   }
 
@@ -49,8 +61,17 @@ contract HorsesNFT is ERC721, ERC721URIStorage, AccessControl {
     public
     view
     override(ERC721, ERC721URIStorage, AccessControl)
+    whenNotPaused
     returns (bool)
   {
     return super.supportsInterface(interfaceId);
+  }
+
+  function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    _pause();
+  }
+
+  function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    _unpause();
   }
 }

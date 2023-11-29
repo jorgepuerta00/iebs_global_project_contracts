@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/HorsesNFT.sol": {
-      "lastModificationDate": 1701026944989,
-      "contentHash": "186570953b5d474c5873cf9074f96907",
+      "lastModificationDate": 1701275175311,
+      "contentHash": "85f04c34d8dfd682649071ee83c100e5",
       "sourceName": "contracts/HorsesNFT.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -33,7 +33,8 @@
         "@openzeppelin/contracts/token/ERC721/ERC721.sol",
         "@openzeppelin/contracts/access/AccessControl.sol",
         "@openzeppelin/contracts/utils/Counters.sol",
-        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol"
+        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        "@openzeppelin/contracts/security/Pausable.sol"
       ],
       "versionPragmas": [
         "^0.8.9"
@@ -719,8 +720,8 @@
       "artifacts": []
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/horsesMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1701033130921,
-      "contentHash": "7fa979ea1c3b1623af79596d436395f7",
+      "lastModificationDate": 1701275287992,
+      "contentHash": "0ebb412c42c67fd094507071792e50d9",
       "sourceName": "contracts/horsesMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -751,6 +752,7 @@
         "@openzeppelin/contracts/security/ReentrancyGuard.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
         "./../HorsesNFT.sol",
         "./../SiliquaCoin.sol"
       ],
@@ -762,8 +764,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/SiliquaCoin.sol": {
-      "lastModificationDate": 1699818869081,
-      "contentHash": "dfe77b1b81451d40ca3fe6b251a0b297",
+      "lastModificationDate": 1701275086948,
+      "contentHash": "d8496b5eafaecaecd60d8af350d83f99",
       "sourceName": "contracts/SiliquaCoin.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -794,6 +796,7 @@
         "@openzeppelin/contracts/token/ERC20/ERC20.sol",
         "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
         "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
         "@openzeppelin/contracts/access/Ownable.sol"
       ],
       "versionPragmas": [
@@ -1342,8 +1345,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/assetsMarket/HorsesAssetsNFT.sol": {
-      "lastModificationDate": 1701031589119,
-      "contentHash": "a5c4e3c77750521fe5d30954458852f2",
+      "lastModificationDate": 1701275390776,
+      "contentHash": "81fd2eb66be50244317bad07cc3f7e51",
       "sourceName": "contracts/assetsMarket/HorsesAssetsNFT.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1372,7 +1375,8 @@
       "imports": [
         "@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/utils/Strings.sol"
+        "@openzeppelin/contracts/utils/Strings.sol",
+        "@openzeppelin/contracts/security/Pausable.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
@@ -1382,8 +1386,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/assetsMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1701033048791,
-      "contentHash": "4e6c7dcd5df5599f1801b338878530fb",
+      "lastModificationDate": 1701275344288,
+      "contentHash": "763ece27d9ff8d0fd6a29017c38f1591",
       "sourceName": "contracts/assetsMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1414,6 +1418,7 @@
         "@openzeppelin/contracts/security/ReentrancyGuard.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
         "./HorsesAssetsNFT.sol",
         "./../SiliquaCoin.sol"
       ],
@@ -1425,8 +1430,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/horsesMarket/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1701033082620,
-      "contentHash": "dad11aac13fc74cb09a4120acd76136d",
+      "lastModificationDate": 1701275316095,
+      "contentHash": "65cbd21285a09d530c6e17f7d3d37c51",
       "sourceName": "contracts/horsesMarket/NFTAuctionMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1456,6 +1461,7 @@
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
         "./../HorsesNFT.sol",
         "./../SiliquaCoin.sol"
       ],
@@ -1467,8 +1473,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/assetsMarket/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1701033060538,
-      "contentHash": "782a1c158ad42a8e4e2f90bf5a8f0776",
+      "lastModificationDate": 1701275368802,
+      "contentHash": "8055040cc40829b3cb3223840fb1d72c",
       "sourceName": "contracts/assetsMarket/NFTAuctionMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1498,6 +1504,7 @@
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
         "./HorsesAssetsNFT.sol",
         "./../SiliquaCoin.sol"
       ],
@@ -1509,8 +1516,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/racing/HorseRacingEvent.sol": {
-      "lastModificationDate": 1701203907421,
-      "contentHash": "1d026e87d28d9d7555faf43033f3804b",
+      "lastModificationDate": 1701275217837,
+      "contentHash": "3c377d8ee555e0d454bf69bac26c4eb4",
       "sourceName": "contracts/racing/HorseRacingEvent.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1539,6 +1546,7 @@
       "imports": [
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/utils/Counters.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
         "./../HorsesNFT.sol"
       ],
       "versionPragmas": [
@@ -1549,8 +1557,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/racing/DerbyBettingHub.sol": {
-      "lastModificationDate": 1701207073072,
-      "contentHash": "a128227ecc2ec5bc9ef7a3437c5ed33a",
+      "lastModificationDate": 1701275257725,
+      "contentHash": "50a7e2f5c35b6e52cc0c9edae46298c9",
       "sourceName": "contracts/racing/DerbyBettingHub.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1579,6 +1587,7 @@
       "imports": [
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/utils/Counters.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
         "./HorseRacingEvent.sol"
       ],
       "versionPragmas": [
@@ -1622,6 +1631,44 @@
       ],
       "artifacts": [
         "console"
+      ]
+    },
+    "/Users/jorgepuerta/repos/iebs_sprint_3/node_modules/@openzeppelin/contracts/security/Pausable.sol": {
+      "lastModificationDate": 1697997399450,
+      "contentHash": "25c8108f36fdd472bc78d4c4af240c11",
+      "sourceName": "@openzeppelin/contracts/security/Pausable.sol",
+      "solcConfig": {
+        "version": "0.8.21",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Pausable"
       ]
     }
   }

@@ -3,9 +3,10 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "./HorseRacingEvent.sol";
 
-contract DerbyBettingHub is Ownable {
+contract DerbyBettingHub is Ownable, Pausable {
   HorseRacingEvent public racingEvent;
 
   using Counters for Counters.Counter;
@@ -40,7 +41,10 @@ contract DerbyBettingHub is Ownable {
   }
 
   // function to place a bet
-  function placeBet(uint256 raceId, uint256[] memory horseIds) public payable {
+  function placeBet(
+    uint256 raceId,
+    uint256[] memory horseIds
+  ) public payable whenNotPaused {
     require(
       racingEvent.getRaceStatus(raceId),
       "Race not active or already started"
@@ -64,7 +68,7 @@ contract DerbyBettingHub is Ownable {
   }
 
   // function to claim winnings
-  function claimWinnings(uint256 raceId, uint256 betId) public {
+  function claimWinnings(uint256 raceId, uint256 betId) public whenNotPaused {
     Bet storage bet = betsByRace[raceId][betId];
 
     require(bet.bettor != address(0), "Bet does not exist");
@@ -174,5 +178,13 @@ contract DerbyBettingHub is Ownable {
     } else {
       return betAmount * 2; // duplicate original bet
     }
+  }
+
+  function pause() public onlyOwner {
+    _pause();
+  }
+
+  function unpause() public onlyOwner {
+    _unpause();
   }
 }

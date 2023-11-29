@@ -3,7 +3,7 @@ import { BigNumberish, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import { HorsesAssetsNFT, AssetsAuctionMarketplace, SiliquaCoin } from '../typechain';
 
-xdescribe('NFTAuctionMarketplace', () => {
+describe('AssetsAuctionMarketplace', () => {
   let owner: Signer;
   let seller: Signer;
   let bidder1: Signer;

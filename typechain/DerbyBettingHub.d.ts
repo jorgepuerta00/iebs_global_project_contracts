@@ -25,10 +25,13 @@ interface DerbyBettingHubInterface extends ethers.utils.Interface {
     "betsByRace(uint256,uint256)": FunctionFragment;
     "claimWinnings(uint256,uint256)": FunctionFragment;
     "owner()": FunctionFragment;
+    "pause()": FunctionFragment;
+    "paused()": FunctionFragment;
     "placeBet(uint256,uint256[])": FunctionFragment;
     "racingEvent()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "unpause()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -40,6 +43,8 @@ interface DerbyBettingHubInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "placeBet",
     values: [BigNumberish, BigNumberish[]]
@@ -56,6 +61,7 @@ interface DerbyBettingHubInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "betsByRace", data: BytesLike): Result;
   decodeFunctionResult(
@@ -63,6 +69,8 @@ interface DerbyBettingHubInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "placeBet", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "racingEvent",
@@ -76,16 +84,21 @@ interface DerbyBettingHubInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
 
   events: {
     "BetClaimed(uint256,uint256,address,uint256)": EventFragment;
     "BetPlaced(uint256,uint256,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "Paused(address)": EventFragment;
+    "Unpaused(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "BetClaimed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BetPlaced"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
 export type BetClaimedEvent = TypedEvent<
@@ -109,6 +122,10 @@ export type BetPlacedEvent = TypedEvent<
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
 >;
+
+export type PausedEvent = TypedEvent<[string] & { account: string }>;
+
+export type UnpausedEvent = TypedEvent<[string] & { account: string }>;
 
 export class DerbyBettingHub extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -176,6 +193,12 @@ export class DerbyBettingHub extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
+
     placeBet(
       raceId: BigNumberish,
       horseIds: BigNumberish[],
@@ -190,6 +213,10 @@ export class DerbyBettingHub extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -216,6 +243,12 @@ export class DerbyBettingHub extends BaseContract {
 
   owner(overrides?: CallOverrides): Promise<string>;
 
+  pause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  paused(overrides?: CallOverrides): Promise<boolean>;
+
   placeBet(
     raceId: BigNumberish,
     horseIds: BigNumberish[],
@@ -230,6 +263,10 @@ export class DerbyBettingHub extends BaseContract {
 
   transferOwnership(
     newOwner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  unpause(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -256,6 +293,10 @@ export class DerbyBettingHub extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<string>;
 
+    pause(overrides?: CallOverrides): Promise<void>;
+
+    paused(overrides?: CallOverrides): Promise<boolean>;
+
     placeBet(
       raceId: BigNumberish,
       horseIds: BigNumberish[],
@@ -270,6 +311,8 @@ export class DerbyBettingHub extends BaseContract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    unpause(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -348,6 +391,18 @@ export class DerbyBettingHub extends BaseContract {
       [string, string],
       { previousOwner: string; newOwner: string }
     >;
+
+    "Paused(address)"(
+      account?: null
+    ): TypedEventFilter<[string], { account: string }>;
+
+    Paused(account?: null): TypedEventFilter<[string], { account: string }>;
+
+    "Unpaused(address)"(
+      account?: null
+    ): TypedEventFilter<[string], { account: string }>;
+
+    Unpaused(account?: null): TypedEventFilter<[string], { account: string }>;
   };
 
   estimateGas: {
@@ -365,6 +420,12 @@ export class DerbyBettingHub extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
+
     placeBet(
       raceId: BigNumberish,
       horseIds: BigNumberish[],
@@ -379,6 +440,10 @@ export class DerbyBettingHub extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -398,6 +463,12 @@ export class DerbyBettingHub extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     placeBet(
       raceId: BigNumberish,
       horseIds: BigNumberish[],
@@ -412,6 +483,10 @@ export class DerbyBettingHub extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

@@ -4,10 +4,11 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "./HorsesAssetsNFT.sol";
 import "./../SiliquaCoin.sol";
 
-contract AssetsAuctionMarketplace is Ownable, ERC1155Holder {
+contract AssetsAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
   HorsesAssetsNFT public nftToken;
   ISiliquaCoin public token;
   uint256 public commissionPercentage;
@@ -64,7 +65,7 @@ contract AssetsAuctionMarketplace is Ownable, ERC1155Holder {
     uint256 amount,
     uint256 startingPrice,
     uint256 duration
-  ) external {
+  ) external whenNotPaused {
     require(
       nftToken.balanceOf(msg.sender, tokenId) >= amount,
       "Insufficient balance"
@@ -94,7 +95,10 @@ contract AssetsAuctionMarketplace is Ownable, ERC1155Holder {
     );
   }
 
-  function placeBid(uint256 _auctionId, uint256 bidAmount) external {
+  function placeBid(
+    uint256 _auctionId,
+    uint256 bidAmount
+  ) external whenNotPaused {
     Auction storage auction = auctions[_auctionId];
     require(!auction.ended, "Auction already ended");
     require(block.timestamp < auction.auctionEndTime, "Auction has ended");
@@ -116,7 +120,7 @@ contract AssetsAuctionMarketplace is Ownable, ERC1155Holder {
     emit BidPlaced(auction.auctionId, msg.sender, bidAmount);
   }
 
-  function endAuction(uint256 _auctionId) external onlyOwner {
+  function endAuction(uint256 _auctionId) external onlyOwner whenNotPaused {
     Auction storage auction = auctions[_auctionId];
     require(!auction.ended, "Auction already ended");
     require(
@@ -161,27 +165,41 @@ contract AssetsAuctionMarketplace is Ownable, ERC1155Holder {
     }
   }
 
-  function approveSeller(address seller) external onlyOwner {
+  function approveSeller(address seller) external onlyOwner whenNotPaused {
     nftToken.setApprovalForAll(seller, true);
   }
 
-  function revokeSellerApproval(address seller) external onlyOwner {
+  function revokeSellerApproval(
+    address seller
+  ) external onlyOwner whenNotPaused {
     nftToken.setApprovalForAll(seller, false);
   }
 
-  function setNFTContract(address _nftContractAddress) external onlyOwner {
+  function setNFTContract(
+    address _nftContractAddress
+  ) external onlyOwner whenNotPaused {
     nftToken = HorsesAssetsNFT(_nftContractAddress);
   }
 
-  function setSiliquaCoin(address _siliquaCoinAddress) external onlyOwner {
+  function setSiliquaCoin(
+    address _siliquaCoinAddress
+  ) external onlyOwner whenNotPaused {
     token = ISiliquaCoin(_siliquaCoinAddress);
   }
 
   function updateCommissionPercentage(
     uint256 _newCommissionPercentage
-  ) external onlyOwner {
+  ) external onlyOwner whenNotPaused {
     // Ensure the commission percentage is within a valid range
     require(_newCommissionPercentage <= 100, "Invalid commission percentage");
     commissionPercentage = _newCommissionPercentage;
+  }
+
+  function pause() public onlyOwner {
+    _pause();
+  }
+
+  function unpause() public onlyOwner {
+    _unpause();
   }
 }

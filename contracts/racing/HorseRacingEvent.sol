@@ -3,9 +3,10 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "./../HorsesNFT.sol";
 
-contract HorseRacingEvent is Ownable {
+contract HorseRacingEvent is Ownable, Pausable {
   HorsesNFT public horsesNFTContract;
 
   using Counters for Counters.Counter;
@@ -46,7 +47,7 @@ contract HorseRacingEvent is Ownable {
   function createRace(
     uint256 entryFee,
     uint256[] memory prizeDistribution
-  ) public onlyOwner {
+  ) public onlyOwner whenNotPaused {
     uint256 totalPercentage;
     uint numWinners = prizeDistribution.length;
     for (uint256 i = 0; i < prizeDistribution.length; i++) {
@@ -78,7 +79,10 @@ contract HorseRacingEvent is Ownable {
   }
 
   // function to register a horse in a race
-  function enterHorseInRace(uint256 raceId, uint256 horseId) public payable {
+  function enterHorseInRace(
+    uint256 raceId,
+    uint256 horseId
+  ) public payable whenNotPaused {
     Race storage race = races[raceId];
     require(getRaceStatus(raceId), "Race not active or already started");
     require(getOwnerOfHorse(horseId) == msg.sender, "Not the horse owner");
@@ -93,7 +97,7 @@ contract HorseRacingEvent is Ownable {
   }
 
   // function to start a race
-  function startRace(uint256 raceId) public onlyOwner {
+  function startRace(uint256 raceId) public onlyOwner whenNotPaused {
     Race storage race = races[raceId];
     require(getRaceStatus(raceId), "Race not active or already started");
     require(
@@ -109,7 +113,7 @@ contract HorseRacingEvent is Ownable {
   function endRace(
     uint256 raceId,
     uint256[] memory winningHorseIds
-  ) public onlyOwner {
+  ) public onlyOwner whenNotPaused {
     Race storage race = races[raceId];
     require(race.started, "Race not started");
     require(
@@ -139,21 +143,25 @@ contract HorseRacingEvent is Ownable {
   }
 
   // function to get horse's owner
-  function getOwnerOfHorse(uint256 horseId) private view returns (address) {
+  function getOwnerOfHorse(
+    uint256 horseId
+  ) private view whenNotPaused returns (address) {
     return horsesNFTContract.ownerOf(horseId);
   }
 
   // function to get winning horses
   function getRaceResults(
     uint256 raceId
-  ) public view returns (uint256[] memory) {
+  ) public view whenNotPaused returns (uint256[] memory) {
     require(races[raceId].ended, "Race has not ended yet");
 
     return races[raceId].winningHorseIds;
   }
 
   // function to get if the
-  function getRaceStatus(uint256 raceId) public view returns (bool active) {
+  function getRaceStatus(
+    uint256 raceId
+  ) public view whenNotPaused returns (bool active) {
     require(raceId < _nextRaceId.current(), "Race does not exist");
 
     Race storage race = races[raceId];
@@ -161,7 +169,9 @@ contract HorseRacingEvent is Ownable {
   }
 
   // function to get if the race was ended
-  function isEndedRace(uint256 raceId) public view returns (bool active) {
+  function isEndedRace(
+    uint256 raceId
+  ) public view whenNotPaused returns (bool active) {
     require(raceId < _nextRaceId.current(), "Race does not exist");
 
     Race storage race = races[raceId];
@@ -171,10 +181,18 @@ contract HorseRacingEvent is Ownable {
   // function to get the totalPrizePool from a race
   function getTotalPrizePoolRace(
     uint256 raceId
-  ) private view returns (uint256 totalPrizePool) {
+  ) private view whenNotPaused returns (uint256 totalPrizePool) {
     require(raceId < _nextRaceId.current(), "Race does not exist");
 
     Race storage race = races[raceId];
     return race.totalPrizePool;
+  }
+
+  function pause() public onlyOwner {
+    _pause();
+  }
+
+  function unpause() public onlyOwner {
+    _unpause();
   }
 }

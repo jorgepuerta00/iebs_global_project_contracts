@@ -5,10 +5,16 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "./HorsesAssetsNFT.sol";
 import "./../SiliquaCoin.sol";
 
-contract AssetsMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
+contract AssetsMarketplace is
+  Ownable,
+  ReentrancyGuard,
+  ERC1155Holder,
+  Pausable
+{
   HorsesAssetsNFT public nftToken;
   ISiliquaCoin public token;
   uint256 public commissionPercentage;
@@ -72,7 +78,7 @@ contract AssetsMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
     uint256 _tokenId,
     uint256 _amount,
     uint256 _price
-  ) external nonReentrant {
+  ) external nonReentrant whenNotPaused {
     require(
       nftToken.balanceOf(msg.sender, _tokenId) >= _amount,
       "Insufficient balance"
@@ -102,7 +108,9 @@ contract AssetsMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
     listingId++;
   }
 
-  function cancelListing(uint256 _listingId) external nonReentrant {
+  function cancelListing(
+    uint256 _listingId
+  ) external nonReentrant whenNotPaused {
     require(_listingId < listingId, "Invalid listing ID");
     Listing storage listing = listings[_listingId];
     require(
@@ -133,7 +141,7 @@ contract AssetsMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
     );
   }
 
-  function purchaseNFT(uint256 _listingId) external nonReentrant {
+  function purchaseNFT(uint256 _listingId) external nonReentrant whenNotPaused {
     require(_listingId < listingId, "ID doesn't exist");
     Listing storage listing = listings[_listingId];
     require(listing.isActive, "Listing is not active");
@@ -170,6 +178,7 @@ contract AssetsMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
   function getActiveListings()
     external
     view
+    whenNotPaused
     returns (Listing[] memory activeListings)
   {
     uint256 activeListingCount = 0;
@@ -191,30 +200,44 @@ contract AssetsMarketplace is Ownable, ReentrancyGuard, ERC1155Holder {
     return activeListings;
   }
 
-  function approveSeller(address seller) external onlyOwner {
+  function approveSeller(address seller) external onlyOwner whenNotPaused {
     nftToken.setApprovalForAll(seller, true);
   }
 
-  function revokeSellerApproval(address seller) external onlyOwner {
+  function revokeSellerApproval(
+    address seller
+  ) external onlyOwner whenNotPaused {
     nftToken.setApprovalForAll(seller, false);
   }
 
-  function setNFTContract(address _nftContractAddress) external onlyOwner {
+  function setNFTContract(
+    address _nftContractAddress
+  ) external onlyOwner whenNotPaused {
     nftToken = HorsesAssetsNFT(_nftContractAddress);
     emit NFTContractUpdated(_nftContractAddress);
   }
 
-  function setSiliquaCoin(address _siliquaCoinAddress) external onlyOwner {
+  function setSiliquaCoin(
+    address _siliquaCoinAddress
+  ) external onlyOwner whenNotPaused {
     token = ISiliquaCoin(_siliquaCoinAddress);
     emit SiliquaCoinUpdated(_siliquaCoinAddress);
   }
 
   function updateCommissionPercentage(
     uint256 _newCommissionPercentage
-  ) external onlyOwner {
+  ) external onlyOwner whenNotPaused {
     // Ensure the commission percentage is within a valid range
     require(_newCommissionPercentage <= 100, "Invalid commission percentage");
     commissionPercentage = _newCommissionPercentage;
     emit CommissionPercentageUpdated(_newCommissionPercentage);
+  }
+
+  function pause() public onlyOwner {
+    _pause();
+  }
+
+  function unpause() public onlyOwner {
+    _unpause();
   }
 }

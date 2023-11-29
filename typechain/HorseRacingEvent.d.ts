@@ -30,10 +30,13 @@ interface HorseRacingEventInterface extends ethers.utils.Interface {
     "horsesNFTContract()": FunctionFragment;
     "isEndedRace(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
+    "pause()": FunctionFragment;
+    "paused()": FunctionFragment;
     "races(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "startRace(uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "unpause()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -65,6 +68,8 @@ interface HorseRacingEventInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(functionFragment: "races", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -78,6 +83,7 @@ interface HorseRacingEventInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "createRace", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "endRace", data: BytesLike): Result;
@@ -102,6 +108,8 @@ interface HorseRacingEventInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "races", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
@@ -112,22 +120,27 @@ interface HorseRacingEventInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
 
   events: {
     "HorseEnteredRace(uint256,address,uint256)": EventFragment;
     "HorseWithdrawn(uint256,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "Paused(address)": EventFragment;
     "RaceCreated(uint256,uint256,uint256,uint256[])": EventFragment;
     "RaceEnded(uint256,uint256[])": EventFragment;
     "RaceStarted(uint256)": EventFragment;
+    "Unpaused(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "HorseEnteredRace"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "HorseWithdrawn"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RaceCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RaceEnded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RaceStarted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
 export type HorseEnteredRaceEvent = TypedEvent<
@@ -150,6 +163,8 @@ export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
 >;
 
+export type PausedEvent = TypedEvent<[string] & { account: string }>;
+
 export type RaceCreatedEvent = TypedEvent<
   [BigNumber, BigNumber, BigNumber, BigNumber[]] & {
     raceId: BigNumber;
@@ -164,6 +179,8 @@ export type RaceEndedEvent = TypedEvent<
 >;
 
 export type RaceStartedEvent = TypedEvent<[BigNumber] & { raceId: BigNumber }>;
+
+export type UnpausedEvent = TypedEvent<[string] & { account: string }>;
 
 export class HorseRacingEvent extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -246,6 +263,12 @@ export class HorseRacingEvent extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
+
     races(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -282,6 +305,10 @@ export class HorseRacingEvent extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -323,6 +350,12 @@ export class HorseRacingEvent extends BaseContract {
 
   owner(overrides?: CallOverrides): Promise<string>;
 
+  pause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  paused(overrides?: CallOverrides): Promise<boolean>;
+
   races(
     arg0: BigNumberish,
     overrides?: CallOverrides
@@ -359,6 +392,10 @@ export class HorseRacingEvent extends BaseContract {
 
   transferOwnership(
     newOwner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  unpause(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -400,6 +437,10 @@ export class HorseRacingEvent extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<string>;
 
+    pause(overrides?: CallOverrides): Promise<void>;
+
+    paused(overrides?: CallOverrides): Promise<boolean>;
+
     races(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -433,6 +474,8 @@ export class HorseRacingEvent extends BaseContract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    unpause(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -488,6 +531,12 @@ export class HorseRacingEvent extends BaseContract {
       { previousOwner: string; newOwner: string }
     >;
 
+    "Paused(address)"(
+      account?: null
+    ): TypedEventFilter<[string], { account: string }>;
+
+    Paused(account?: null): TypedEventFilter<[string], { account: string }>;
+
     "RaceCreated(uint256,uint256,uint256,uint256[])"(
       raceId?: null,
       entryFee?: null,
@@ -541,6 +590,12 @@ export class HorseRacingEvent extends BaseContract {
     RaceStarted(
       raceId?: null
     ): TypedEventFilter<[BigNumber], { raceId: BigNumber }>;
+
+    "Unpaused(address)"(
+      account?: null
+    ): TypedEventFilter<[string], { account: string }>;
+
+    Unpaused(account?: null): TypedEventFilter<[string], { account: string }>;
   };
 
   estimateGas: {
@@ -581,6 +636,12 @@ export class HorseRacingEvent extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
+
     races(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(
@@ -594,6 +655,10 @@ export class HorseRacingEvent extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -636,6 +701,12 @@ export class HorseRacingEvent extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     races(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -652,6 +723,10 @@ export class HorseRacingEvent extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

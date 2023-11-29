@@ -31,6 +31,8 @@ interface HorsesAuctionMarketplaceInterface extends ethers.utils.Interface {
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
     "owner()": FunctionFragment;
+    "pause()": FunctionFragment;
+    "paused()": FunctionFragment;
     "placeBid(uint256,uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "revokeSellerApproval(address)": FunctionFragment;
@@ -40,6 +42,7 @@ interface HorsesAuctionMarketplaceInterface extends ethers.utils.Interface {
     "token()": FunctionFragment;
     "totalCommissionEarned()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "unpause()": FunctionFragment;
     "updateCommissionPercentage(uint256)": FunctionFragment;
   };
 
@@ -74,6 +77,8 @@ interface HorsesAuctionMarketplaceInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "placeBid",
     values: [BigNumberish, BigNumberish]
@@ -107,6 +112,7 @@ interface HorsesAuctionMarketplaceInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "updateCommissionPercentage",
     values: [BigNumberish]
@@ -137,6 +143,8 @@ interface HorsesAuctionMarketplaceInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "placeBid", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
@@ -167,6 +175,7 @@ interface HorsesAuctionMarketplaceInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "updateCommissionPercentage",
     data: BytesLike
@@ -177,12 +186,16 @@ interface HorsesAuctionMarketplaceInterface extends ethers.utils.Interface {
     "AuctionEnded(uint256,address,uint256)": EventFragment;
     "BidPlaced(uint256,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "Paused(address)": EventFragment;
+    "Unpaused(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AuctionCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AuctionEnded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BidPlaced"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
 export type AuctionCreatedEvent = TypedEvent<
@@ -215,6 +228,10 @@ export type BidPlacedEvent = TypedEvent<
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
 >;
+
+export type PausedEvent = TypedEvent<[string] & { account: string }>;
+
+export type UnpausedEvent = TypedEvent<[string] & { account: string }>;
 
 export class HorsesAuctionMarketplace extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -331,6 +348,12 @@ export class HorsesAuctionMarketplace extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
+
     placeBid(
       _auctionId: BigNumberish,
       bidAmount: BigNumberish,
@@ -367,6 +390,10 @@ export class HorsesAuctionMarketplace extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -447,6 +474,12 @@ export class HorsesAuctionMarketplace extends BaseContract {
 
   owner(overrides?: CallOverrides): Promise<string>;
 
+  pause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  paused(overrides?: CallOverrides): Promise<boolean>;
+
   placeBid(
     _auctionId: BigNumberish,
     bidAmount: BigNumberish,
@@ -483,6 +516,10 @@ export class HorsesAuctionMarketplace extends BaseContract {
 
   transferOwnership(
     newOwner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  unpause(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -560,6 +597,10 @@ export class HorsesAuctionMarketplace extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<string>;
 
+    pause(overrides?: CallOverrides): Promise<void>;
+
+    paused(overrides?: CallOverrides): Promise<boolean>;
+
     placeBid(
       _auctionId: BigNumberish,
       bidAmount: BigNumberish,
@@ -596,6 +637,8 @@ export class HorsesAuctionMarketplace extends BaseContract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    unpause(overrides?: CallOverrides): Promise<void>;
 
     updateCommissionPercentage(
       _newCommissionPercentage: BigNumberish,
@@ -693,6 +736,18 @@ export class HorsesAuctionMarketplace extends BaseContract {
       [string, string],
       { previousOwner: string; newOwner: string }
     >;
+
+    "Paused(address)"(
+      account?: null
+    ): TypedEventFilter<[string], { account: string }>;
+
+    Paused(account?: null): TypedEventFilter<[string], { account: string }>;
+
+    "Unpaused(address)"(
+      account?: null
+    ): TypedEventFilter<[string], { account: string }>;
+
+    Unpaused(account?: null): TypedEventFilter<[string], { account: string }>;
   };
 
   estimateGas: {
@@ -742,6 +797,12 @@ export class HorsesAuctionMarketplace extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
+
     placeBid(
       _auctionId: BigNumberish,
       bidAmount: BigNumberish,
@@ -778,6 +839,10 @@ export class HorsesAuctionMarketplace extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -839,6 +904,12 @@ export class HorsesAuctionMarketplace extends BaseContract {
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     placeBid(
       _auctionId: BigNumberish,
       bidAmount: BigNumberish,
@@ -877,6 +948,10 @@ export class HorsesAuctionMarketplace extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

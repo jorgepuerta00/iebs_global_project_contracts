@@ -4,8 +4,9 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
-contract HorsesAssetsNFT is ERC1155, Ownable {
+contract HorsesAssetsNFT is ERC1155, Ownable, Pausable {
   using Strings for uint256;
 
   // Mapping from token ID to token URI
@@ -19,7 +20,7 @@ contract HorsesAssetsNFT is ERC1155, Ownable {
     uint256 tokenId,
     uint256 amount,
     string memory newURI
-  ) public onlyOwner {
+  ) public onlyOwner whenNotPaused {
     require(
       bytes(_tokenURIs[tokenId]).length == 0,
       "Asset already minted with this id"
@@ -34,7 +35,7 @@ contract HorsesAssetsNFT is ERC1155, Ownable {
     uint256[] memory tokenIds,
     uint256[] memory amounts,
     string[] memory uris
-  ) public onlyOwner {
+  ) public onlyOwner whenNotPaused {
     require(tokenIds.length == uris.length, "IDs and URIs length mismatch");
     _mintBatch(to, tokenIds, amounts, "");
 
@@ -44,12 +45,17 @@ contract HorsesAssetsNFT is ERC1155, Ownable {
   }
 
   // Function to set the URI of a token type
-  function setTokenURI(uint256 tokenId, string memory newURI) public onlyOwner {
+  function setTokenURI(
+    uint256 tokenId,
+    string memory newURI
+  ) public onlyOwner whenNotPaused {
     _tokenURIs[tokenId] = newURI;
   }
 
   // Override for the URI function to return the token URI for each token type
-  function uri(uint256 tokenId) public view override returns (string memory) {
+  function uri(
+    uint256 tokenId
+  ) public view override whenNotPaused returns (string memory) {
     require(
       bytes(_tokenURIs[tokenId]).length != 0,
       "Asset not minted or URI not set"
@@ -63,7 +69,7 @@ contract HorsesAssetsNFT is ERC1155, Ownable {
     address to,
     uint256 tokenId,
     uint256 amount
-  ) public virtual {
+  ) public virtual whenNotPaused {
     safeTransferFrom(from, to, tokenId, amount, "");
   }
 
@@ -73,7 +79,15 @@ contract HorsesAssetsNFT is ERC1155, Ownable {
     address to,
     uint256[] memory tokenIds,
     uint256[] memory amount
-  ) public virtual {
+  ) public virtual whenNotPaused {
     safeBatchTransferFrom(from, to, tokenIds, amount, "");
+  }
+
+  function pause() public onlyOwner {
+    _pause();
+  }
+
+  function unpause() public onlyOwner {
+    _unpause();
   }
 }
