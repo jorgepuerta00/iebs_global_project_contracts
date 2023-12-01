@@ -67,6 +67,14 @@ contract HorsesNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     return super.supportsInterface(interfaceId);
   }
 
+  function setTokenURI(
+    uint256 tokenId,
+    string memory newURI
+  ) public onlyRole(DEFAULT_ADMIN_ROLE) whenNotPaused {
+    require(_exists(tokenId), "ERC721URIStorage: URI set of nonexistent token");
+    _setTokenURI(tokenId, newURI);
+  }
+
   function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
     _pause();
   }
