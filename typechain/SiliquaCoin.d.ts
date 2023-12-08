@@ -321,8 +321,8 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<[BigNumber]>;
 
     mint(
-      to: string,
-      amount: BigNumberish,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -347,9 +347,9 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<ContractTransaction>;
 
     safeTransferFrom(
-      from: string,
-      to: string,
-      amount: BigNumberish,
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -431,8 +431,8 @@ export class SiliquaCoin extends BaseContract {
   ): Promise<BigNumber>;
 
   mint(
-    to: string,
-    amount: BigNumberish,
+    _to: string,
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -457,9 +457,9 @@ export class SiliquaCoin extends BaseContract {
   ): Promise<ContractTransaction>;
 
   safeTransferFrom(
-    from: string,
-    to: string,
-    amount: BigNumberish,
+    _from: string,
+    _to: string,
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -536,8 +536,8 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<BigNumber>;
 
     mint(
-      to: string,
-      amount: BigNumberish,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -558,9 +558,9 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<boolean>;
 
     safeTransferFrom(
-      from: string,
-      to: string,
-      amount: BigNumberish,
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -725,8 +725,8 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<BigNumber>;
 
     mint(
-      to: string,
-      amount: BigNumberish,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -751,9 +751,9 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<BigNumber>;
 
     safeTransferFrom(
-      from: string,
-      to: string,
-      amount: BigNumberish,
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -839,8 +839,8 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     mint(
-      to: string,
-      amount: BigNumberish,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -865,9 +865,9 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     safeTransferFrom(
-      from: string,
-      to: string,
-      amount: BigNumberish,
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

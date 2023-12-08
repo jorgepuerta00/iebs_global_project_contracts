@@ -1,14 +1,14 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Signer } from 'ethers';
-import { HorsesAssetsNFT, AssetsMarketplace, SiliquaCoin } from '../typechain';
+import { AssetsNFT, AssetsMarketplace, SiliquaCoin } from '../typechain';
 describe('AssetsMarketplace', () => {
   let owner: Signer;
   let addr1: Signer;
   let addr2: Signer;
   let addr3: Signer;
   let siliquaCoin: SiliquaCoin;
-  let nftContract: HorsesAssetsNFT;
+  let nftContract: AssetsNFT;
   let marketplace: AssetsMarketplace;
   let assets: any[] = [];
 
@@ -20,9 +20,9 @@ describe('AssetsMarketplace', () => {
     siliquaCoin = await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('1000000'));
     await siliquaCoin.deployed();
 
-    // Deploy the HorsesAssetsNFT token
-    const HorsesAssetsNFT = await ethers.getContractFactory('HorsesAssetsNFT');
-    nftContract = await HorsesAssetsNFT.deploy();
+    // Deploy the AssetsNFT token
+    const AssetsNFT = await ethers.getContractFactory('AssetsNFT');
+    nftContract = await AssetsNFT.deploy();
     await nftContract.deployed();
 
     // Deploy the AssetsMarketplace contract

@@ -6,16 +6,16 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./../HorsesNFT.sol";
+import "./../AvatarNFT.sol";
 import "./../SiliquaCoin.sol";
 
-contract HorsesMarketplace is
+contract AvatarMarketplace is
   Ownable,
   ReentrancyGuard,
   ERC1155Holder,
   Pausable
 {
-  HorsesNFT public nftToken;
+  AvatarNFT public nftToken;
   ISiliquaCoin public token;
   uint256 public commissionPercentage;
   uint256 public totalCommissionEarned;
@@ -69,7 +69,7 @@ contract HorsesMarketplace is
     address _nftContractAddress,
     uint256 _commissionPercentage
   ) {
-    nftToken = HorsesNFT(_nftContractAddress);
+    nftToken = AvatarNFT(_nftContractAddress);
     token = ISiliquaCoin(_siliquaCoinAddress);
     commissionPercentage = _commissionPercentage;
   }
@@ -187,20 +187,20 @@ contract HorsesMarketplace is
     return activeListings;
   }
 
-  function approveSeller(address seller) external onlyOwner whenNotPaused {
-    nftToken.setApprovalForAll(seller, true);
+  function approveSeller(address _seller) external onlyOwner whenNotPaused {
+    nftToken.setApprovalForAll(_seller, true);
   }
 
   function revokeSellerApproval(
-    address seller
+    address _seller
   ) external onlyOwner whenNotPaused {
-    nftToken.setApprovalForAll(seller, false);
+    nftToken.setApprovalForAll(_seller, false);
   }
 
   function setNFTContract(
     address _nftContractAddress
   ) external onlyOwner whenNotPaused {
-    nftToken = HorsesNFT(_nftContractAddress);
+    nftToken = AvatarNFT(_nftContractAddress);
     emit NFTContractUpdated(_nftContractAddress);
   }
 

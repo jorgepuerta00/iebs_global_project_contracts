@@ -5,11 +5,11 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./../HorsesNFT.sol";
+import "./../AvatarNFT.sol";
 import "./../SiliquaCoin.sol";
 
-contract HorsesAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
-  HorsesNFT public nftToken;
+contract AvatarAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
+  AvatarNFT public nftToken;
   ISiliquaCoin public token;
   uint256 public commissionPercentage;
   uint256 public totalCommissionEarned;
@@ -55,52 +55,52 @@ contract HorsesAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
     address _siliquaCoinContractAddress,
     uint256 _commissionPercentage
   ) {
-    nftToken = HorsesNFT(_nftContractAddress);
+    nftToken = AvatarNFT(_nftContractAddress);
     token = ISiliquaCoin(_siliquaCoinContractAddress);
     commissionPercentage = _commissionPercentage;
   }
 
   function createAuction(
-    uint256 tokenId,
-    uint256 amount,
-    uint256 startingPrice,
-    uint256 duration
+    uint256 _tokenId,
+    uint256 _amount,
+    uint256 _startingPrice,
+    uint256 _duration
   ) external whenNotPaused {
-    require(nftToken.balanceOf(msg.sender) >= amount, "Insufficient balance");
+    require(nftToken.balanceOf(msg.sender) >= _amount, "Insufficient balance");
 
     auctions[auctionId] = Auction({
       auctionId: auctionId,
       seller: msg.sender,
-      tokenId: tokenId,
-      amount: amount,
-      startingPrice: startingPrice,
-      highestBid: startingPrice,
+      tokenId: _tokenId,
+      amount: _amount,
+      startingPrice: _startingPrice,
+      highestBid: _startingPrice,
       highestBidder: address(0),
-      auctionEndTime: block.timestamp + duration,
+      auctionEndTime: block.timestamp + _duration,
       ended: false
     });
 
-    nftToken.transferFrom(msg.sender, address(this), tokenId);
+    nftToken.transferFrom(msg.sender, address(this), _tokenId);
 
     emit AuctionCreated(
       auctionId,
       msg.sender,
-      tokenId,
-      amount,
-      startingPrice,
-      duration
+      _tokenId,
+      _amount,
+      _startingPrice,
+      _duration
     );
   }
 
   function placeBid(
     uint256 _auctionId,
-    uint256 bidAmount
+    uint256 _bidAmount
   ) external whenNotPaused {
     Auction storage auction = auctions[_auctionId];
     require(!auction.ended, "Auction already ended");
     require(block.timestamp < auction.auctionEndTime, "Auction has ended");
     require(
-      bidAmount > auction.highestBid,
+      _bidAmount > auction.highestBid,
       "Bid amount must be higher than the current highest bid"
     );
 
@@ -110,11 +110,11 @@ contract HorsesAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
     }
 
     // Place the new bid
-    token.safeTransferFrom(msg.sender, address(this), bidAmount);
-    auction.highestBid = bidAmount;
+    token.safeTransferFrom(msg.sender, address(this), _bidAmount);
+    auction.highestBid = _bidAmount;
     auction.highestBidder = msg.sender;
 
-    emit BidPlaced(auction.auctionId, msg.sender, bidAmount);
+    emit BidPlaced(auction.auctionId, msg.sender, _bidAmount);
   }
 
   function endAuction(uint256 _auctionId) external onlyOwner whenNotPaused {
@@ -156,20 +156,20 @@ contract HorsesAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
     }
   }
 
-  function approveSeller(address seller) external onlyOwner whenNotPaused {
-    nftToken.setApprovalForAll(seller, true);
+  function approveSeller(address _seller) external onlyOwner whenNotPaused {
+    nftToken.setApprovalForAll(_seller, true);
   }
 
   function revokeSellerApproval(
-    address seller
+    address _seller
   ) external onlyOwner whenNotPaused {
-    nftToken.setApprovalForAll(seller, false);
+    nftToken.setApprovalForAll(_seller, false);
   }
 
   function setNFTContract(
     address _nftContractAddress
   ) external onlyOwner whenNotPaused {
-    nftToken = HorsesNFT(_nftContractAddress);
+    nftToken = AvatarNFT(_nftContractAddress);
   }
 
   function setSiliquaCoin(

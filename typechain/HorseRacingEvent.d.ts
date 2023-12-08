@@ -27,8 +27,8 @@ interface HorseRacingEventInterface extends ethers.utils.Interface {
     "enterHorseInRace(uint256,uint256)": FunctionFragment;
     "getRaceResults(uint256)": FunctionFragment;
     "getRaceStatus(uint256)": FunctionFragment;
-    "horsesNFTContract()": FunctionFragment;
     "isEndedRace(uint256)": FunctionFragment;
+    "nftToken()": FunctionFragment;
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
@@ -60,13 +60,10 @@ interface HorseRacingEventInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "horsesNFTContract",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "isEndedRace",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "nftToken", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
@@ -100,13 +97,10 @@ interface HorseRacingEventInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "horsesNFTContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "isEndedRace",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "nftToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
@@ -147,7 +141,7 @@ export type HorseEnteredRaceEvent = TypedEvent<
   [BigNumber, string, BigNumber] & {
     raceId: BigNumber;
     horseOwner: string;
-    horseId: BigNumber;
+    nftId: BigNumber;
   }
 >;
 
@@ -155,7 +149,7 @@ export type HorseWithdrawnEvent = TypedEvent<
   [BigNumber, string, BigNumber] & {
     raceId: BigNumber;
     horseOwner: string;
-    horseId: BigNumber;
+    nftId: BigNumber;
   }
 >;
 
@@ -240,7 +234,7 @@ export class HorseRacingEvent extends BaseContract {
 
     enterHorseInRace(
       raceId: BigNumberish,
-      horseId: BigNumberish,
+      nftId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -254,12 +248,12 @@ export class HorseRacingEvent extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean] & { active: boolean }>;
 
-    horsesNFTContract(overrides?: CallOverrides): Promise<[string]>;
-
     isEndedRace(
       raceId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[boolean] & { active: boolean }>;
+
+    nftToken(overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -327,7 +321,7 @@ export class HorseRacingEvent extends BaseContract {
 
   enterHorseInRace(
     raceId: BigNumberish,
-    horseId: BigNumberish,
+    nftId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -341,12 +335,12 @@ export class HorseRacingEvent extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  horsesNFTContract(overrides?: CallOverrides): Promise<string>;
-
   isEndedRace(
     raceId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  nftToken(overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -414,7 +408,7 @@ export class HorseRacingEvent extends BaseContract {
 
     enterHorseInRace(
       raceId: BigNumberish,
-      horseId: BigNumberish,
+      nftId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -428,12 +422,12 @@ export class HorseRacingEvent extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    horsesNFTContract(overrides?: CallOverrides): Promise<string>;
-
     isEndedRace(
       raceId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    nftToken(overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -482,37 +476,37 @@ export class HorseRacingEvent extends BaseContract {
     "HorseEnteredRace(uint256,address,uint256)"(
       raceId?: null,
       horseOwner?: null,
-      horseId?: null
+      nftId?: null
     ): TypedEventFilter<
       [BigNumber, string, BigNumber],
-      { raceId: BigNumber; horseOwner: string; horseId: BigNumber }
+      { raceId: BigNumber; horseOwner: string; nftId: BigNumber }
     >;
 
     HorseEnteredRace(
       raceId?: null,
       horseOwner?: null,
-      horseId?: null
+      nftId?: null
     ): TypedEventFilter<
       [BigNumber, string, BigNumber],
-      { raceId: BigNumber; horseOwner: string; horseId: BigNumber }
+      { raceId: BigNumber; horseOwner: string; nftId: BigNumber }
     >;
 
     "HorseWithdrawn(uint256,address,uint256)"(
       raceId?: null,
       horseOwner?: null,
-      horseId?: null
+      nftId?: null
     ): TypedEventFilter<
       [BigNumber, string, BigNumber],
-      { raceId: BigNumber; horseOwner: string; horseId: BigNumber }
+      { raceId: BigNumber; horseOwner: string; nftId: BigNumber }
     >;
 
     HorseWithdrawn(
       raceId?: null,
       horseOwner?: null,
-      horseId?: null
+      nftId?: null
     ): TypedEventFilter<
       [BigNumber, string, BigNumber],
-      { raceId: BigNumber; horseOwner: string; horseId: BigNumber }
+      { raceId: BigNumber; horseOwner: string; nftId: BigNumber }
     >;
 
     "OwnershipTransferred(address,address)"(
@@ -613,7 +607,7 @@ export class HorseRacingEvent extends BaseContract {
 
     enterHorseInRace(
       raceId: BigNumberish,
-      horseId: BigNumberish,
+      nftId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -627,12 +621,12 @@ export class HorseRacingEvent extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    horsesNFTContract(overrides?: CallOverrides): Promise<BigNumber>;
-
     isEndedRace(
       raceId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    nftToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -678,7 +672,7 @@ export class HorseRacingEvent extends BaseContract {
 
     enterHorseInRace(
       raceId: BigNumberish,
-      horseId: BigNumberish,
+      nftId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -692,12 +686,12 @@ export class HorseRacingEvent extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    horsesNFTContract(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     isEndedRace(
       raceId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    nftToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

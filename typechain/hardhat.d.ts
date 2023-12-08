@@ -105,9 +105,9 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
     getContractFactory(
-      name: "HorsesAssetsNFT",
+      name: "AssetsNFT",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.HorsesAssetsNFT__factory>;
+    ): Promise<Contracts.AssetsNFT__factory>;
     getContractFactory(
       name: "AssetsAuctionMarketplace",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -117,25 +117,25 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AssetsMarketplace__factory>;
     getContractFactory(
-      name: "HorsesAuctionMarketplace",
+      name: "AvatarNFT",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.HorsesAuctionMarketplace__factory>;
+    ): Promise<Contracts.AvatarNFT__factory>;
     getContractFactory(
-      name: "HorsesMarketplace",
+      name: "AvatarAuctionMarketplace",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.HorsesMarketplace__factory>;
+    ): Promise<Contracts.AvatarAuctionMarketplace__factory>;
     getContractFactory(
-      name: "HorsesNFT",
+      name: "AvatarMarketplace",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.HorsesNFT__factory>;
+    ): Promise<Contracts.AvatarMarketplace__factory>;
     getContractFactory(
-      name: "DerbyBettingHub",
+      name: "AvatarSmashEvent",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.DerbyBettingHub__factory>;
+    ): Promise<Contracts.AvatarSmashEvent__factory>;
     getContractFactory(
-      name: "HorseRacingEvent",
+      name: "BettingHub",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.HorseRacingEvent__factory>;
+    ): Promise<Contracts.BettingHub__factory>;
     getContractFactory(
       name: "ISiliquaCoin",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -261,10 +261,10 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
     getContractAt(
-      name: "HorsesAssetsNFT",
+      name: "AssetsNFT",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.HorsesAssetsNFT>;
+    ): Promise<Contracts.AssetsNFT>;
     getContractAt(
       name: "AssetsAuctionMarketplace",
       address: string,
@@ -276,30 +276,30 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.AssetsMarketplace>;
     getContractAt(
-      name: "HorsesAuctionMarketplace",
+      name: "AvatarNFT",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.HorsesAuctionMarketplace>;
+    ): Promise<Contracts.AvatarNFT>;
     getContractAt(
-      name: "HorsesMarketplace",
+      name: "AvatarAuctionMarketplace",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.HorsesMarketplace>;
+    ): Promise<Contracts.AvatarAuctionMarketplace>;
     getContractAt(
-      name: "HorsesNFT",
+      name: "AvatarMarketplace",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.HorsesNFT>;
+    ): Promise<Contracts.AvatarMarketplace>;
     getContractAt(
-      name: "DerbyBettingHub",
+      name: "AvatarSmashEvent",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.DerbyBettingHub>;
+    ): Promise<Contracts.AvatarSmashEvent>;
     getContractAt(
-      name: "HorseRacingEvent",
+      name: "BettingHub",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.HorseRacingEvent>;
+    ): Promise<Contracts.BettingHub>;
     getContractAt(
       name: "ISiliquaCoin",
       address: string,

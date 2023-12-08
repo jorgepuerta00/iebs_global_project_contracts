@@ -201,7 +201,7 @@ export class DerbyBettingHub extends BaseContract {
 
     placeBet(
       raceId: BigNumberish,
-      horseIds: BigNumberish[],
+      nftIds: BigNumberish[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -251,7 +251,7 @@ export class DerbyBettingHub extends BaseContract {
 
   placeBet(
     raceId: BigNumberish,
-    horseIds: BigNumberish[],
+    nftIds: BigNumberish[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -299,7 +299,7 @@ export class DerbyBettingHub extends BaseContract {
 
     placeBet(
       raceId: BigNumberish,
-      horseIds: BigNumberish[],
+      nftIds: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -428,7 +428,7 @@ export class DerbyBettingHub extends BaseContract {
 
     placeBet(
       raceId: BigNumberish,
-      horseIds: BigNumberish[],
+      nftIds: BigNumberish[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -471,7 +471,7 @@ export class DerbyBettingHub extends BaseContract {
 
     placeBet(
       raceId: BigNumberish,
-      horseIds: BigNumberish[],
+      nftIds: BigNumberish[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

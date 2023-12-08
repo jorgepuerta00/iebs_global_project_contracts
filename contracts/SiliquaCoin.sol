@@ -51,8 +51,8 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable, Pausable {
   }
 
   // Mint tokens to an address (only callable by the owner)
-  function mint(address to, uint256 amount) external onlyOwner whenNotPaused {
-    _mint(to, amount);
+  function mint(address _to, uint256 _amount) external onlyOwner whenNotPaused {
+    _mint(_to, _amount);
   }
 
   // Claim 1 token from the faucet
@@ -81,11 +81,11 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable, Pausable {
 
   // safe transfer from function to avoid ERC20 transfer errors
   function safeTransferFrom(
-    address from,
-    address to,
-    uint256 amount
+    address _from,
+    address _to,
+    uint256 _amount
   ) public whenNotPaused returns (bool) {
-    transferFrom(from, to, amount);
+    transferFrom(_from, _to, _amount);
     return true;
   }
 

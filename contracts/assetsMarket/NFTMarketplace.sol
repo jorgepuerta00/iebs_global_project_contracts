@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./HorsesAssetsNFT.sol";
+import "./AssetsNFT.sol";
 import "./../SiliquaCoin.sol";
 
 contract AssetsMarketplace is
@@ -15,7 +15,7 @@ contract AssetsMarketplace is
   ERC1155Holder,
   Pausable
 {
-  HorsesAssetsNFT public nftToken;
+  AssetsNFT public nftToken;
   ISiliquaCoin public token;
   uint256 public commissionPercentage;
   uint256 public totalCommissionEarned;
@@ -69,7 +69,7 @@ contract AssetsMarketplace is
     address _nftContractAddress,
     uint256 _commissionPercentage
   ) {
-    nftToken = HorsesAssetsNFT(_nftContractAddress);
+    nftToken = AssetsNFT(_nftContractAddress);
     token = ISiliquaCoin(_siliquaCoinAddress);
     commissionPercentage = _commissionPercentage;
   }
@@ -213,7 +213,7 @@ contract AssetsMarketplace is
   function setNFTContract(
     address _nftContractAddress
   ) external onlyOwner whenNotPaused {
-    nftToken = HorsesAssetsNFT(_nftContractAddress);
+    nftToken = AssetsNFT(_nftContractAddress);
     emit NFTContractUpdated(_nftContractAddress);
   }
 
