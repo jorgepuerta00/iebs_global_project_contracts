@@ -22,11 +22,11 @@ describe('AvatarSmashEvent', () => {
     await nftToken.deployed();
 
     // Mint 5 tokens to players
-    await nftToken.connect(owner).safeMint(await player1.getAddress(), 'https://example.com/horse/0');
-    await nftToken.connect(owner).safeMint(await player2.getAddress(), 'https://example.com/horse/1');
-    await nftToken.connect(owner).safeMint(await player3.getAddress(), 'https://example.com/horse/2');
-    await nftToken.connect(owner).safeMint(await player4.getAddress(), 'https://example.com/horse/3');
-    await nftToken.connect(owner).safeMint(await player5.getAddress(), 'https://example.com/horse/4');
+    await nftToken.connect(owner).safeMint(await player1.getAddress(), 'https://example.com/fight/0');
+    await nftToken.connect(owner).safeMint(await player2.getAddress(), 'https://example.com/fight/1');
+    await nftToken.connect(owner).safeMint(await player3.getAddress(), 'https://example.com/fight/2');
+    await nftToken.connect(owner).safeMint(await player4.getAddress(), 'https://example.com/fight/3');
+    await nftToken.connect(owner).safeMint(await player5.getAddress(), 'https://example.com/fight/4');
 
     // deploy the AvatarSmashEvent contract
     const AvatarSmashEvent = await ethers.getContractFactory('AvatarSmashEvent');
@@ -97,13 +97,13 @@ describe('AvatarSmashEvent', () => {
         .to.be.revertedWith("Fight not active or already started");
     });
 
-    it("should revert if horse owner is not the player", async function () {
+    it("should revert if fight owner is not the player", async function () {
       const entryFee = ethers.utils.parseEther("0.1");
 
       let player6: Signer;
       [player6] = await ethers.getSigners();
 
-      await nftToken.connect(owner).safeMint(await player6.getAddress(), 'https://example.com/horse/6');
+      await nftToken.connect(owner).safeMint(await player6.getAddress(), 'https://example.com/fight/6');
 
       await expect(
         avatarSmashContract.connect(player6).enterFighterInFight(0, 0, { value: entryFee })
@@ -128,14 +128,14 @@ describe('AvatarSmashEvent', () => {
         let player: Signer;
         [player] = await ethers.getSigners();
 
-        await nftToken.connect(owner).safeMint(await player.getAddress(), `https://example.com/horse/${i}`);
+        await nftToken.connect(owner).safeMint(await player.getAddress(), `https://example.com/fight/${i}`);
         await avatarSmashContract.connect(player).enterFighterInFight(0, i, { value: entryFee });
       }
 
       let player20: Signer;
       [player20] = await ethers.getSigners();
 
-      await nftToken.connect(owner).safeMint(await player20.getAddress(), 'https://example.com/horse/20');
+      await nftToken.connect(owner).safeMint(await player20.getAddress(), 'https://example.com/fight/20');
 
       await expect(
         avatarSmashContract.connect(player20).enterFighterInFight(0, 20, { value: entryFee })
@@ -143,13 +143,13 @@ describe('AvatarSmashEvent', () => {
         .to.be.revertedWith("Max participants exceeded");
     });
 
-    it("should allow a horse to enter an active fight with correct conditions", async function () {
+    it("should allow a fight to enter an active fight with correct conditions", async function () {
       const entryFee = ethers.utils.parseEther("0.1");
 
       let player6: Signer;
       [player6] = await ethers.getSigners();
 
-      await nftToken.connect(owner).safeMint(await player6.getAddress(), 'https://example.com/horse/5');
+      await nftToken.connect(owner).safeMint(await player6.getAddress(), 'https://example.com/fight/5');
 
       await expect(
         avatarSmashContract.connect(player6).enterFighterInFight(0, 5, { value: entryFee })
