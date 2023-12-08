@@ -12,6 +12,7 @@ import {
   BaseContract,
   ContractTransaction,
   Overrides,
+  PayableOverrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -21,11 +22,10 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface AvatarAuctionMarketplaceInterface extends ethers.utils.Interface {
   functions: {
-    "approveSeller(address)": FunctionFragment;
     "auctionId()": FunctionFragment;
     "auctions(uint256)": FunctionFragment;
     "commissionPercentage()": FunctionFragment;
-    "createAuction(uint256,uint256,uint256,uint256)": FunctionFragment;
+    "createAuction(uint256,uint256,uint256)": FunctionFragment;
     "endAuction(uint256)": FunctionFragment;
     "nftToken()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
@@ -33,9 +33,8 @@ interface AvatarAuctionMarketplaceInterface extends ethers.utils.Interface {
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
-    "placeBid(uint256,uint256)": FunctionFragment;
+    "placeBid(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "revokeSellerApproval(address)": FunctionFragment;
     "setNFTContract(address)": FunctionFragment;
     "setSiliquaCoin(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -46,10 +45,6 @@ interface AvatarAuctionMarketplaceInterface extends ethers.utils.Interface {
     "updateCommissionPercentage(uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "approveSeller",
-    values: [string]
-  ): string;
   encodeFunctionData(functionFragment: "auctionId", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "auctions",
@@ -61,7 +56,7 @@ interface AvatarAuctionMarketplaceInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "createAuction",
-    values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "endAuction",
@@ -81,15 +76,11 @@ interface AvatarAuctionMarketplaceInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "placeBid",
-    values: [BigNumberish, BigNumberish]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "revokeSellerApproval",
-    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "setNFTContract",
@@ -118,10 +109,6 @@ interface AvatarAuctionMarketplaceInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "approveSeller",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "auctionId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "auctions", data: BytesLike): Result;
   decodeFunctionResult(
@@ -148,10 +135,6 @@ interface AvatarAuctionMarketplaceInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "placeBid", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "revokeSellerApproval",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -182,7 +165,7 @@ interface AvatarAuctionMarketplaceInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "AuctionCreated(uint256,address,uint256,uint256,uint256,uint256)": EventFragment;
+    "AuctionCreated(uint256,address,uint256,uint256,uint256)": EventFragment;
     "AuctionEnded(uint256,address,uint256)": EventFragment;
     "BidPlaced(uint256,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
@@ -199,11 +182,10 @@ interface AvatarAuctionMarketplaceInterface extends ethers.utils.Interface {
 }
 
 export type AuctionCreatedEvent = TypedEvent<
-  [BigNumber, string, BigNumber, BigNumber, BigNumber, BigNumber] & {
+  [BigNumber, string, BigNumber, BigNumber, BigNumber] & {
     auctionId: BigNumber;
     seller: string;
     tokenId: BigNumber;
-    amount: BigNumber;
     startingPrice: BigNumber;
     duration: BigNumber;
   }
@@ -277,11 +259,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
   interface: AvatarAuctionMarketplaceInterface;
 
   functions: {
-    approveSeller(
-      _seller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     auctionId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     auctions(
@@ -294,7 +271,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber,
         string,
         BigNumber,
         boolean
@@ -302,7 +278,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
         auctionId: BigNumber;
         seller: string;
         tokenId: BigNumber;
-        amount: BigNumber;
         startingPrice: BigNumber;
         highestBid: BigNumber;
         highestBidder: string;
@@ -315,7 +290,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
 
     createAuction(
       _tokenId: BigNumberish,
-      _amount: BigNumberish,
       _startingPrice: BigNumberish,
       _duration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -356,16 +330,10 @@ export class AvatarAuctionMarketplace extends BaseContract {
 
     placeBid(
       _auctionId: BigNumberish,
-      _bidAmount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    revokeSellerApproval(
-      _seller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -403,11 +371,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  approveSeller(
-    _seller: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   auctionId(overrides?: CallOverrides): Promise<BigNumber>;
 
   auctions(
@@ -420,7 +383,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
       BigNumber,
       BigNumber,
       BigNumber,
-      BigNumber,
       string,
       BigNumber,
       boolean
@@ -428,7 +390,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
       auctionId: BigNumber;
       seller: string;
       tokenId: BigNumber;
-      amount: BigNumber;
       startingPrice: BigNumber;
       highestBid: BigNumber;
       highestBidder: string;
@@ -441,7 +402,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
 
   createAuction(
     _tokenId: BigNumberish,
-    _amount: BigNumberish,
     _startingPrice: BigNumberish,
     _duration: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -482,16 +442,10 @@ export class AvatarAuctionMarketplace extends BaseContract {
 
   placeBid(
     _auctionId: BigNumberish,
-    _bidAmount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   renounceOwnership(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  revokeSellerApproval(
-    _seller: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -529,8 +483,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    approveSeller(_seller: string, overrides?: CallOverrides): Promise<void>;
-
     auctionId(overrides?: CallOverrides): Promise<BigNumber>;
 
     auctions(
@@ -543,7 +495,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber,
         string,
         BigNumber,
         boolean
@@ -551,7 +502,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
         auctionId: BigNumber;
         seller: string;
         tokenId: BigNumber;
-        amount: BigNumber;
         startingPrice: BigNumber;
         highestBid: BigNumber;
         highestBidder: string;
@@ -564,7 +514,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
 
     createAuction(
       _tokenId: BigNumberish,
-      _amount: BigNumberish,
       _startingPrice: BigNumberish,
       _duration: BigNumberish,
       overrides?: CallOverrides
@@ -603,16 +552,10 @@ export class AvatarAuctionMarketplace extends BaseContract {
 
     placeBid(
       _auctionId: BigNumberish,
-      _bidAmount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    revokeSellerApproval(
-      _seller: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     setNFTContract(
       _nftContractAddress: string,
@@ -647,20 +590,18 @@ export class AvatarAuctionMarketplace extends BaseContract {
   };
 
   filters: {
-    "AuctionCreated(uint256,address,uint256,uint256,uint256,uint256)"(
+    "AuctionCreated(uint256,address,uint256,uint256,uint256)"(
       auctionId?: BigNumberish | null,
       seller?: null,
       tokenId?: null,
-      amount?: null,
       startingPrice?: null,
       duration?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, BigNumber],
+      [BigNumber, string, BigNumber, BigNumber, BigNumber],
       {
         auctionId: BigNumber;
         seller: string;
         tokenId: BigNumber;
-        amount: BigNumber;
         startingPrice: BigNumber;
         duration: BigNumber;
       }
@@ -670,16 +611,14 @@ export class AvatarAuctionMarketplace extends BaseContract {
       auctionId?: BigNumberish | null,
       seller?: null,
       tokenId?: null,
-      amount?: null,
       startingPrice?: null,
       duration?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, BigNumber],
+      [BigNumber, string, BigNumber, BigNumber, BigNumber],
       {
         auctionId: BigNumber;
         seller: string;
         tokenId: BigNumber;
-        amount: BigNumber;
         startingPrice: BigNumber;
         duration: BigNumber;
       }
@@ -751,11 +690,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
   };
 
   estimateGas: {
-    approveSeller(
-      _seller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     auctionId(overrides?: CallOverrides): Promise<BigNumber>;
 
     auctions(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -764,7 +698,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
 
     createAuction(
       _tokenId: BigNumberish,
-      _amount: BigNumberish,
       _startingPrice: BigNumberish,
       _duration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -805,16 +738,10 @@ export class AvatarAuctionMarketplace extends BaseContract {
 
     placeBid(
       _auctionId: BigNumberish,
-      _bidAmount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    revokeSellerApproval(
-      _seller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -853,11 +780,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
   };
 
   populateTransaction: {
-    approveSeller(
-      _seller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     auctionId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     auctions(
@@ -871,7 +793,6 @@ export class AvatarAuctionMarketplace extends BaseContract {
 
     createAuction(
       _tokenId: BigNumberish,
-      _amount: BigNumberish,
       _startingPrice: BigNumberish,
       _duration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -912,16 +833,10 @@ export class AvatarAuctionMarketplace extends BaseContract {
 
     placeBid(
       _auctionId: BigNumberish,
-      _bidAmount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    revokeSellerApproval(
-      _seller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

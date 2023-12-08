@@ -677,50 +677,6 @@
       ],
       "artifacts": []
     },
-    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/horsesMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1702047497664,
-      "contentHash": "494f32a021fdef064cce82e4521a7776",
-      "sourceName": "contracts/horsesMarket/NFTMarketplace.sol",
-      "solcConfig": {
-        "version": "0.8.21",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "@openzeppelin/contracts/security/ReentrancyGuard.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
-        "@openzeppelin/contracts/security/Pausable.sol",
-        "./../AvatarNFT.sol",
-        "./../SiliquaCoin.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "AvatarMarketplace"
-      ]
-    },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/SiliquaCoin.sol": {
       "lastModificationDate": 1702051794550,
       "contentHash": "605a735fa5065feb673ef7908ead0774",
@@ -1346,49 +1302,6 @@
         "AssetsMarketplace"
       ]
     },
-    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/horsesMarket/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1702047566058,
-      "contentHash": "6e9bcc47b3a1f5ca44bd525debc1dd6b",
-      "sourceName": "contracts/horsesMarket/NFTAuctionMarketplace.sol",
-      "solcConfig": {
-        "version": "0.8.21",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
-        "@openzeppelin/contracts/security/Pausable.sol",
-        "./../AvatarNFT.sol",
-        "./../SiliquaCoin.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "AvatarAuctionMarketplace"
-      ]
-    },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/assetsMarket/NFTAuctionMarketplace.sol": {
       "lastModificationDate": 1702045393333,
       "contentHash": "7d57779d78a7f5c7965f758bc172cf3b",
@@ -1589,10 +1502,51 @@
         "AvatarNFT"
       ]
     },
-    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/racing/BettingHub.sol": {
+    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/match/AvatarSmashEvent.sol": {
+      "lastModificationDate": 1702049847482,
+      "contentHash": "0b087b68044b4ea187b3a848c4f17b05",
+      "sourceName": "contracts/match/AvatarSmashEvent.sol",
+      "solcConfig": {
+        "version": "0.8.21",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/utils/Counters.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
+        "./../AvatarNFT.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AvatarSmashEvent"
+      ]
+    },
+    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/match/BettingHub.sol": {
       "lastModificationDate": 1702049298386,
       "contentHash": "9b6349d3c88cca17e84462679eadfc87",
-      "sourceName": "contracts/racing/BettingHub.sol",
+      "sourceName": "contracts/match/BettingHub.sol",
       "solcConfig": {
         "version": "0.8.21",
         "settings": {
@@ -1630,10 +1584,10 @@
         "BettingHub"
       ]
     },
-    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/racing/AvatarSmashEvent.sol": {
-      "lastModificationDate": 1702049847482,
-      "contentHash": "0b087b68044b4ea187b3a848c4f17b05",
-      "sourceName": "contracts/racing/AvatarSmashEvent.sol",
+    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/avatarMarket/NFTMarketplace.sol": {
+      "lastModificationDate": 1702059380462,
+      "contentHash": "3f244724d9ffdb5f1558c0ac106a21fc",
+      "sourceName": "contracts/avatarMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
         "settings": {
@@ -1659,16 +1613,63 @@
         }
       },
       "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/security/ReentrancyGuard.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/utils/Counters.sol",
+        "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
         "@openzeppelin/contracts/security/Pausable.sol",
-        "./../AvatarNFT.sol"
+        "./../AvatarNFT.sol",
+        "./../SiliquaCoin.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "AvatarSmashEvent"
+        "AvatarMarketplace"
+      ]
+    },
+    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/avatarMarket/NFTAuctionMarketplace.sol": {
+      "lastModificationDate": 1702059279978,
+      "contentHash": "2b103a17059ef953d4f48d265662c9e8",
+      "sourceName": "contracts/avatarMarket/NFTAuctionMarketplace.sol",
+      "solcConfig": {
+        "version": "0.8.21",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/security/ReentrancyGuard.sol",
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
+        "./../AvatarNFT.sol",
+        "./../SiliquaCoin.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AvatarAuctionMarketplace"
       ]
     }
   }
