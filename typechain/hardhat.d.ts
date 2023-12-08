@@ -117,6 +117,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AssetsMarketplace__factory>;
     getContractFactory(
+      name: "AvatarNFT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AvatarNFT__factory>;
+    getContractFactory(
       name: "AvatarAuctionMarketplace",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AvatarAuctionMarketplace__factory>;
@@ -124,10 +128,6 @@ declare module "hardhat/types/runtime" {
       name: "AvatarMarketplace",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AvatarMarketplace__factory>;
-    getContractFactory(
-      name: "AvatarNFT",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AvatarNFT__factory>;
     getContractFactory(
       name: "AvatarSmashEvent",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -276,6 +276,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.AssetsMarketplace>;
     getContractAt(
+      name: "AvatarNFT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AvatarNFT>;
+    getContractAt(
       name: "AvatarAuctionMarketplace",
       address: string,
       signer?: ethers.Signer
@@ -285,11 +290,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.AvatarMarketplace>;
-    getContractAt(
-      name: "AvatarNFT",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AvatarNFT>;
     getContractAt(
       name: "AvatarSmashEvent",
       address: string,

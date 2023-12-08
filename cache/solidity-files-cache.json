@@ -1259,8 +1259,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/assetsMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1702045439153,
-      "contentHash": "6570b121439d0f15243b4c82d9b371cd",
+      "lastModificationDate": 1702060041778,
+      "contentHash": "0a1421740992adbea1f219175eb41de5",
       "sourceName": "contracts/assetsMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1303,8 +1303,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/assetsMarket/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1702045393333,
-      "contentHash": "7d57779d78a7f5c7965f758bc172cf3b",
+      "lastModificationDate": 1702060471668,
+      "contentHash": "b55932c0982e4bec52eb87a030122f1f",
       "sourceName": "contracts/assetsMarket/NFTAuctionMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1332,6 +1332,7 @@
       },
       "imports": [
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/security/ReentrancyGuard.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
         "@openzeppelin/contracts/security/Pausable.sol",
@@ -1460,51 +1461,9 @@
         "AssetsNFT"
       ]
     },
-    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/AvatarNFT.sol": {
-      "lastModificationDate": 1702047336760,
-      "contentHash": "572ca8668c2f9f63f1a71c41db026535",
-      "sourceName": "contracts/AvatarNFT.sol",
-      "solcConfig": {
-        "version": "0.8.21",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
-        "@openzeppelin/contracts/access/AccessControl.sol",
-        "@openzeppelin/contracts/utils/Counters.sol",
-        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        "@openzeppelin/contracts/security/Pausable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.9"
-      ],
-      "artifacts": [
-        "AvatarNFT"
-      ]
-    },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/match/AvatarSmashEvent.sol": {
-      "lastModificationDate": 1702049847482,
-      "contentHash": "0b087b68044b4ea187b3a848c4f17b05",
+      "lastModificationDate": 1702059628648,
+      "contentHash": "ef5d2a7c9628770b9db18f33a8cc9046",
       "sourceName": "contracts/match/AvatarSmashEvent.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1534,7 +1493,7 @@
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/utils/Counters.sol",
         "@openzeppelin/contracts/security/Pausable.sol",
-        "./../AvatarNFT.sol"
+        "./../avatarMarket/AvatarNFT.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
@@ -1544,7 +1503,7 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/match/BettingHub.sol": {
-      "lastModificationDate": 1702049298386,
+      "lastModificationDate": 1702059632979,
       "contentHash": "9b6349d3c88cca17e84462679eadfc87",
       "sourceName": "contracts/match/BettingHub.sol",
       "solcConfig": {
@@ -1585,8 +1544,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/avatarMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1702059380462,
-      "contentHash": "3f244724d9ffdb5f1558c0ac106a21fc",
+      "lastModificationDate": 1702059874152,
+      "contentHash": "76bb6ef1b062c9588aa919635d05b792",
       "sourceName": "contracts/avatarMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1618,7 +1577,7 @@
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
         "@openzeppelin/contracts/security/Pausable.sol",
-        "./../AvatarNFT.sol",
+        "./AvatarNFT.sol",
         "./../SiliquaCoin.sol"
       ],
       "versionPragmas": [
@@ -1629,8 +1588,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/avatarMarket/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1702059279978,
-      "contentHash": "2b103a17059ef953d4f48d265662c9e8",
+      "lastModificationDate": 1702060385237,
+      "contentHash": "7d95196e4b6f9a9603ea230b833b0bef",
       "sourceName": "contracts/avatarMarket/NFTAuctionMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1662,7 +1621,7 @@
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
         "@openzeppelin/contracts/security/Pausable.sol",
-        "./../AvatarNFT.sol",
+        "./AvatarNFT.sol",
         "./../SiliquaCoin.sol"
       ],
       "versionPragmas": [
@@ -1670,6 +1629,48 @@
       ],
       "artifacts": [
         "AvatarAuctionMarketplace"
+      ]
+    },
+    "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/avatarMarket/AvatarNFT.sol": {
+      "lastModificationDate": 1702059586560,
+      "contentHash": "572ca8668c2f9f63f1a71c41db026535",
+      "sourceName": "contracts/avatarMarket/AvatarNFT.sol",
+      "solcConfig": {
+        "version": "0.8.21",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/access/AccessControl.sol",
+        "@openzeppelin/contracts/utils/Counters.sol",
+        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        "@openzeppelin/contracts/security/Pausable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "AvatarNFT"
       ]
     }
   }

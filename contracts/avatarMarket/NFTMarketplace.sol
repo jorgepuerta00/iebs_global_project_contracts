@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./../AvatarNFT.sol";
+import "./AvatarNFT.sol";
 import "./../SiliquaCoin.sol";
 
 contract AvatarMarketplace is
@@ -70,10 +70,7 @@ contract AvatarMarketplace is
     commissionPercentage = _commissionPercentage;
   }
 
-  function listNFT(
-    uint256 _tokenId,
-    uint256 _price
-  ) external nonReentrant whenNotPaused {
+  function listNFT(uint256 _tokenId, uint256 _price) external whenNotPaused {
     require(nftToken.ownerOf(_tokenId) == msg.sender, "Only owner can sell");
 
     // Transfer the NFT tokens to the contract
@@ -92,9 +89,7 @@ contract AvatarMarketplace is
     listingId++;
   }
 
-  function cancelListing(
-    uint256 _listingId
-  ) external nonReentrant whenNotPaused {
+  function cancelListing(uint256 _listingId) external whenNotPaused {
     require(_listingId < listingId, "Invalid listing ID");
     Listing storage listing = listings[_listingId];
     require(
@@ -201,7 +196,6 @@ contract AvatarMarketplace is
   function updateCommissionPercentage(
     uint256 _newCommissionPercentage
   ) external onlyOwner whenNotPaused {
-    // Ensure the commission percentage is within a valid range
     require(_newCommissionPercentage <= 100, "Invalid commission percentage");
     commissionPercentage = _newCommissionPercentage;
     emit CommissionPercentageUpdated(_newCommissionPercentage);

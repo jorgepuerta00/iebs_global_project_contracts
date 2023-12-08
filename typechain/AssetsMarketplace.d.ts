@@ -12,6 +12,7 @@ import {
   BaseContract,
   ContractTransaction,
   Overrides,
+  PayableOverrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -21,7 +22,6 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface AssetsMarketplaceInterface extends ethers.utils.Interface {
   functions: {
-    "approveSeller(address)": FunctionFragment;
     "cancelListing(uint256)": FunctionFragment;
     "commissionPercentage()": FunctionFragment;
     "getActiveListings()": FunctionFragment;
@@ -36,7 +36,6 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     "paused()": FunctionFragment;
     "purchaseNFT(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "revokeSellerApproval(address)": FunctionFragment;
     "setNFTContract(address)": FunctionFragment;
     "setSiliquaCoin(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -47,10 +46,6 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     "updateCommissionPercentage(uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "approveSeller",
-    values: [string]
-  ): string;
   encodeFunctionData(
     functionFragment: "cancelListing",
     values: [BigNumberish]
@@ -93,10 +88,6 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "revokeSellerApproval",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setNFTContract",
     values: [string]
   ): string;
@@ -123,10 +114,6 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "approveSeller",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "cancelListing",
     data: BytesLike
@@ -160,10 +147,6 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "revokeSellerApproval",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -316,11 +299,6 @@ export class AssetsMarketplace extends BaseContract {
   interface: AssetsMarketplaceInterface;
 
   functions: {
-    approveSeller(
-      seller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     cancelListing(
       _listingId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -412,15 +390,10 @@ export class AssetsMarketplace extends BaseContract {
 
     purchaseNFT(
       _listingId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    revokeSellerApproval(
-      seller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -457,11 +430,6 @@ export class AssetsMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
-
-  approveSeller(
-    seller: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   cancelListing(
     _listingId: BigNumberish,
@@ -536,15 +504,10 @@ export class AssetsMarketplace extends BaseContract {
 
   purchaseNFT(
     _listingId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   renounceOwnership(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  revokeSellerApproval(
-    seller: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -582,8 +545,6 @@ export class AssetsMarketplace extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    approveSeller(seller: string, overrides?: CallOverrides): Promise<void>;
-
     cancelListing(
       _listingId: BigNumberish,
       overrides?: CallOverrides
@@ -659,11 +620,6 @@ export class AssetsMarketplace extends BaseContract {
     ): Promise<void>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    revokeSellerApproval(
-      seller: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     setNFTContract(
       _nftContractAddress: string,
@@ -870,11 +826,6 @@ export class AssetsMarketplace extends BaseContract {
   };
 
   estimateGas: {
-    approveSeller(
-      seller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     cancelListing(
       _listingId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -925,15 +876,10 @@ export class AssetsMarketplace extends BaseContract {
 
     purchaseNFT(
       _listingId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    revokeSellerApproval(
-      seller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -972,11 +918,6 @@ export class AssetsMarketplace extends BaseContract {
   };
 
   populateTransaction: {
-    approveSeller(
-      seller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     cancelListing(
       _listingId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1032,15 +973,10 @@ export class AssetsMarketplace extends BaseContract {
 
     purchaseNFT(
       _listingId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    revokeSellerApproval(
-      seller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

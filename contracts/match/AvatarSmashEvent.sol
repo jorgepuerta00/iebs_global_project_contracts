@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./../AvatarNFT.sol";
+import "./../avatarMarket/AvatarNFT.sol";
 
 contract AvatarSmashEvent is Ownable, Pausable {
   AvatarNFT public nftToken;

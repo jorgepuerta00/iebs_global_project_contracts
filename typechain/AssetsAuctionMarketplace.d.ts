@@ -12,6 +12,7 @@ import {
   BaseContract,
   ContractTransaction,
   Overrides,
+  PayableOverrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -21,7 +22,6 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface AssetsAuctionMarketplaceInterface extends ethers.utils.Interface {
   functions: {
-    "approveSeller(address)": FunctionFragment;
     "auctionId()": FunctionFragment;
     "auctions(uint256)": FunctionFragment;
     "commissionPercentage()": FunctionFragment;
@@ -33,9 +33,8 @@ interface AssetsAuctionMarketplaceInterface extends ethers.utils.Interface {
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
-    "placeBid(uint256,uint256)": FunctionFragment;
+    "placeBid(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "revokeSellerApproval(address)": FunctionFragment;
     "setNFTContract(address)": FunctionFragment;
     "setSiliquaCoin(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -46,10 +45,6 @@ interface AssetsAuctionMarketplaceInterface extends ethers.utils.Interface {
     "updateCommissionPercentage(uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "approveSeller",
-    values: [string]
-  ): string;
   encodeFunctionData(functionFragment: "auctionId", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "auctions",
@@ -81,15 +76,11 @@ interface AssetsAuctionMarketplaceInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "placeBid",
-    values: [BigNumberish, BigNumberish]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "revokeSellerApproval",
-    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "setNFTContract",
@@ -118,10 +109,6 @@ interface AssetsAuctionMarketplaceInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "approveSeller",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "auctionId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "auctions", data: BytesLike): Result;
   decodeFunctionResult(
@@ -148,10 +135,6 @@ interface AssetsAuctionMarketplaceInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "placeBid", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "revokeSellerApproval",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -277,11 +260,6 @@ export class AssetsAuctionMarketplace extends BaseContract {
   interface: AssetsAuctionMarketplaceInterface;
 
   functions: {
-    approveSeller(
-      seller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     auctionId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     auctions(
@@ -314,10 +292,10 @@ export class AssetsAuctionMarketplace extends BaseContract {
     commissionPercentage(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     createAuction(
-      tokenId: BigNumberish,
-      amount: BigNumberish,
-      startingPrice: BigNumberish,
-      duration: BigNumberish,
+      _tokenId: BigNumberish,
+      _amount: BigNumberish,
+      _startingPrice: BigNumberish,
+      _duration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -356,16 +334,10 @@ export class AssetsAuctionMarketplace extends BaseContract {
 
     placeBid(
       _auctionId: BigNumberish,
-      bidAmount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    revokeSellerApproval(
-      seller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -403,11 +375,6 @@ export class AssetsAuctionMarketplace extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  approveSeller(
-    seller: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   auctionId(overrides?: CallOverrides): Promise<BigNumber>;
 
   auctions(
@@ -440,10 +407,10 @@ export class AssetsAuctionMarketplace extends BaseContract {
   commissionPercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
   createAuction(
-    tokenId: BigNumberish,
-    amount: BigNumberish,
-    startingPrice: BigNumberish,
-    duration: BigNumberish,
+    _tokenId: BigNumberish,
+    _amount: BigNumberish,
+    _startingPrice: BigNumberish,
+    _duration: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -482,16 +449,10 @@ export class AssetsAuctionMarketplace extends BaseContract {
 
   placeBid(
     _auctionId: BigNumberish,
-    bidAmount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   renounceOwnership(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  revokeSellerApproval(
-    seller: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -529,8 +490,6 @@ export class AssetsAuctionMarketplace extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    approveSeller(seller: string, overrides?: CallOverrides): Promise<void>;
-
     auctionId(overrides?: CallOverrides): Promise<BigNumber>;
 
     auctions(
@@ -563,10 +522,10 @@ export class AssetsAuctionMarketplace extends BaseContract {
     commissionPercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
     createAuction(
-      tokenId: BigNumberish,
-      amount: BigNumberish,
-      startingPrice: BigNumberish,
-      duration: BigNumberish,
+      _tokenId: BigNumberish,
+      _amount: BigNumberish,
+      _startingPrice: BigNumberish,
+      _duration: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -603,16 +562,10 @@ export class AssetsAuctionMarketplace extends BaseContract {
 
     placeBid(
       _auctionId: BigNumberish,
-      bidAmount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    revokeSellerApproval(
-      seller: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     setNFTContract(
       _nftContractAddress: string,
@@ -751,11 +704,6 @@ export class AssetsAuctionMarketplace extends BaseContract {
   };
 
   estimateGas: {
-    approveSeller(
-      seller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     auctionId(overrides?: CallOverrides): Promise<BigNumber>;
 
     auctions(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -763,10 +711,10 @@ export class AssetsAuctionMarketplace extends BaseContract {
     commissionPercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
     createAuction(
-      tokenId: BigNumberish,
-      amount: BigNumberish,
-      startingPrice: BigNumberish,
-      duration: BigNumberish,
+      _tokenId: BigNumberish,
+      _amount: BigNumberish,
+      _startingPrice: BigNumberish,
+      _duration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -805,16 +753,10 @@ export class AssetsAuctionMarketplace extends BaseContract {
 
     placeBid(
       _auctionId: BigNumberish,
-      bidAmount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    revokeSellerApproval(
-      seller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -853,11 +795,6 @@ export class AssetsAuctionMarketplace extends BaseContract {
   };
 
   populateTransaction: {
-    approveSeller(
-      seller: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     auctionId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     auctions(
@@ -870,10 +807,10 @@ export class AssetsAuctionMarketplace extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     createAuction(
-      tokenId: BigNumberish,
-      amount: BigNumberish,
-      startingPrice: BigNumberish,
-      duration: BigNumberish,
+      _tokenId: BigNumberish,
+      _amount: BigNumberish,
+      _startingPrice: BigNumberish,
+      _duration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -912,16 +849,10 @@ export class AssetsAuctionMarketplace extends BaseContract {
 
     placeBid(
       _auctionId: BigNumberish,
-      bidAmount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    revokeSellerApproval(
-      seller: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

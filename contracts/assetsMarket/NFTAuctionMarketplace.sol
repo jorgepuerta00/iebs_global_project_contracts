@@ -2,13 +2,19 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "./AssetsNFT.sol";
 import "./../SiliquaCoin.sol";
 
-contract AssetsAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
+contract AssetsAuctionMarketplace is
+  Ownable,
+  ReentrancyGuard,
+  ERC1155Holder,
+  Pausable
+{
   AssetsNFT public nftToken;
   ISiliquaCoin public token;
   uint256 public commissionPercentage;
@@ -61,66 +67,67 @@ contract AssetsAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
   }
 
   function createAuction(
-    uint256 tokenId,
-    uint256 amount,
-    uint256 startingPrice,
-    uint256 duration
+    uint256 _tokenId,
+    uint256 _amount,
+    uint256 _startingPrice,
+    uint256 _duration
   ) external whenNotPaused {
     require(
-      nftToken.balanceOf(msg.sender, tokenId) >= amount,
+      nftToken.balanceOf(msg.sender, _tokenId) >= _amount,
       "Insufficient balance"
     );
+    require(_duration > 0, "Duration must be greater than 0");
 
     auctions[auctionId] = Auction({
       auctionId: auctionId,
       seller: msg.sender,
-      tokenId: tokenId,
-      amount: amount,
-      startingPrice: startingPrice,
-      highestBid: startingPrice,
+      tokenId: _tokenId,
+      amount: _amount,
+      startingPrice: _startingPrice,
+      highestBid: _startingPrice,
       highestBidder: address(0),
-      auctionEndTime: block.timestamp + duration,
+      auctionEndTime: block.timestamp + _duration,
       ended: false
     });
 
-    nftToken.transferFrom(msg.sender, address(this), tokenId, amount);
+    nftToken.transferFrom(msg.sender, address(this), _tokenId, _amount);
 
     emit AuctionCreated(
       auctionId,
       msg.sender,
-      tokenId,
-      amount,
-      startingPrice,
-      duration
+      _tokenId,
+      _amount,
+      _startingPrice,
+      _duration
     );
   }
 
   function placeBid(
-    uint256 _auctionId,
-    uint256 bidAmount
-  ) external whenNotPaused {
+    uint256 _auctionId
+  ) external payable nonReentrant whenNotPaused {
     Auction storage auction = auctions[_auctionId];
     require(!auction.ended, "Auction already ended");
     require(block.timestamp < auction.auctionEndTime, "Auction has ended");
     require(
-      bidAmount > auction.highestBid,
+      msg.value > auction.highestBid,
       "Bid amount must be higher than the current highest bid"
     );
 
     // Refund the previous highest bidder
     if (auction.highestBidder != address(0)) {
-      token.safeTransfer(auction.highestBidder, auction.highestBid);
+      payable(auction.highestBidder).transfer(auction.highestBid);
     }
 
-    // Place the new bid
-    token.safeTransferFrom(msg.sender, address(this), bidAmount);
-    auction.highestBid = bidAmount;
+    // Set the new highest bid
+    auction.highestBid = msg.value;
     auction.highestBidder = msg.sender;
 
-    emit BidPlaced(auction.auctionId, msg.sender, bidAmount);
+    emit BidPlaced(auction.auctionId, msg.sender, msg.value);
   }
 
-  function endAuction(uint256 _auctionId) external onlyOwner whenNotPaused {
+  function endAuction(
+    uint256 _auctionId
+  ) external onlyOwner nonReentrant whenNotPaused {
     Auction storage auction = auctions[_auctionId];
     require(!auction.ended, "Auction already ended");
     require(
@@ -133,13 +140,11 @@ contract AssetsAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
     if (auction.highestBidder != address(0)) {
       // Calculate commission amount
       uint256 feeAmount = (auction.highestBid * commissionPercentage) / 100;
-      uint256 total = auction.highestBid - feeAmount;
-
-      // Transfer the remaining amount to the seller
-      token.safeTransfer(auction.seller, total);
-
-      // Update total commission earned
       totalCommissionEarned += feeAmount;
+
+      // Transfer the remaining Ether amount to the seller
+      uint256 sellerAmount = auction.highestBid - feeAmount;
+      payable(auction.seller).transfer(sellerAmount);
 
       // Transfer NFT to the highest bidder
       nftToken.transferFrom(
@@ -148,6 +153,13 @@ contract AssetsAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
         auction.tokenId,
         auction.amount
       );
+
+      // Send 1 SiliquaCoin as a reward to the highest bidder
+      token.safeTransfer(auction.highestBidder, 1e18); // 1 SiliquaCoin
+
+      // Send 1 SiliquaCoin as a reward to the seller
+      token.safeTransfer(auction.seller, 1e18); // 1 SiliquaCoin
+
       emit AuctionEnded(
         auction.auctionId,
         auction.highestBidder,
@@ -165,16 +177,6 @@ contract AssetsAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
     }
   }
 
-  function approveSeller(address seller) external onlyOwner whenNotPaused {
-    nftToken.setApprovalForAll(seller, true);
-  }
-
-  function revokeSellerApproval(
-    address seller
-  ) external onlyOwner whenNotPaused {
-    nftToken.setApprovalForAll(seller, false);
-  }
-
   function setNFTContract(
     address _nftContractAddress
   ) external onlyOwner whenNotPaused {
@@ -190,7 +192,6 @@ contract AssetsAuctionMarketplace is Ownable, ERC1155Holder, Pausable {
   function updateCommissionPercentage(
     uint256 _newCommissionPercentage
   ) external onlyOwner whenNotPaused {
-    // Ensure the commission percentage is within a valid range
     require(_newCommissionPercentage <= 100, "Invalid commission percentage");
     commissionPercentage = _newCommissionPercentage;
   }

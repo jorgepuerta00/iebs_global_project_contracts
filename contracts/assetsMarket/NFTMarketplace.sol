@@ -78,24 +78,16 @@ contract AssetsMarketplace is
     uint256 _tokenId,
     uint256 _amount,
     uint256 _price
-  ) external nonReentrant whenNotPaused {
+  ) external whenNotPaused {
     require(
       nftToken.balanceOf(msg.sender, _tokenId) >= _amount,
       "Insufficient balance"
     );
 
-    // Deduct commission from the listing price
-    uint256 feeAmount = (_price * commissionPercentage) / 100;
-
-    // Transfer commission to the contract address
-    token.safeTransferFrom(msg.sender, address(this), feeAmount);
-
     // Transfer the NFT tokens to the contract
     nftToken.transferFrom(msg.sender, address(this), _tokenId, _amount);
 
-    // Update total commission earned
-    totalCommissionEarned += feeAmount;
-
+    // Create a new listing
     listings[listingId] = Listing(
       listingId,
       msg.sender,
@@ -108,9 +100,7 @@ contract AssetsMarketplace is
     listingId++;
   }
 
-  function cancelListing(
-    uint256 _listingId
-  ) external nonReentrant whenNotPaused {
+  function cancelListing(uint256 _listingId) external whenNotPaused {
     require(_listingId < listingId, "Invalid listing ID");
     Listing storage listing = listings[_listingId];
     require(
@@ -118,14 +108,6 @@ contract AssetsMarketplace is
       "Only the seller can cancel the listing"
     );
     require(listing.isActive, "Listing is not active");
-
-    // Transfer the NFT tokens back to the seller
-    nftToken.transferFrom(
-      address(this),
-      msg.sender,
-      listing.tokenId,
-      listing.amount
-    );
 
     // Deactivate the listing
     listing.isActive = false;
@@ -141,21 +123,26 @@ contract AssetsMarketplace is
     );
   }
 
-  function purchaseNFT(uint256 _listingId) external nonReentrant whenNotPaused {
+  function purchaseNFT(
+    uint256 _listingId
+  ) external payable nonReentrant whenNotPaused {
     require(_listingId < listingId, "ID doesn't exist");
     Listing storage listing = listings[_listingId];
     require(listing.isActive, "Listing is not active");
+    require(msg.value == listing.price, "Incorrect price");
 
     // Calculate commission amount
     uint256 feeAmount = (listing.price * commissionPercentage) / 100;
-
-    // Transfer the remaining amount to the seller
-    token.safeTransferFrom(msg.sender, listing.seller, listing.price);
-    token.safeTransfer(address(this), feeAmount);
-
-    // Update total commission earned
     totalCommissionEarned += feeAmount;
 
+    // Transfer commission from the sale price
+    payable(owner()).transfer(feeAmount);
+
+    // Transfer the remaining amount to the seller
+    uint256 sellerAmount = listing.price - feeAmount;
+    payable(listing.seller).transfer(sellerAmount);
+
+    // Transfer the NFT to the buyer
     nftToken.transferFrom(
       address(this),
       msg.sender,
@@ -163,6 +150,13 @@ contract AssetsMarketplace is
       listing.amount
     );
 
+    // Send 1 SiliquaCoin as a reward to the buyer
+    token.safeTransfer(msg.sender, 1e18); // 1 SiliquaCoin
+
+    // Send 1 SiliquaCoin as a reward to the seller
+    token.safeTransfer(listing.seller, 1e18); // 1 SiliquaCoin
+
+    // Update the listing as inactive
     listing.isActive = false;
     emit NFTPurchased(
       _listingId,
@@ -200,16 +194,6 @@ contract AssetsMarketplace is
     return activeListings;
   }
 
-  function approveSeller(address seller) external onlyOwner whenNotPaused {
-    nftToken.setApprovalForAll(seller, true);
-  }
-
-  function revokeSellerApproval(
-    address seller
-  ) external onlyOwner whenNotPaused {
-    nftToken.setApprovalForAll(seller, false);
-  }
-
   function setNFTContract(
     address _nftContractAddress
   ) external onlyOwner whenNotPaused {
@@ -227,7 +211,6 @@ contract AssetsMarketplace is
   function updateCommissionPercentage(
     uint256 _newCommissionPercentage
   ) external onlyOwner whenNotPaused {
-    // Ensure the commission percentage is within a valid range
     require(_newCommissionPercentage <= 100, "Invalid commission percentage");
     commissionPercentage = _newCommissionPercentage;
     emit CommissionPercentageUpdated(_newCommissionPercentage);

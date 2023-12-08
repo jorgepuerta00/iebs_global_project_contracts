@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./../AvatarNFT.sol";
+import "./AvatarNFT.sol";
 import "./../SiliquaCoin.sol";
 
 contract AvatarAuctionMarketplace is
@@ -130,7 +130,7 @@ contract AvatarAuctionMarketplace is
     auction.ended = true;
 
     if (auction.highestBidder != address(0)) {
-      // Calculate commission amount in SiliquaCoin
+      // Calculate commission amount
       uint256 feeAmount = (auction.highestBid * commissionPercentage) / 100;
       totalCommissionEarned += feeAmount;
 
