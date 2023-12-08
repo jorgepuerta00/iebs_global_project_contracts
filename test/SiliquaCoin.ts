@@ -10,12 +10,15 @@ describe('SiliquaCoin', () => {
   let addr1: Signer;
   let addr2: Signer;
   let addr3: Signer;
+  let votingPeriod: number;
 
   beforeEach(async () => {
     [owner, addr1, addr2, addr3] = await ethers.getSigners();
     SiliquaCoin = await ethers.getContractFactory('SiliquaCoin');
     siliquaCoin = (await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('1000000'))) as SiliquaCoin;
     await siliquaCoin.deployed();
+
+    votingPeriod = votingPeriod = (await siliquaCoin.VOTING_PERIOD()).toNumber();
   });
 
   describe('Deployment', () => {
@@ -183,4 +186,85 @@ describe('SiliquaCoin', () => {
     });
   });
 
+  describe('Gobernance', () => {
+    it('Should allow a user to create a proposal', async () => {
+      // Mint some tokens for addr1
+      await siliquaCoin.mint(await addr1.getAddress(), ethers.utils.parseEther('100'));
+
+      // addr1 creates a proposal
+      await expect(siliquaCoin.connect(addr1).createProposal("Proposal 1"))
+        .to.emit(siliquaCoin, 'ProposalCreated')
+        .withArgs(0, "Proposal 1");
+
+      // Check the proposal details
+      const proposal = await siliquaCoin.proposals(0);
+      expect(proposal.description).to.equal("Proposal 1");
+      expect(proposal.deadline).to.be.gt(0);
+    });
+
+    it('Should fail to create a proposal if the user does not have enough tokens', async () => {
+      // addr1 tries to create a proposal without enough tokens
+      await expect(siliquaCoin.connect(addr1).createProposal("Proposal 2"))
+        .to.be.revertedWith('Insufficient tokens');
+    });
+  });
+
+  describe('Voting on Proposals', () => {
+    beforeEach(async () => {
+      // Mint tokens and create a proposal
+      await siliquaCoin.mint(await addr1.getAddress(), ethers.utils.parseEther('100'));
+      await siliquaCoin.connect(addr1).createProposal("Proposal 1");
+    });
+
+    it('Should allow a user to vote on a proposal', async () => {
+      // addr1 votes on the proposal
+      await expect(siliquaCoin.connect(addr1).voteOnProposal(0, true))
+        .to.emit(siliquaCoin, 'Voted')
+        .withArgs(await addr1.getAddress(), 0, true);
+
+      // Check the vote count
+      const proposal = await siliquaCoin.proposals(0);
+      expect(proposal.yesVotes).to.equal(ethers.utils.parseEther('100'));
+    });
+
+    it('Should fail if the user tries to vote after the deadline', async () => {
+      // Increase time beyond the deadline
+      await ethers.provider.send('evm_increaseTime', [votingPeriod + 1]);
+      await ethers.provider.send('evm_mine', []);
+
+      // Attempt to vote, should fail
+      await expect(siliquaCoin.connect(addr1).voteOnProposal(0, true))
+        .to.be.revertedWith('Voting period over');
+    });
+  });
+
+  describe('Executing Proposals', () => {
+    beforeEach(async () => {
+      // Mint tokens, create and vote on a proposal
+      await siliquaCoin.mint(await addr1.getAddress(), ethers.utils.parseEther('100'));
+      await siliquaCoin.connect(addr1).createProposal("Proposal 1");
+      await siliquaCoin.connect(addr1).voteOnProposal(0, true);
+    });
+
+    it('Should execute a proposal after the voting period', async () => {
+      // Increase time beyond the deadline
+      await ethers.provider.send('evm_increaseTime', [votingPeriod + 1]);
+      await ethers.provider.send('evm_mine', []);
+
+      // Execute the proposal
+      await expect(siliquaCoin.executeProposal(0))
+        .to.emit(siliquaCoin, 'ProposalExecuted')
+        .withArgs(0, true);
+
+      // Verify the proposal is executed
+      const proposal = await siliquaCoin.proposals(0);
+      expect(proposal.executed).to.be.true;
+    });
+
+    it('Should fail to execute a proposal before the deadline', async () => {
+      // Attempt to execute the proposal before deadline
+      await expect(siliquaCoin.executeProposal(0))
+        .to.be.revertedWith('Voting not over');
+    });
+  });
 });

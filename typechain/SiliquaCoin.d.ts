@@ -21,22 +21,28 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface SiliquaCoinInterface extends ethers.utils.Interface {
   functions: {
+    "MIN_TOKENS_TO_PROPOSE()": FunctionFragment;
     "TOKEN_TO_ETH_RATE()": FunctionFragment;
+    "VOTING_PERIOD()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "burnFrom(address,uint256)": FunctionFragment;
     "claimTokens()": FunctionFragment;
+    "createProposal(string)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
+    "executeProposal(uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "lastClaimedTimestamp(address)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
+    "nextProposalId()": FunctionFragment;
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
+    "proposals(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "safeTransfer(address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
@@ -46,10 +52,19 @@ interface SiliquaCoinInterface extends ethers.utils.Interface {
     "transferFrom(address,address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unpause()": FunctionFragment;
+    "voteOnProposal(uint256,bool)": FunctionFragment;
   };
 
   encodeFunctionData(
+    functionFragment: "MIN_TOKENS_TO_PROPOSE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "TOKEN_TO_ETH_RATE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "VOTING_PERIOD",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -70,10 +85,18 @@ interface SiliquaCoinInterface extends ethers.utils.Interface {
     functionFragment: "claimTokens",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "createProposal",
+    values: [string]
+  ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "decreaseAllowance",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "executeProposal",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "increaseAllowance",
@@ -88,9 +111,17 @@ interface SiliquaCoinInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "nextProposalId",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "proposals",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
@@ -121,9 +152,21 @@ interface SiliquaCoinInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "voteOnProposal",
+    values: [BigNumberish, boolean]
+  ): string;
 
   decodeFunctionResult(
+    functionFragment: "MIN_TOKENS_TO_PROPOSE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "TOKEN_TO_ETH_RATE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "VOTING_PERIOD",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
@@ -135,9 +178,17 @@ interface SiliquaCoinInterface extends ethers.utils.Interface {
     functionFragment: "claimTokens",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "createProposal",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "executeProposal",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -150,9 +201,14 @@ interface SiliquaCoinInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "nextProposalId",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "proposals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -180,22 +236,32 @@ interface SiliquaCoinInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "voteOnProposal",
+    data: BytesLike
+  ): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
+    "ProposalCreated(uint256,string)": EventFragment;
+    "ProposalExecuted(uint256,bool)": EventFragment;
     "TokensPurchased(address,uint256,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
+    "Voted(address,uint256,bool)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ProposalCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ProposalExecuted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TokensPurchased"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Voted"): EventFragment;
 }
 
 export type ApprovalEvent = TypedEvent<
@@ -212,6 +278,14 @@ export type OwnershipTransferredEvent = TypedEvent<
 
 export type PausedEvent = TypedEvent<[string] & { account: string }>;
 
+export type ProposalCreatedEvent = TypedEvent<
+  [BigNumber, string] & { proposalId: BigNumber; description: string }
+>;
+
+export type ProposalExecutedEvent = TypedEvent<
+  [BigNumber, boolean] & { proposalId: BigNumber; result: boolean }
+>;
+
 export type TokensPurchasedEvent = TypedEvent<
   [string, BigNumber, BigNumber] & {
     buyer: string;
@@ -225,6 +299,14 @@ export type TransferEvent = TypedEvent<
 >;
 
 export type UnpausedEvent = TypedEvent<[string] & { account: string }>;
+
+export type VotedEvent = TypedEvent<
+  [string, BigNumber, boolean] & {
+    voter: string;
+    proposalId: BigNumber;
+    vote: boolean;
+  }
+>;
 
 export class SiliquaCoin extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -270,7 +352,11 @@ export class SiliquaCoin extends BaseContract {
   interface: SiliquaCoinInterface;
 
   functions: {
+    MIN_TOKENS_TO_PROPOSE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     TOKEN_TO_ETH_RATE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    VOTING_PERIOD(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     allowance(
       owner: string,
@@ -301,11 +387,21 @@ export class SiliquaCoin extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    createProposal(
+      _description: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
     decreaseAllowance(
       spender: string,
       subtractedValue: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    executeProposal(
+      _proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -321,12 +417,14 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<[BigNumber]>;
 
     mint(
-      _to: string,
-      _amount: BigNumberish,
+      to: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
+
+    nextProposalId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -335,6 +433,19 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<ContractTransaction>;
 
     paused(overrides?: CallOverrides): Promise<[boolean]>;
+
+    proposals(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, BigNumber, BigNumber, BigNumber, boolean] & {
+        description: string;
+        deadline: BigNumber;
+        yesVotes: BigNumber;
+        noVotes: BigNumber;
+        executed: boolean;
+      }
+    >;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -347,9 +458,9 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<ContractTransaction>;
 
     safeTransferFrom(
-      _from: string,
-      _to: string,
-      _amount: BigNumberish,
+      from: string,
+      to: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -378,9 +489,19 @@ export class SiliquaCoin extends BaseContract {
     unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    voteOnProposal(
+      _proposalId: BigNumberish,
+      _vote: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
+  MIN_TOKENS_TO_PROPOSE(overrides?: CallOverrides): Promise<BigNumber>;
+
   TOKEN_TO_ETH_RATE(overrides?: CallOverrides): Promise<BigNumber>;
+
+  VOTING_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
   allowance(
     owner: string,
@@ -411,11 +532,21 @@ export class SiliquaCoin extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  createProposal(
+    _description: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   decimals(overrides?: CallOverrides): Promise<number>;
 
   decreaseAllowance(
     spender: string,
     subtractedValue: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  executeProposal(
+    _proposalId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -431,12 +562,14 @@ export class SiliquaCoin extends BaseContract {
   ): Promise<BigNumber>;
 
   mint(
-    _to: string,
-    _amount: BigNumberish,
+    to: string,
+    amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   name(overrides?: CallOverrides): Promise<string>;
+
+  nextProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -445,6 +578,19 @@ export class SiliquaCoin extends BaseContract {
   ): Promise<ContractTransaction>;
 
   paused(overrides?: CallOverrides): Promise<boolean>;
+
+  proposals(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [string, BigNumber, BigNumber, BigNumber, boolean] & {
+      description: string;
+      deadline: BigNumber;
+      yesVotes: BigNumber;
+      noVotes: BigNumber;
+      executed: boolean;
+    }
+  >;
 
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -457,9 +603,9 @@ export class SiliquaCoin extends BaseContract {
   ): Promise<ContractTransaction>;
 
   safeTransferFrom(
-    _from: string,
-    _to: string,
-    _amount: BigNumberish,
+    from: string,
+    to: string,
+    amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -489,8 +635,18 @@ export class SiliquaCoin extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  voteOnProposal(
+    _proposalId: BigNumberish,
+    _vote: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
+    MIN_TOKENS_TO_PROPOSE(overrides?: CallOverrides): Promise<BigNumber>;
+
     TOKEN_TO_ETH_RATE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    VOTING_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
       owner: string,
@@ -516,6 +672,11 @@ export class SiliquaCoin extends BaseContract {
 
     claimTokens(overrides?: CallOverrides): Promise<void>;
 
+    createProposal(
+      _description: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     decimals(overrides?: CallOverrides): Promise<number>;
 
     decreaseAllowance(
@@ -523,6 +684,11 @@ export class SiliquaCoin extends BaseContract {
       subtractedValue: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    executeProposal(
+      _proposalId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     increaseAllowance(
       spender: string,
@@ -536,18 +702,33 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<BigNumber>;
 
     mint(
-      _to: string,
-      _amount: BigNumberish,
+      to: string,
+      amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     name(overrides?: CallOverrides): Promise<string>;
+
+    nextProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
     pause(overrides?: CallOverrides): Promise<void>;
 
     paused(overrides?: CallOverrides): Promise<boolean>;
+
+    proposals(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, BigNumber, BigNumber, BigNumber, boolean] & {
+        description: string;
+        deadline: BigNumber;
+        yesVotes: BigNumber;
+        noVotes: BigNumber;
+        executed: boolean;
+      }
+    >;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
@@ -558,9 +739,9 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<boolean>;
 
     safeTransferFrom(
-      _from: string,
-      _to: string,
-      _amount: BigNumberish,
+      from: string,
+      to: string,
+      amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -587,6 +768,12 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<void>;
 
     unpause(overrides?: CallOverrides): Promise<void>;
+
+    voteOnProposal(
+      _proposalId: BigNumberish,
+      _vote: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
@@ -630,6 +817,38 @@ export class SiliquaCoin extends BaseContract {
 
     Paused(account?: null): TypedEventFilter<[string], { account: string }>;
 
+    "ProposalCreated(uint256,string)"(
+      proposalId?: null,
+      description?: null
+    ): TypedEventFilter<
+      [BigNumber, string],
+      { proposalId: BigNumber; description: string }
+    >;
+
+    ProposalCreated(
+      proposalId?: null,
+      description?: null
+    ): TypedEventFilter<
+      [BigNumber, string],
+      { proposalId: BigNumber; description: string }
+    >;
+
+    "ProposalExecuted(uint256,bool)"(
+      proposalId?: null,
+      result?: null
+    ): TypedEventFilter<
+      [BigNumber, boolean],
+      { proposalId: BigNumber; result: boolean }
+    >;
+
+    ProposalExecuted(
+      proposalId?: null,
+      result?: null
+    ): TypedEventFilter<
+      [BigNumber, boolean],
+      { proposalId: BigNumber; result: boolean }
+    >;
+
     "TokensPurchased(address,uint256,uint256)"(
       buyer?: string | null,
       ethAmount?: null,
@@ -671,10 +890,32 @@ export class SiliquaCoin extends BaseContract {
     ): TypedEventFilter<[string], { account: string }>;
 
     Unpaused(account?: null): TypedEventFilter<[string], { account: string }>;
+
+    "Voted(address,uint256,bool)"(
+      voter?: string | null,
+      proposalId?: null,
+      vote?: null
+    ): TypedEventFilter<
+      [string, BigNumber, boolean],
+      { voter: string; proposalId: BigNumber; vote: boolean }
+    >;
+
+    Voted(
+      voter?: string | null,
+      proposalId?: null,
+      vote?: null
+    ): TypedEventFilter<
+      [string, BigNumber, boolean],
+      { voter: string; proposalId: BigNumber; vote: boolean }
+    >;
   };
 
   estimateGas: {
+    MIN_TOKENS_TO_PROPOSE(overrides?: CallOverrides): Promise<BigNumber>;
+
     TOKEN_TO_ETH_RATE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    VOTING_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
       owner: string,
@@ -705,11 +946,21 @@ export class SiliquaCoin extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    createProposal(
+      _description: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     decreaseAllowance(
       spender: string,
       subtractedValue: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    executeProposal(
+      _proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -725,12 +976,14 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<BigNumber>;
 
     mint(
-      _to: string,
-      _amount: BigNumberish,
+      to: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
+
+    nextProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -739,6 +992,11 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<BigNumber>;
 
     paused(overrides?: CallOverrides): Promise<BigNumber>;
+
+    proposals(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -751,9 +1009,9 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<BigNumber>;
 
     safeTransferFrom(
-      _from: string,
-      _to: string,
-      _amount: BigNumberish,
+      from: string,
+      to: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -782,10 +1040,22 @@ export class SiliquaCoin extends BaseContract {
     unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    voteOnProposal(
+      _proposalId: BigNumberish,
+      _vote: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    MIN_TOKENS_TO_PROPOSE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     TOKEN_TO_ETH_RATE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    VOTING_PERIOD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     allowance(
       owner: string,
@@ -819,11 +1089,21 @@ export class SiliquaCoin extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    createProposal(
+      _description: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     decreaseAllowance(
       spender: string,
       subtractedValue: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    executeProposal(
+      _proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -839,12 +1119,14 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     mint(
-      _to: string,
-      _amount: BigNumberish,
+      to: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    nextProposalId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -853,6 +1135,11 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    proposals(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -865,9 +1152,9 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     safeTransferFrom(
-      _from: string,
-      _to: string,
-      _amount: BigNumberish,
+      from: string,
+      to: string,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -894,6 +1181,12 @@ export class SiliquaCoin extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    voteOnProposal(
+      _proposalId: BigNumberish,
+      _vote: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

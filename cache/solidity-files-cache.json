@@ -722,8 +722,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/SiliquaCoin.sol": {
-      "lastModificationDate": 1702047276158,
-      "contentHash": "e80738f5ae98fc3a7bcf1f899e1f0275",
+      "lastModificationDate": 1702051794550,
+      "contentHash": "605a735fa5065feb673ef7908ead0774",
       "sourceName": "contracts/SiliquaCoin.sol",
       "solcConfig": {
         "version": "0.8.21",
