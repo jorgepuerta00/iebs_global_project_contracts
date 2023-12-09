@@ -678,8 +678,8 @@
       "artifacts": []
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/SiliquaCoin.sol": {
-      "lastModificationDate": 1702051794550,
-      "contentHash": "605a735fa5065feb673ef7908ead0774",
+      "lastModificationDate": 1702063255469,
+      "contentHash": "c5331be6fd2f26ace6fbbbd9fc8b814d",
       "sourceName": "contracts/SiliquaCoin.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -711,7 +711,8 @@
         "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
         "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol",
         "@openzeppelin/contracts/security/Pausable.sol",
-        "@openzeppelin/contracts/access/Ownable.sol"
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/security/ReentrancyGuard.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
@@ -1259,8 +1260,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/assetsMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1702060041778,
-      "contentHash": "0a1421740992adbea1f219175eb41de5",
+      "lastModificationDate": 1702063442904,
+      "contentHash": "b47cb9011915253973b47d33d547c34c",
       "sourceName": "contracts/assetsMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1287,7 +1288,6 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/security/ReentrancyGuard.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
@@ -1303,8 +1303,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/assetsMarket/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1702060471668,
-      "contentHash": "b55932c0982e4bec52eb87a030122f1f",
+      "lastModificationDate": 1702063468967,
+      "contentHash": "270f5cfaaa54cad45fee73f03fb6de0e",
       "sourceName": "contracts/assetsMarket/NFTAuctionMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1331,13 +1331,11 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/security/ReentrancyGuard.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
         "@openzeppelin/contracts/security/Pausable.sol",
-        "./AssetsNFT.sol",
-        "./../SiliquaCoin.sol"
+        "./AssetsNFT.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
@@ -1544,8 +1542,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/avatarMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1702059874152,
-      "contentHash": "76bb6ef1b062c9588aa919635d05b792",
+      "lastModificationDate": 1702063413529,
+      "contentHash": "492a9c784db1dac31997f1e8b857c2e1",
       "sourceName": "contracts/avatarMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1572,7 +1570,6 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/security/ReentrancyGuard.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
@@ -1588,8 +1585,8 @@
       ]
     },
     "/Users/jorgepuerta/repos/iebs_sprint_3/contracts/avatarMarket/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1702060385237,
-      "contentHash": "7d95196e4b6f9a9603ea230b833b0bef",
+      "lastModificationDate": 1702063378027,
+      "contentHash": "c17ec7edb94cc598e9a94e11f908a0a0",
       "sourceName": "contracts/avatarMarket/NFTAuctionMarketplace.sol",
       "solcConfig": {
         "version": "0.8.21",
@@ -1616,13 +1613,11 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/security/ReentrancyGuard.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol",
         "@openzeppelin/contracts/security/Pausable.sol",
-        "./AvatarNFT.sol",
-        "./../SiliquaCoin.sol"
+        "./AvatarNFT.sol"
       ],
       "versionPragmas": [
         "^0.8.20"

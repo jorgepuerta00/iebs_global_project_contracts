@@ -37,9 +37,7 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     "purchaseNFT(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "setNFTContract(address)": FunctionFragment;
-    "setSiliquaCoin(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
-    "token()": FunctionFragment;
     "totalCommissionEarned()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unpause()": FunctionFragment;
@@ -92,14 +90,9 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "setSiliquaCoin",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "token", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalCommissionEarned",
     values?: undefined
@@ -154,14 +147,9 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setSiliquaCoin",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalCommissionEarned",
     data: BytesLike
@@ -402,17 +390,10 @@ export class AssetsMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setSiliquaCoin(
-      _siliquaCoinAddress: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
-
-    token(overrides?: CallOverrides): Promise<[string]>;
 
     totalCommissionEarned(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -516,17 +497,10 @@ export class AssetsMarketplace extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setSiliquaCoin(
-    _siliquaCoinAddress: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   supportsInterface(
     interfaceId: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
-
-  token(overrides?: CallOverrides): Promise<string>;
 
   totalCommissionEarned(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -626,17 +600,10 @@ export class AssetsMarketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setSiliquaCoin(
-      _siliquaCoinAddress: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
-
-    token(overrides?: CallOverrides): Promise<string>;
 
     totalCommissionEarned(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -888,17 +855,10 @@ export class AssetsMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setSiliquaCoin(
-      _siliquaCoinAddress: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    token(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalCommissionEarned(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -985,17 +945,10 @@ export class AssetsMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setSiliquaCoin(
-      _siliquaCoinAddress: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalCommissionEarned(
       overrides?: CallOverrides

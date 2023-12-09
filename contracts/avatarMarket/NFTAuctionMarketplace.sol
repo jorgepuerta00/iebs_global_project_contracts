@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "./AvatarNFT.sol";
-import "./../SiliquaCoin.sol";
 
 contract AvatarAuctionMarketplace is
   Ownable,
@@ -16,7 +14,6 @@ contract AvatarAuctionMarketplace is
   Pausable
 {
   AvatarNFT public nftToken;
-  ISiliquaCoin public token;
   uint256 public commissionPercentage;
   uint256 public totalCommissionEarned;
 
@@ -54,13 +51,8 @@ contract AvatarAuctionMarketplace is
     uint256 winningBid
   );
 
-  constructor(
-    address _nftContractAddress,
-    address _siliquaCoinContractAddress,
-    uint256 _commissionPercentage
-  ) {
+  constructor(address _nftContractAddress, uint256 _commissionPercentage) {
     nftToken = AvatarNFT(_nftContractAddress);
-    token = ISiliquaCoin(_siliquaCoinContractAddress);
     commissionPercentage = _commissionPercentage;
   }
 
@@ -145,12 +137,6 @@ contract AvatarAuctionMarketplace is
         auction.tokenId
       );
 
-      // Send 1 SiliquaCoin as a reward to the highest bidder
-      token.safeTransfer(auction.highestBidder, 1e18); // 1 SiliquaCoin
-
-      // Send 1 SiliquaCoin as a reward to the seller
-      token.safeTransfer(auction.seller, 1e18); // 1 SiliquaCoin
-
       emit AuctionEnded(
         auction.auctionId,
         auction.highestBidder,
@@ -167,12 +153,6 @@ contract AvatarAuctionMarketplace is
     address _nftContractAddress
   ) external onlyOwner whenNotPaused {
     nftToken = AvatarNFT(_nftContractAddress);
-  }
-
-  function setSiliquaCoin(
-    address _siliquaCoinAddress
-  ) external onlyOwner whenNotPaused {
-    token = ISiliquaCoin(_siliquaCoinAddress);
   }
 
   function updateCommissionPercentage(

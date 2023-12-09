@@ -1,24 +1,19 @@
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
 import { Signer } from 'ethers';
-import { AssetsNFT, AssetsMarketplace, SiliquaCoin } from '../typechain';
+import { ethers } from 'hardhat';
+import { AssetsMarketplace, AssetsNFT } from '../typechain';
+
 describe('AssetsMarketplace', () => {
   let owner: Signer;
   let addr1: Signer;
   let addr2: Signer;
   let addr3: Signer;
-  let siliquaCoin: SiliquaCoin;
   let nftContract: AssetsNFT;
   let marketplace: AssetsMarketplace;
   let assets: any[] = [];
 
   beforeEach(async () => {
     [owner, addr1, addr2, addr3] = await ethers.getSigners();
-
-    // Deploy the test ERC-20 Token contract
-    const SiliquaCoin = await ethers.getContractFactory('SiliquaCoin');
-    siliquaCoin = await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('1000000'));
-    await siliquaCoin.deployed();
 
     // Deploy the AssetsNFT token
     const AssetsNFT = await ethers.getContractFactory('AssetsNFT');
@@ -27,7 +22,7 @@ describe('AssetsMarketplace', () => {
 
     // Deploy the AssetsMarketplace contract
     marketplace = await ethers.getContractFactory('AssetsMarketplace', owner)
-      .then(factory => factory.deploy(siliquaCoin.address, nftContract.address, 10)) // 10% commission
+      .then(factory => factory.deploy(nftContract.address, 10)) // 10% commission
       .then(contract => contract.deployed());
 
     assets = [
@@ -83,10 +78,6 @@ describe('AssetsMarketplace', () => {
       // Get the seller's address
       const sellerAddress = await addr1.getAddress();
 
-      // Mint a siliquaCoin for the seller
-      await siliquaCoin.connect(owner).mint(await addr1.getAddress(), 1000);
-      await siliquaCoin.connect(addr1).approve(marketplace.address, 1000);
-
       // Mint NFTs and transfer ownership to the contract or other accounts
       await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 1000, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
 
@@ -114,10 +105,6 @@ describe('AssetsMarketplace', () => {
 
     it('should not allow listing NFTs if the caller does not own the token', async () => {
       const tokenId = 33;
-
-      // Mint a siliquaCoin for the seller
-      await siliquaCoin.connect(owner).mint(await addr1.getAddress(), 1000);
-      await siliquaCoin.connect(addr1).approve(marketplace.address, 1000);
 
       // Mint a new NFT for a different address
       await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 200, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
@@ -158,16 +145,12 @@ describe('AssetsMarketplace', () => {
       const tokenId = 33;
       const amount = 1;
 
-      // Mint a siliquaCoin for the seller
-      await siliquaCoin.connect(owner).mint(sellerAddress, 1000);
-      await siliquaCoin.connect(addr1).approve(marketplace.address, 1000);
-
       // Mint a new NFT for the seller
       await nftContract.connect(owner).mint(sellerAddress, tokenId, 400, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
-      await marketplace.connect(owner).approveSeller(sellerAddress);
+      //await marketplace.connect(owner).approveSeller(sellerAddress);
 
       // List the NFT
       await marketplace.connect(addr1).listNFT(tokenId, amount, 350);
@@ -195,16 +178,12 @@ describe('AssetsMarketplace', () => {
       const tokenId = 33;
       const amount = 1;
 
-      // Mint a siliquaCoin for the seller
-      await siliquaCoin.connect(owner).mint(sellerAddress, 1000);
-      await siliquaCoin.connect(addr1).approve(marketplace.address, 1000);
-
       // Mint a new NFT for the seller
       await nftContract.connect(owner).mint(sellerAddress, tokenId, 400, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
-      await marketplace.connect(owner).approveSeller(sellerAddress);
+      //await marketplace.connect(owner).approveSeller(sellerAddress);
 
       // List the NFT
       await marketplace.connect(addr1).listNFT(tokenId, amount, 350);
@@ -227,34 +206,27 @@ describe('AssetsMarketplace', () => {
       const buyerAddress = await addr2.getAddress();
       const tokenId = 33;
       const amount = 1;
-      const price = 90;
-
-      // Mint a siliquaCoin for the seller
-      await siliquaCoin.connect(owner).mint(await addr1.getAddress(), 1000);
-      await siliquaCoin.connect(addr1).approve(marketplace.address, 1000);
-
-      // Mint a siliquaCoin for the buyer
-      await siliquaCoin.connect(owner).mint(await addr2.getAddress(), 1000);
-      await siliquaCoin.connect(addr2).approve(marketplace.address, 1000);
+      const tokenPrice = 90;
+      const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
       await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
-      await marketplace.connect(owner).approveSeller(buyerAddress);
+      //await marketplace.connect(owner).approveSeller(buyerAddress);
 
       // List the NFT for sale
-      await marketplace.connect(addr1).listNFT(tokenId, amount, price);
+      await marketplace.connect(addr1).listNFT(tokenId, amount, tokenPriceInWei);
 
       // Ensure the listing is active before purchasing
       const initialActiveListings = await marketplace.getActiveListings();
       expect(initialActiveListings.length).to.equal(1);
 
       // Purchase the NFT
-      await expect(marketplace.connect(addr2).purchaseNFT(0))
+      await expect(marketplace.connect(addr2).purchaseNFT(0, { value: tokenPriceInWei }))
         .to.emit(marketplace, 'NFTPurchased')
-        .withArgs(0, buyerAddress, sellerAddress, tokenId, amount, price, 'purchased');
+        .withArgs(0, buyerAddress, sellerAddress, tokenId, amount, tokenPriceInWei, 'purchased');
 
       // Ensure the listing is no longer active after the purchase
       const finalActiveListings = await marketplace.getActiveListings();
@@ -285,34 +257,27 @@ describe('AssetsMarketplace', () => {
       const buyerAddress = await addr2.getAddress();
       const tokenId = 33;
       const amount = 1;
-      const price = 90;
-
-      // Mint a siliquaCoin for the seller
-      await siliquaCoin.connect(owner).mint(await addr1.getAddress(), 1000);
-      await siliquaCoin.connect(addr1).approve(marketplace.address, 1000);
-
-      // Mint a siliquaCoin for the buyer
-      await siliquaCoin.connect(owner).mint(await addr2.getAddress(), 1000);
-      await siliquaCoin.connect(addr2).approve(marketplace.address, 1000);
+      const tokenPrice = 90;
+      const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
       await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
-      await marketplace.connect(owner).approveSeller(buyerAddress);
+      //await marketplace.connect(owner).approveSeller(buyerAddress);
 
       // List the NFT for sale
-      await marketplace.connect(addr1).listNFT(tokenId, amount, price);
+      await marketplace.connect(addr1).listNFT(tokenId, amount, tokenPriceInWei);
 
       // Ensure the listing is active before purchasing
       const initialActiveListings = await marketplace.getActiveListings();
       expect(initialActiveListings.length).to.equal(1);
 
       // Purchase the NFT
-      await expect(marketplace.connect(addr2).purchaseNFT(0))
+      await expect(marketplace.connect(addr2).purchaseNFT(0, { value: tokenPriceInWei }))
         .to.emit(marketplace, 'NFTPurchased')
-        .withArgs(0, buyerAddress, sellerAddress, tokenId, amount, price, 'purchased');
+        .withArgs(0, buyerAddress, sellerAddress, tokenId, amount, tokenPriceInWei, 'purchased');
 
       // Ensure the listing is no longer active after the purchase
       const finalActiveListings = await marketplace.getActiveListings();
@@ -327,14 +292,8 @@ describe('AssetsMarketplace', () => {
       // Get the seller's address
       const sellerAddress = await owner.getAddress();
       const tokenId = 33;
-
-      // Mint a siliquaCoin for the seller
-      await siliquaCoin.connect(owner).mint(await owner.getAddress(), 1000);
-      await siliquaCoin.connect(owner).approve(marketplace.address, 1000);
-
-      // Mint a siliquaCoin for the buyer
-      await siliquaCoin.connect(owner).mint(await addr1.getAddress(), 1000);
-      await siliquaCoin.connect(addr1).approve(marketplace.address, 1000);
+      const tokenPrice = 90;
+      const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
       await nftContract.connect(owner).mint(sellerAddress, tokenId, 80, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
@@ -343,10 +302,10 @@ describe('AssetsMarketplace', () => {
       await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
 
       // List the NFT for sale
-      await marketplace.connect(owner).listNFT(tokenId, 1, 70);
+      await marketplace.connect(owner).listNFT(tokenId, 1, tokenPriceInWei);
 
       // Purchase the listed NFT
-      await marketplace.connect(addr1).purchaseNFT(0);
+      await marketplace.connect(addr1).purchaseNFT(0, { value: tokenPriceInWei });
 
       // Ensure the listing is inactive after the purchase
       const inactiveListings = await marketplace.getActiveListings();
@@ -360,14 +319,8 @@ describe('AssetsMarketplace', () => {
       // Get the seller's address
       const sellerAddress = await owner.getAddress();
       const tokenId = 33;
-
-      // Mint a siliquaCoin for the seller
-      await siliquaCoin.connect(owner).mint(await owner.getAddress(), 1000);
-      await siliquaCoin.connect(owner).approve(marketplace.address, 1000);
-
-      // Mint a siliquaCoin for the buyer with insufficient funds
-      await siliquaCoin.connect(owner).mint(await addr1.getAddress(), 500);
-      await siliquaCoin.connect(addr1).approve(marketplace.address, 5000);
+      const tokenPrice = 100000;
+      const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
       await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
@@ -376,14 +329,19 @@ describe('AssetsMarketplace', () => {
       await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
 
       // List the NFT for sale
-      await marketplace.connect(owner).listNFT(tokenId, 1, 600);
+      await marketplace.connect(owner).listNFT(tokenId, 1, tokenPriceInWei);
 
       // Ensure the listing is active before purchasing
       const initialActiveListings = await marketplace.getActiveListings();
       expect(initialActiveListings.length).to.equal(1);
 
-      // Attempt to purchase the NFT with insufficient funds
-      await expect(marketplace.connect(addr1).purchaseNFT(0)).to.be.revertedWith("ERC20: transfer amount exceeds balance");
+      try {
+        await marketplace.connect(addr1).purchaseNFT(0, { value: tokenPriceInWei });
+        expect.fail("La transacción no debería haberse completado");
+      } catch (error: any) {
+        // Ensure the error message is correct
+        expect(error.message).to.include("sender doesn't have enough funds");
+      }
 
       // Ensure the listing is still active after the failed purchase attempt
       const activeListings = await marketplace.getActiveListings();
@@ -412,30 +370,6 @@ describe('AssetsMarketplace', () => {
 
       // Call the setNFTContract function by a non-owner
       await expect(marketplace.connect(addr2).setNFTContract(newNFTContractAddress)).to.be.revertedWith("Ownable: caller is not the owner");
-    });
-  });
-
-  describe('setSiliquaCoin', () => {
-    it('should allow the owner to set the SiliquaCoin contract address', async () => {
-      // Get the new SiliquaCoin contract address
-      const newSiliquaCoinAddress = await siliquaCoin.connect(owner).address;
-
-      // Call the setSiliquaCoin function by the owner
-      await expect(marketplace.connect(owner).setSiliquaCoin(newSiliquaCoinAddress))
-        .to.emit(marketplace, 'SiliquaCoinUpdated')
-        .withArgs(newSiliquaCoinAddress);
-
-      // Verify that the SiliquaCoin contract address has been updated
-      const updatedSiliquaCoinAddress = await marketplace.token();
-      expect(updatedSiliquaCoinAddress).to.equal(newSiliquaCoinAddress);
-    });
-
-    it('should not allow non-owner to set the SiliquaCoin contract address', async () => {
-      // Get the new SiliquaCoin contract address
-      const newSiliquaCoinAddress = await siliquaCoin.connect(owner).address;
-
-      // Call the setSiliquaCoin function by a non-owner
-      await expect(marketplace.connect(addr1).setSiliquaCoin(newSiliquaCoinAddress)).to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 

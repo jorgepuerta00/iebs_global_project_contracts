@@ -1,24 +1,18 @@
 import { expect } from 'chai';
 import { BigNumberish, Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import { AssetsNFT, AssetsAuctionMarketplace, SiliquaCoin } from '../typechain';
+import { AssetsAuctionMarketplace, AssetsNFT } from '../typechain';
 
 describe('AssetsAuctionMarketplace', () => {
   let owner: Signer;
   let seller: Signer;
   let bidder1: Signer;
   let bidder2: Signer;
-  let siliquaCoin: SiliquaCoin;
   let nftContract: AssetsNFT;
   let marketplace: AssetsAuctionMarketplace;
 
   beforeEach(async () => {
     [owner, seller, bidder1, bidder2] = await ethers.getSigners();
-
-    // Deploy the test ERC-20 Token contract
-    const SiliquaCoin = await ethers.getContractFactory('SiliquaCoin');
-    siliquaCoin = await SiliquaCoin.deploy('SiliquaCoin', 'SILQ', ethers.utils.parseEther('1000000'));
-    await siliquaCoin.deployed();
 
     // Deploy the AssetsNFT token
     const AssetsNFT = await ethers.getContractFactory('AssetsNFT');
@@ -27,21 +21,19 @@ describe('AssetsAuctionMarketplace', () => {
 
     // Deploy the NFTMarketplace contract
     marketplace = await ethers.getContractFactory('AssetsAuctionMarketplace', owner)
-      .then(factory => factory.deploy(nftContract.address, siliquaCoin.address, 15)) // 15% commission
+      .then(factory => factory.deploy(nftContract.address, 15)) // 15% commission
       .then(contract => contract.deployed());
   });
 
   describe('createAuction', () => {
     it('should allow the seller to create an auction for their NFT', async () => {
       // Get the seller's and bidder's addresses
+      const tokenId = 0;
       const sellerAddress = await seller.getAddress();
-
-      // Mint a siliquaCoin for the seller and approve the marketplace contract
-      await siliquaCoin.connect(owner).mint(sellerAddress, ethers.utils.parseEther('1000'));
-      await siliquaCoin.connect(seller).approve(marketplace.address, ethers.utils.parseEther('1000'));
+      const startingPrice = ethers.utils.parseUnits('1', 'ether');
+      const auctionDuration = 86400; // 1 day
 
       // Mint a new NFT for the seller
-      const tokenId = 0;
       await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/0.json');
 
       // Ensure the seller has approved the marketplace contract to spend their NFTs
@@ -51,8 +43,6 @@ describe('AssetsAuctionMarketplace', () => {
       const balanceBeforeAuction = await nftContract.balanceOf(marketplace.address, tokenId);
 
       // Create an auction for the NFT
-      const startingPrice = ethers.utils.parseEther('1');
-      const auctionDuration = 86400; // 1 day
       await expect(marketplace.connect(seller).createAuction(tokenId, 50, startingPrice, auctionDuration))
         .to.emit(marketplace, 'AuctionCreated')
         .withArgs(0, sellerAddress, tokenId, 50, startingPrice, auctionDuration);
@@ -78,7 +68,7 @@ describe('AssetsAuctionMarketplace', () => {
     it('should revert if seller does not own the token', async () => {
       const tokenId = 1;
       const amount = 50;
-      const startingPrice = ethers.utils.parseEther('1');
+      const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
 
       // Attempt to create an auction without owning the token
@@ -89,10 +79,6 @@ describe('AssetsAuctionMarketplace', () => {
     it('should revert if seller does not have sufficient balance of the token', async () => {
       // Get the seller's and bidder's addresses
       const sellerAddress = await seller.getAddress();
-
-      // Mint a siliquaCoin for the seller and approve the marketplace contract
-      await siliquaCoin.connect(owner).mint(sellerAddress, ethers.utils.parseEther('1000'));
-      await siliquaCoin.connect(seller).approve(marketplace.address, ethers.utils.parseEther('1000'));
 
       // Mint a new NFT for the seller
       const tokenId = 0;
@@ -112,13 +98,13 @@ describe('AssetsAuctionMarketplace', () => {
   describe('placeBid', () => {
     it('should revert if auction has already ended', async () => {
       const tokenId = 1;
+      const initialSupply = 100;
       const amount = 50;
-      const startingPrice = ethers.utils.parseEther('1');
+      const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
 
       // Mint tokens, create an auction, and approve bidder
-      await mintTokensAndCreateAuction(tokenId, amount, startingPrice, auctionDuration);
-      await approveBidder(bidder1);
+      await mintTokensAndCreateAuction(tokenId, initialSupply, amount, startingPrice, auctionDuration);
 
       // Increase time to make the auction end
       await ethers.provider.send('evm_increaseTime', [86401]); // 1 day + 1 second
@@ -127,72 +113,76 @@ describe('AssetsAuctionMarketplace', () => {
       marketplace.connect(seller).endAuction(0);
 
       // Attempt to place a bid after auction has ended
-      await expect(marketplace.connect(bidder1).placeBid(0, ethers.utils.parseEther('2')))
+      await expect(marketplace.connect(bidder1).placeBid(0))
         .to.be.revertedWith("Auction has ended");
     });
 
     it('should revert if bid amount is not higher than current highest bid', async () => {
       const tokenId = 1;
+      const initialSupply = 100;
       const amount = 50;
-      const startingPrice = ethers.utils.parseEther('1');
+      const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
 
       // Mint tokens, create an auction, and approve bidder
-      await mintTokensAndCreateAuction(tokenId, amount, startingPrice, auctionDuration);
+      await mintTokensAndCreateAuction(tokenId, initialSupply, amount, startingPrice, auctionDuration);
 
       // Attempt to place a bid with an amount equal to current highest bid
-      await expect(marketplace.connect(bidder1).placeBid(0, startingPrice))
+      await expect(marketplace.connect(bidder1).placeBid(0))
         .to.be.revertedWith("Bid amount must be higher than the current highest bid");
     });
 
     it('should allow bidder to place a valid bid', async () => {
       const tokenId = 1;
+      const initialSupply = 100;
       const amount = 50;
-      const startingPrice = ethers.utils.parseEther('1');
+      const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
 
       // Mint tokens, create an auction, and approve bidder
-      await mintTokensAndCreateAuction(tokenId, amount, startingPrice, auctionDuration);
-      await approveBidder(bidder1);
+      await mintTokensAndCreateAuction(tokenId, initialSupply, amount, startingPrice, auctionDuration);
 
       // Place a valid bid
-      await expect(marketplace.connect(bidder1).placeBid(0, ethers.utils.parseEther('2')))
+      await expect(marketplace.connect(bidder1).placeBid(0, { value: ethers.utils.parseUnits('2', 'ether') }))
         .to.emit(marketplace, 'BidPlaced')
-        .withArgs(0, await bidder1.getAddress(), ethers.utils.parseEther('2'));
+        .withArgs(0, await bidder1.getAddress(), ethers.utils.parseUnits('2', 'ether'));
 
       // Verify auction details after placing bid
       const auction = await marketplace.auctions(0);
-      expect(auction.highestBid).to.equal(ethers.utils.parseEther('2'));
+      expect(auction.highestBid).to.equal(ethers.utils.parseUnits('2', 'ether'));
       expect(auction.highestBidder).to.equal(await bidder1.getAddress());
     });
 
     it('should refund previous highest bidder', async () => {
       const tokenId = 1;
+      const initialSupply = 100;
       const amount = 50;
-      const startingPrice = ethers.utils.parseEther('1');
+      const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
 
       // Mint tokens, create an auction, and approve bidder
-      await mintTokensAndCreateAuction(tokenId, amount, startingPrice, auctionDuration);
-      await approveBidder(bidder1);
+      await mintTokensAndCreateAuction(tokenId, initialSupply, amount, startingPrice, auctionDuration);
+
+      // Verify initial balance of bidder1
+      const inicialBalanceBidder1 = await ethers.provider.getBalance(await bidder1.getAddress());
+      expect(inicialBalanceBidder1).to.equal('9997999824206717754573');
 
       // Place an initial bid
-      await marketplace.connect(bidder1).placeBid(0, ethers.utils.parseEther('2'));
+      await marketplace.connect(bidder1).placeBid(0, { value: ethers.utils.parseUnits('2', 'ether') });
 
-      // Verify previous highest bidder (bidder1) is refunded
-      const previousbidder1Balance = await siliquaCoin.balanceOf(await bidder1.getAddress());
-      expect(previousbidder1Balance).to.equal(ethers.utils.parseEther('998'));
+      // veryfy new balance of bidder1
+      const newBalanceBidder1 = await ethers.provider.getBalance(await bidder1.getAddress());
+      expect(newBalanceBidder1).to.equal('9995999762180335144045');
 
       // Increase time to make another bidder place a higher bid
       await ethers.provider.send('evm_increaseTime', [3600]); // 1 hour
 
       // Place a higher bid from bidder2
-      await approveBidder(bidder2);
-      await marketplace.connect(bidder2).placeBid(0, ethers.utils.parseEther('3'));
+      await marketplace.connect(bidder2).placeBid(0, { value: ethers.utils.parseUnits('3', 'ether') });
 
       // Verify previous highest bidder (bidder1) is refunded
-      const bidder1Balance = await siliquaCoin.balanceOf(await bidder1.getAddress());
-      expect(bidder1Balance).to.equal(ethers.utils.parseEther('1000'));
+      const previousBalanceBidder1 = await ethers.provider.getBalance(await bidder1.getAddress());
+      expect(previousBalanceBidder1).to.equal('9997999762180335144045');
     });
 
   });
@@ -200,13 +190,13 @@ describe('AssetsAuctionMarketplace', () => {
   describe('endAuction', () => {
     it('should revert if auction has already ended', async () => {
       const tokenId = 1;
+      const initialSupply = 100;
       const amount = 50;
-      const startingPrice = ethers.utils.parseEther('1');
+      const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
 
       // Mint tokens, create an auction, and approve bidder
-      await mintTokensAndCreateAuction(tokenId, amount, startingPrice, auctionDuration);
-      await approveBidder(bidder1);
+      await mintTokensAndCreateAuction(tokenId, initialSupply, amount, startingPrice, auctionDuration);
 
       // Increase time to make the auction end
       await ethers.provider.send('evm_increaseTime', [86401]); // 1 day + 1 second
@@ -215,19 +205,19 @@ describe('AssetsAuctionMarketplace', () => {
       marketplace.connect(seller).endAuction(0);
 
       // Attempt to place a bid after auction has ended
-      await expect(marketplace.connect(bidder1).placeBid(0, ethers.utils.parseEther('2')))
+      await expect(marketplace.connect(bidder1).placeBid(0))
         .to.be.revertedWith("Auction has ended");
     });
 
     it('should revert if auction has not yet ended', async () => {
       const tokenId = 1;
+      const initialSupply = 100;
       const amount = 50;
-      const startingPrice = ethers.utils.parseEther('1');
+      const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
 
       // Mint tokens, create an auction, and approve bidder
-      await mintTokensAndCreateAuction(tokenId, amount, startingPrice, auctionDuration);
-      await approveBidder(bidder1);
+      await mintTokensAndCreateAuction(tokenId, initialSupply, amount, startingPrice, auctionDuration);
 
       // Attempt to end the auction before it has ended
       await expect(marketplace.connect(owner).endAuction(0))
@@ -236,24 +226,29 @@ describe('AssetsAuctionMarketplace', () => {
 
     it('should end the auction and transfer NFT and funds correctly', async () => {
       const tokenId = 1;
+      const initialSupply = 100;
       const amount = 50;
-      const startingPrice = ethers.utils.parseEther('1');
+      const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
 
       // Mint tokens, create an auction, and approve bidder
-      await mintTokensAndCreateAuction(tokenId, amount, startingPrice, auctionDuration);
-      await approveBidder(bidder1);
+      await mintTokensAndCreateAuction(tokenId, initialSupply, amount, startingPrice, auctionDuration);
 
       // Place a bid
-      await marketplace.connect(bidder1).placeBid(0, ethers.utils.parseEther('2'));
+      await marketplace.connect(bidder1).placeBid(0, { value: ethers.utils.parseUnits('3', 'ether') });
 
       // Increase time to make the auction end
       await ethers.provider.send('evm_increaseTime', [86401]); // 1 day + 1 second
 
+      // verify initial balance of seller
+      const initialBalanceSeller = await ethers.provider.getBalance(await seller.getAddress());
+      console.log('seller initial balance: ', ethers.utils.formatEther(initialBalanceSeller));
+      expect(initialBalanceSeller).to.equal('9999997642027684155444');
+
       // End the auction
       await expect(marketplace.connect(owner).endAuction(0))
         .to.emit(marketplace, 'AuctionEnded')
-        .withArgs(0, await bidder1.getAddress(), ethers.utils.parseEther('2'));
+        .withArgs(0, await bidder1.getAddress(), ethers.utils.parseUnits('3', 'ether'));
 
       // Verify NFT is transferred to the highest bidder
       const bidder1NFTBalance = await nftContract.balanceOf(await bidder1.getAddress(), tokenId);
@@ -261,32 +256,38 @@ describe('AssetsAuctionMarketplace', () => {
 
       // Verify NFT is deducted from seller 
       const sellerBalance = await nftContract.balanceOf(await seller.getAddress(), tokenId);
-      expect(sellerBalance).to.equal(amount);
+      expect(sellerBalance).to.equal(initialSupply - amount);
 
       // Verify auction details after ending
       const auction = await marketplace.auctions(0);
+      console.log('auction ended: ', auction.ended);
       expect(auction.ended).to.be.true;
 
       // Verify total seller earned (after commission)
-      const bidAmount = ethers.utils.parseEther('2');
+      const bidAmount = ethers.utils.parseUnits('3', 'ether');
       const feeAmount = (bidAmount.mul(15)).div(100);
       const totalCommissionEarned = await marketplace.totalCommissionEarned();
       expect(totalCommissionEarned).to.equal(feeAmount);
+      console.log('bidAmount: ', ethers.utils.formatEther(bidAmount));
+      console.log('total Commission Earned: ', ethers.utils.formatEther(totalCommissionEarned));
 
       // Verify funds are transferred to the seller (after commission)
       const total = bidAmount.sub(feeAmount);
-      const sellerTokenBalance = await siliquaCoin.balanceOf(await seller.getAddress());
-      expect(sellerTokenBalance).to.equal(total.add(ethers.utils.parseEther('1000')));
+      const newBalanceSeller = await ethers.provider.getBalance(await seller.getAddress());
+
+      expect(newBalanceSeller).to.equal(initialBalanceSeller.add(total));
+      console.log('seller new balance: ', ethers.utils.formatEther(newBalanceSeller));
     });
 
     it('should end the auction and transfer NFT back to seller if no bids were placed', async () => {
       const tokenId = 1;
+      const initialSupply = 100;
       const amount = 50;
-      const startingPrice = ethers.utils.parseEther('1');
+      const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
 
       // Mint tokens, create an auction, and approve bidder
-      await mintTokensAndCreateAuction(tokenId, amount, startingPrice, auctionDuration);
+      await mintTokensAndCreateAuction(tokenId, initialSupply, amount, startingPrice, auctionDuration);
 
       // Increase time to make the auction end
       await ethers.provider.send('evm_increaseTime', [86401]); // 1 day + 1 second
@@ -306,12 +307,9 @@ describe('AssetsAuctionMarketplace', () => {
     });
   });
 
-  async function mintTokensAndCreateAuction(tokenId: BigNumberish, amount: BigNumberish, startingPrice: BigNumberish, auctionDuration: BigNumberish) {
-    // Mint a siliquaCoin for the seller and approve the marketplace contract
-    await approveBidder(seller);
-
+  async function mintTokensAndCreateAuction(tokenId: BigNumberish, initialSupply: BigNumberish, amount: BigNumberish, startingPrice: BigNumberish, auctionDuration: BigNumberish) {
     // Mint a new NFT for the seller
-    await nftContract.connect(owner).mint(await seller.getAddress(), tokenId, 100, `https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/${tokenId}.json`);
+    await nftContract.connect(owner).mint(await seller.getAddress(), tokenId, initialSupply, `https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/${tokenId}.json`);
 
     // Ensure the seller has approved the marketplace contract to spend their NFTs
     await nftContract.connect(seller).setApprovalForAll(marketplace.address, true);
@@ -319,10 +317,4 @@ describe('AssetsAuctionMarketplace', () => {
     // Create an auction for the NFT
     await marketplace.connect(seller).createAuction(tokenId, amount, startingPrice, auctionDuration);
   }
-
-  async function approveBidder(bidder: Signer) {
-    await siliquaCoin.connect(owner).mint(await bidder.getAddress(), ethers.utils.parseEther('1000'));
-    await siliquaCoin.connect(bidder).approve(marketplace.address, ethers.utils.parseEther('1000'));
-  }
-
 });

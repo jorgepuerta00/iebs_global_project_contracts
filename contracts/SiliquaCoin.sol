@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 interface ISiliquaCoin {
   function safeTransfer(address to, uint256 value) external returns (bool);
@@ -18,7 +19,13 @@ interface ISiliquaCoin {
   ) external returns (bool);
 }
 
-contract SiliquaCoin is ERC20, ERC20Burnable, Ownable, Pausable {
+contract SiliquaCoin is
+  ERC20,
+  ERC20Burnable,
+  Ownable,
+  ReentrancyGuard,
+  Pausable
+{
   using SafeERC20 for IERC20;
 
   uint256 public constant TOKEN_TO_ETH_RATE = 1000; // 1 ETH = 1000 SiliquaCoin
@@ -57,7 +64,7 @@ contract SiliquaCoin is ERC20, ERC20Burnable, Ownable, Pausable {
   }
 
   // exchange eth for tokens
-  receive() external payable whenNotPaused {
+  receive() external payable nonReentrant whenNotPaused {
     // Calculate the amount of tokens to mint based on the ETH sent
     uint256 ethAmount = msg.value;
     uint256 tokenAmount = ethAmount * TOKEN_TO_ETH_RATE;

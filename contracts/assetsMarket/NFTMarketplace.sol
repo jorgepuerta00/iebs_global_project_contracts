@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
@@ -16,7 +15,6 @@ contract AssetsMarketplace is
   Pausable
 {
   AssetsNFT public nftToken;
-  ISiliquaCoin public token;
   uint256 public commissionPercentage;
   uint256 public totalCommissionEarned;
 
@@ -64,13 +62,8 @@ contract AssetsMarketplace is
   event SiliquaCoinUpdated(address indexed newSiliquaCoinAddress);
   event CommissionPercentageUpdated(uint256 newCommissionPercentage);
 
-  constructor(
-    address _siliquaCoinAddress,
-    address _nftContractAddress,
-    uint256 _commissionPercentage
-  ) {
+  constructor(address _nftContractAddress, uint256 _commissionPercentage) {
     nftToken = AssetsNFT(_nftContractAddress);
-    token = ISiliquaCoin(_siliquaCoinAddress);
     commissionPercentage = _commissionPercentage;
   }
 
@@ -150,12 +143,6 @@ contract AssetsMarketplace is
       listing.amount
     );
 
-    // Send 1 SiliquaCoin as a reward to the buyer
-    token.safeTransfer(msg.sender, 1e18); // 1 SiliquaCoin
-
-    // Send 1 SiliquaCoin as a reward to the seller
-    token.safeTransfer(listing.seller, 1e18); // 1 SiliquaCoin
-
     // Update the listing as inactive
     listing.isActive = false;
     emit NFTPurchased(
@@ -199,13 +186,6 @@ contract AssetsMarketplace is
   ) external onlyOwner whenNotPaused {
     nftToken = AssetsNFT(_nftContractAddress);
     emit NFTContractUpdated(_nftContractAddress);
-  }
-
-  function setSiliquaCoin(
-    address _siliquaCoinAddress
-  ) external onlyOwner whenNotPaused {
-    token = ISiliquaCoin(_siliquaCoinAddress);
-    emit SiliquaCoinUpdated(_siliquaCoinAddress);
   }
 
   function updateCommissionPercentage(
