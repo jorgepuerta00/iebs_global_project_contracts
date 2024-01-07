@@ -166,7 +166,7 @@ describe('AssetsAuctionMarketplace', () => {
       // Verify initial balance of bidder1
       const inicialBalanceBidder1 = await ethers.provider.getBalance(await bidder1.getAddress());
       console.log('bidder1 initial balance: ', ethers.utils.formatEther(inicialBalanceBidder1));
-      expect(inicialBalanceBidder1).to.equal('9996872160140977281128');
+      expect(inicialBalanceBidder1).to.equal('9996872161908977295272');
 
       // Place an initial bid
       await marketplace.connect(bidder1).placeBid(0, { value: ethers.utils.parseUnits('2', 'ether') });
@@ -174,7 +174,7 @@ describe('AssetsAuctionMarketplace', () => {
       // veryfy new balance of bidder1
       const newBalanceBidder1 = await ethers.provider.getBalance(await bidder1.getAddress());
       console.log('bidder1 new balance: ', ethers.utils.formatEther(newBalanceBidder1));
-      expect(newBalanceBidder1).to.equal('9994872098596976788776');
+      expect(newBalanceBidder1).to.equal('9994872100364976802920');
 
       // Increase time to make another bidder place a higher bid
       await ethers.provider.send('evm_increaseTime', [3600]); // 1 hour
@@ -185,7 +185,7 @@ describe('AssetsAuctionMarketplace', () => {
       // Verify previous highest bidder (bidder1) is refunded
       const currentBalanceBidder1 = await ethers.provider.getBalance(await bidder1.getAddress());
       console.log('bidder1 current balance: ', ethers.utils.formatEther(currentBalanceBidder1));
-      expect(currentBalanceBidder1).to.equal('9996872098596976788776');
+      expect(currentBalanceBidder1).to.equal('9996872100364976802920');
     });
 
   });
@@ -246,7 +246,7 @@ describe('AssetsAuctionMarketplace', () => {
       // verify initial balance of seller
       const initialBalanceSeller = await ethers.provider.getBalance(await seller.getAddress());
       console.log('seller initial balance: ', ethers.utils.formatEther(initialBalanceSeller));
-      expect(initialBalanceSeller).to.equal('9996572073032936347852');
+      expect(initialBalanceSeller).to.equal('9996572073016936347724');
 
       // End the auction
       await expect(marketplace.connect(owner).endAuction(0))
