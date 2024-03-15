@@ -4,7 +4,7 @@ import { ethers } from 'hardhat';
 import { AvatarNFT } from '../typechain';
 
 describe('AvatarNFT', () => {
-  let ArtNFTFactory: ContractFactory;
+  let NFTFactory: ContractFactory;
   let nftContract: AvatarNFT;
   let owner: Signer;
   let addr1: Signer;
@@ -12,8 +12,8 @@ describe('AvatarNFT', () => {
 
   beforeEach(async () => {
     [owner, addr1, addr2] = await ethers.getSigners();
-    ArtNFTFactory = await ethers.getContractFactory('AvatarNFT');
-    nftContract = (await ArtNFTFactory.deploy()) as AvatarNFT;
+    NFTFactory = await ethers.getContractFactory('AvatarNFT');
+    nftContract = (await NFTFactory.deploy('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6')) as AvatarNFT;
     await nftContract.deployed();
   });
 
@@ -26,13 +26,13 @@ describe('AvatarNFT', () => {
 
   describe('Minting', () => {
     it('Should allow owner to mint new tokens', async () => {
-      await nftContract.connect(owner).safeMint(await addr1.getAddress(), 'https://example.com/token/1');
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
       expect(await nftContract.ownerOf(0)).to.equal(await addr1.getAddress());
-      expect(await nftContract.tokenURI(0)).to.equal('https://example.com/token/1');
+      expect(await nftContract.tokenURI(0)).to.equal('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/0');
     });
 
     it('Should revert if non-owner tries to mint', async () => {
-      await expect(nftContract.connect(addr1).safeMint(await addr2.getAddress(), 'https://example.com/token/2')).to.be.revertedWith(
+      await expect(nftContract.connect(addr1).safeMint(await addr2.getAddress())).to.be.revertedWith(
         'AccessControl: account 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 is missing role 0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6'
       );
     });
@@ -40,21 +40,21 @@ describe('AvatarNFT', () => {
 
   describe('Token Burning', () => {
     it('Should allow owner to burn tokens', async () => {
-      await nftContract.connect(owner).safeMint(await owner.getAddress(), 'https://example.com/token/1');
+      await nftContract.connect(owner).safeMint(await owner.getAddress());
       await expect(nftContract.connect(owner).burn(1)).to.be.revertedWith('ERC721: invalid token ID');
     });
 
     it('Should revert if non-owner tries to burn tokens', async () => {
-      await nftContract.connect(owner).safeMint(await addr1.getAddress(), 'https://example.com/token/1');
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
       await expect(nftContract.connect(addr1).burn(1)).to.be.revertedWith('AccessControl: account 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 is missing role 0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6');
     });
   });
 
   describe('URI and Interface', () => {
     it('Should return correct token URI', async () => {
-      await nftContract.connect(owner).safeMint(await addr1.getAddress(), 'https://example.com/token/1');
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
       const uri = await nftContract.tokenURI(0);
-      expect(uri).to.equal('https://example.com/token/1');
+      expect(uri).to.equal('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/0');
     });
 
     it('Should support ERC721 and ERC721URIStorage interfaces', async () => {

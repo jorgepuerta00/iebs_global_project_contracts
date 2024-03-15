@@ -12,10 +12,22 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
 
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
   Counters.Counter private _tokenIdCounter;
+  string private baseURI;
 
-  constructor() ERC721("AvatarNFT", "AVA") {
+  constructor(string memory _initialBaseURI) ERC721("AvatarNFT", "AVA") {
     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     _grantRole(MINTER_ROLE, msg.sender);
+    setBaseURI(_initialBaseURI);
+  }
+
+  function setBaseURI(
+    string memory _newBaseURI
+  ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    baseURI = _newBaseURI;
+  }
+
+  function _baseURI() internal view override returns (string memory) {
+    return baseURI;
   }
 
   function burn(uint256 _tokenId) public onlyRole(MINTER_ROLE) whenNotPaused {
@@ -33,14 +45,16 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     super._burn(_tokenId);
   }
 
-  function safeMint(
-    address _to,
-    string memory _uri
-  ) public onlyRole(MINTER_ROLE) whenNotPaused {
+  function safeMint(address _to) public onlyRole(MINTER_ROLE) whenNotPaused {
     uint256 tokenId = _tokenIdCounter.current();
     _tokenIdCounter.increment();
+
+    string memory newTokenURI = string(
+      abi.encodePacked("/", uint2str(tokenId))
+    );
+
     _safeMint(_to, tokenId);
-    _setTokenURI(tokenId, _uri);
+    _setTokenURI(tokenId, newTokenURI);
   }
 
   function tokenURI(
@@ -84,5 +98,24 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
 
   function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
     _unpause();
+  }
+
+  function uint2str(uint256 _i) internal pure returns (string memory) {
+    if (_i == 0) {
+      return "0";
+    }
+    uint256 j = _i;
+    uint256 length;
+    while (j != 0) {
+      length++;
+      j /= 10;
+    }
+    bytes memory bstr = new bytes(length);
+    uint256 k = length;
+    while (_i != 0) {
+      bstr[--k] = bytes1(uint8(48 + (_i % 10)));
+      _i /= 10;
+    }
+    return string(bstr);
   }
 }

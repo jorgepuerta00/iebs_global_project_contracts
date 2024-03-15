@@ -1,74 +1,32 @@
 import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import { AssetsMarketplace, AssetsNFT } from '../typechain';
+import { AvatarMarketplace, AvatarNFT } from '../typechain';
 
-describe('AssetsMarketplace', () => {
+describe('AvatarMarketplace', () => {
   let owner: Signer;
   let addr1: Signer;
   let addr2: Signer;
   let addr3: Signer;
-  let nftContract: AssetsNFT;
-  let marketplace: AssetsMarketplace;
-  let assets: any[] = [];
+  let nftContract: AvatarNFT;
+  let marketplace: AvatarMarketplace;
 
   beforeEach(async () => {
     [owner, addr1, addr2, addr3] = await ethers.getSigners();
 
-    // Deploy the AssetsNFT token
-    const AssetsNFT = await ethers.getContractFactory('AssetsNFT');
-    nftContract = await AssetsNFT.deploy();
+    // Deploy the AvatarNFT token
+    const AvatarNFT = await ethers.getContractFactory('AvatarNFT');
+    nftContract = await AvatarNFT.deploy('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6');
     await nftContract.deployed();
 
-    // Deploy the AssetsMarketplace contract
-    marketplace = await ethers.getContractFactory('AssetsMarketplace', owner)
+    // Deploy the AvatarMarketplace contract
+    marketplace = await ethers.getContractFactory('AvatarMarketplace', owner)
       .then(factory => factory.deploy(nftContract.address, 10)) // 10% commission
       .then(contract => contract.deployed());
 
-    assets = [
-      { id: 0, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/0.json', amount: 1 },     // SADDLE_GOLD
-      { id: 1, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/1.json', amount: 10 },    // SADDLE_SILVER
-      { id: 2, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/2.json', amount: 100 },   // SADDLE_BRONZE
-      { id: 3, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/3.json', amount: 1 },     // HORSESHOE_GOLD
-      { id: 4, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/4.json', amount: 10 },    // HORSESHOE_SILVER
-      { id: 5, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/5.json', amount: 100 },   // HORSESHOE_BRONZE
-      { id: 6, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/6.json', amount: 1 },     // BIT_GOLD
-      { id: 7, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/7.json', amount: 10 },    // BIT_SILVER
-      { id: 8, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/8.json', amount: 100 },   // BIT_BRONZE
-      { id: 9, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/9.json', amount: 1 },     // REINS_GOLD
-      { id: 10, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/10.json', amount: 10 },  // REINS_SILVER
-      { id: 11, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/11.json', amount: 100 }, // REINS_BRONZE
-      { id: 12, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/12.json', amount: 1 },   // STIRRUPS_GOLD
-      { id: 13, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/13.json', amount: 10 },  // STIRRUPS_SILVER
-      { id: 14, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/14.json', amount: 100 }, // STIRRUPS_BRONZE
-      { id: 15, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/15.json', amount: 1 },   // GIRTH_GOLD
-      { id: 16, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/16.json', amount: 10 },  // GIRTH_SILVER
-      { id: 17, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/17.json', amount: 100 }, // GIRTH_BRONZE
-      { id: 18, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/18.json', amount: 1 },   // BREASTPLATE_GOLD
-      { id: 19, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/19.json', amount: 10 },  // BREASTPLATE_SILVER
-      { id: 20, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/20.json', amount: 100 }, // BREASTPLATE_BRONZE
-      { id: 21, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/21.json', amount: 1 },   // LEGWRAPS_GOLD
-      { id: 22, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/22.json', amount: 10 },  // LEGWRAPS_SILVER
-      { id: 23, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/23.json', amount: 100 }, // LEGWRAPS_BRONZE
-      { id: 24, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/24.json', amount: 1 },   // NOSEBAND_GOLD
-      { id: 25, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/25.json', amount: 10 },  // NOSEBAND_SILVER
-      { id: 26, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/26.json', amount: 100 }, // NOSEBAND_BRONZE
-      { id: 27, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/27.json', amount: 1 },   // BLANKET_GOLD
-      { id: 28, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/28.json', amount: 10 },  // BLANKET_SILVER
-      { id: 29, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/29.json', amount: 100 }, // BLANKET_BRONZE
-      { id: 30, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/30.json', amount: 1 },   // SKIN_GOLD
-      { id: 31, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/31.json', amount: 10 },  // SKIN_SILVER
-      { id: 32, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/32.json', amount: 100 }  // SKIN_BRONZE
-    ];
-
     // Mint NFTs and transfer ownership to owner contract
-    for (const asset of assets) {
-      await nftContract.connect(owner).mint(
-        await owner.getAddress(),
-        asset.id,
-        asset.amount,
-        asset.uri
-      );
+    for (let i = 0; i < 5; i++) {
+      await nftContract.connect(owner).safeMint(await owner.getAddress());
     }
   });
 
@@ -79,7 +37,7 @@ describe('AssetsMarketplace', () => {
       const sellerAddress = await addr1.getAddress();
 
       // Mint NFTs and transfer ownership to the contract or other accounts
-      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 1000, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
 
       // Approve the contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -89,7 +47,7 @@ describe('AssetsMarketplace', () => {
       expect(initialListings.length).to.equal(0);
 
       // List the NFT
-      await expect(marketplace.connect(addr1).listNFT(tokenId, 1, 100))
+      await expect(marketplace.connect(addr1).listNFT(tokenId, 1))
         .to.emit(marketplace, 'NFTListed')
         .withArgs(0, sellerAddress, tokenId, 1, 100, 'listed');
 
@@ -98,7 +56,6 @@ describe('AssetsMarketplace', () => {
       expect(activeListings.length).to.equal(1);
       expect(activeListings[0].seller).to.equal(sellerAddress);
       expect(activeListings[0].tokenId).to.equal(tokenId);
-      expect(activeListings[0].amount).to.equal(1);
       expect(activeListings[0].price).to.equal(100);
       expect(activeListings[0].isActive).to.be.true;
     });
@@ -107,13 +64,13 @@ describe('AssetsMarketplace', () => {
       const tokenId = 33;
 
       // Mint a new NFT for a different address
-      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 200, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
 
       // Approve the marketplace contract to spend the NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
 
       // Try to list the NFT from a different address
-      await expect(marketplace.connect(addr1).listNFT(32, 1, 150)).to.be.revertedWith("Insufficient balance");
+      await expect(marketplace.connect(addr1).listNFT(32, 1)).to.be.revertedWith("Insufficient balance");
 
       // Ensure there are no active listings
       const activeListings = await marketplace.getActiveListings();
@@ -124,13 +81,13 @@ describe('AssetsMarketplace', () => {
       const tokenId = 33;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 200, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
 
       // Try to list more NFTs than the seller owns
-      await expect(marketplace.connect(addr1).listNFT(tokenId, 300, 2500)).to.be.revertedWith("Insufficient balance");
+      await expect(marketplace.connect(addr1).listNFT(tokenId, 300)).to.be.revertedWith("Insufficient balance");
 
       // Ensure there are no active listings
       const activeListings = await marketplace.getActiveListings();
@@ -143,17 +100,16 @@ describe('AssetsMarketplace', () => {
       // Get the seller's address
       const sellerAddress = await addr1.getAddress();
       const tokenId = 33;
-      const amount = 1;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 400, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).safeMint(sellerAddress);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
       //await marketplace.connect(owner).approveSeller(sellerAddress);
 
       // List the NFT
-      await marketplace.connect(addr1).listNFT(tokenId, amount, 350);
+      await marketplace.connect(addr1).listNFT(tokenId, 400);
 
       // Get the listing ID
       const listingId = 0;
@@ -165,7 +121,7 @@ describe('AssetsMarketplace', () => {
       // Cancel the listing
       await expect(marketplace.connect(addr1).cancelListing(listingId))
         .to.emit(marketplace, 'NFTListingCancelled')
-        .withArgs(listingId, sellerAddress, tokenId, amount, 350, 'cancelled');
+        .withArgs(listingId, sellerAddress, tokenId, 350, 'cancelled');
 
       // Ensure the listing is no longer active after canceling
       const finalActiveListings = await marketplace.getActiveListings();
@@ -176,17 +132,16 @@ describe('AssetsMarketplace', () => {
       // Get the seller's address
       const sellerAddress = await addr1.getAddress();
       const tokenId = 33;
-      const amount = 1;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 400, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).safeMint(sellerAddress);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
       //await marketplace.connect(owner).approveSeller(sellerAddress);
 
       // List the NFT
-      await marketplace.connect(addr1).listNFT(tokenId, amount, 350);
+      await marketplace.connect(addr1).listNFT(tokenId, 400);
 
       // Ensure the listing is active before canceling
       const initialActiveListings = await marketplace.getActiveListings();
@@ -205,19 +160,18 @@ describe('AssetsMarketplace', () => {
       const sellerAddress = await addr1.getAddress();
       const buyerAddress = await addr2.getAddress();
       const tokenId = 33;
-      const amount = 1;
       const tokenPrice = 90;
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).safeMint(sellerAddress);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
       //await marketplace.connect(owner).approveSeller(buyerAddress);
 
       // List the NFT for sale
-      await marketplace.connect(addr1).listNFT(tokenId, amount, tokenPriceInWei);
+      await marketplace.connect(addr1).listNFT(tokenId, tokenPriceInWei);
 
       // Ensure the listing is active before purchasing
       const initialActiveListings = await marketplace.getActiveListings();
@@ -226,14 +180,14 @@ describe('AssetsMarketplace', () => {
       // Purchase the NFT
       await expect(marketplace.connect(addr2).purchaseNFT(0, { value: tokenPriceInWei }))
         .to.emit(marketplace, 'NFTPurchased')
-        .withArgs(0, buyerAddress, sellerAddress, tokenId, amount, tokenPriceInWei, 'purchased');
+        .withArgs(0, buyerAddress, sellerAddress, tokenId, tokenPriceInWei);
 
       // Ensure the listing is no longer active after the purchase
       const finalActiveListings = await marketplace.getActiveListings();
       expect(finalActiveListings.length).to.equal(0);
 
       // Verify the buyer received the NFT
-      const buyerBalance = await nftContract.balanceOf(buyerAddress, tokenId);
+      const buyerBalance = await nftContract.balanceOf(buyerAddress);
       expect(buyerBalance).to.equal(1);
 
       // Try to cancel the inactive listing
@@ -256,19 +210,18 @@ describe('AssetsMarketplace', () => {
       const sellerAddress = await addr1.getAddress();
       const buyerAddress = await addr2.getAddress();
       const tokenId = 33;
-      const amount = 1;
       const tokenPrice = 90;
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).safeMint(sellerAddress);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
       //await marketplace.connect(owner).approveSeller(buyerAddress);
 
       // List the NFT for sale
-      await marketplace.connect(addr1).listNFT(tokenId, amount, tokenPriceInWei);
+      await marketplace.connect(addr1).listNFT(tokenId, tokenPriceInWei);
 
       // Ensure the listing is active before purchasing
       const initialActiveListings = await marketplace.getActiveListings();
@@ -277,14 +230,14 @@ describe('AssetsMarketplace', () => {
       // Purchase the NFT
       await expect(marketplace.connect(addr2).purchaseNFT(0, { value: tokenPriceInWei }))
         .to.emit(marketplace, 'NFTPurchased')
-        .withArgs(0, buyerAddress, sellerAddress, tokenId, amount, tokenPriceInWei, 'purchased');
+        .withArgs(0, buyerAddress, sellerAddress, tokenId, tokenPriceInWei);
 
       // Ensure the listing is no longer active after the purchase
       const finalActiveListings = await marketplace.getActiveListings();
       expect(finalActiveListings.length).to.equal(0);
 
       // Verify the buyer received the NFT
-      const buyerBalance = await nftContract.balanceOf(buyerAddress, tokenId);
+      const buyerBalance = await nftContract.balanceOf(buyerAddress);
       expect(buyerBalance).to.equal(1);
     });
 
@@ -296,13 +249,13 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 80, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).safeMint(sellerAddress);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
 
       // List the NFT for sale
-      await marketplace.connect(owner).listNFT(tokenId, 1, tokenPriceInWei);
+      await marketplace.connect(owner).listNFT(tokenId, tokenPriceInWei);
 
       // Purchase the listed NFT
       await marketplace.connect(addr1).purchaseNFT(0, { value: tokenPriceInWei });
@@ -323,13 +276,13 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).safeMint(sellerAddress);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
 
       // List the NFT for sale
-      await marketplace.connect(owner).listNFT(tokenId, 1, tokenPriceInWei);
+      await marketplace.connect(owner).listNFT(tokenId, tokenPriceInWei);
 
       // Ensure the listing is active before purchasing
       const initialActiveListings = await marketplace.getActiveListings();

@@ -28,6 +28,7 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     "listNFT(uint256,uint256)": FunctionFragment;
     "listingId()": FunctionFragment;
     "listings(uint256)": FunctionFragment;
+    "mintPrice()": FunctionFragment;
     "nftToken()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
@@ -35,7 +36,9 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "purchaseNFT(uint256)": FunctionFragment;
+    "purchaseNFTsPackage()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "setMintPrice(uint256)": FunctionFragment;
     "setNFTContract(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "totalCommissionEarned()": FunctionFragment;
@@ -65,6 +68,7 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     functionFragment: "listings",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "mintPrice", values?: undefined): string;
   encodeFunctionData(functionFragment: "nftToken", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "onERC1155BatchReceived",
@@ -82,8 +86,16 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "purchaseNFTsPackage",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMintPrice",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setNFTContract",
@@ -122,6 +134,7 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "listNFT", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "listingId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "listings", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintPrice", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nftToken", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "onERC1155BatchReceived",
@@ -139,7 +152,15 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "purchaseNFTsPackage",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMintPrice",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -334,6 +355,8 @@ export class AvatarMarketplace extends BaseContract {
       }
     >;
 
+    mintPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     nftToken(overrides?: CallOverrides): Promise<[string]>;
 
     onERC1155BatchReceived(
@@ -367,7 +390,16 @@ export class AvatarMarketplace extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    purchaseNFTsPackage(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setMintPrice(
+      _newMintPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -438,6 +470,8 @@ export class AvatarMarketplace extends BaseContract {
     }
   >;
 
+  mintPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
   nftToken(overrides?: CallOverrides): Promise<string>;
 
   onERC1155BatchReceived(
@@ -471,7 +505,16 @@ export class AvatarMarketplace extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  purchaseNFTsPackage(
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   renounceOwnership(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setMintPrice(
+    _newMintPrice: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -542,6 +585,8 @@ export class AvatarMarketplace extends BaseContract {
       }
     >;
 
+    mintPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
     nftToken(overrides?: CallOverrides): Promise<string>;
 
     onERC1155BatchReceived(
@@ -573,7 +618,14 @@ export class AvatarMarketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    purchaseNFTsPackage(overrides?: CallOverrides): Promise<void>;
+
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
+
+    setMintPrice(
+      _newMintPrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     setNFTContract(
       _nftContractAddress: string,
@@ -780,6 +832,8 @@ export class AvatarMarketplace extends BaseContract {
 
     listings(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
+    mintPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
     nftToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     onERC1155BatchReceived(
@@ -813,7 +867,16 @@ export class AvatarMarketplace extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    purchaseNFTsPackage(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setMintPrice(
+      _newMintPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -869,6 +932,8 @@ export class AvatarMarketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    mintPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     nftToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     onERC1155BatchReceived(
@@ -902,7 +967,16 @@ export class AvatarMarketplace extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    purchaseNFTsPackage(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setMintPrice(
+      _newMintPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

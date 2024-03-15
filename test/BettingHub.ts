@@ -18,16 +18,16 @@ describe('BettingHub', () => {
 
     // Deploy the AvatarNFT contract
     const AvatarNFT = await ethers.getContractFactory('AvatarNFT');
-    nftToken = await AvatarNFT.deploy();
+    nftToken = await AvatarNFT.deploy('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6');
     await nftToken.deployed();
 
     // Mint 5 tokens to players
-    await nftToken.connect(owner).safeMint(await player1.getAddress(), 'https://example.com/fight/0');
-    await nftToken.connect(owner).safeMint(await player1.getAddress(), 'https://example.com/fight/1');
-    await nftToken.connect(owner).safeMint(await player1.getAddress(), 'https://example.com/fight/2');
-    await nftToken.connect(owner).safeMint(await player1.getAddress(), 'https://example.com/fight/3');
-    await nftToken.connect(owner).safeMint(await player1.getAddress(), 'https://example.com/fight/4');
-    await nftToken.connect(owner).safeMint(await player1.getAddress(), 'https://example.com/fight/5');
+    await nftToken.connect(owner).safeMint(await player1.getAddress());
+    await nftToken.connect(owner).safeMint(await player1.getAddress());
+    await nftToken.connect(owner).safeMint(await player1.getAddress());
+    await nftToken.connect(owner).safeMint(await player1.getAddress());
+    await nftToken.connect(owner).safeMint(await player1.getAddress());
+    await nftToken.connect(owner).safeMint(await player1.getAddress());
 
     // deploy the AvatarSmashEvent contract
     const AvatarSmashEvent = await ethers.getContractFactory('AvatarSmashEvent');

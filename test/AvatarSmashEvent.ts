@@ -18,15 +18,15 @@ describe('AvatarSmashEvent', () => {
 
     // Deploy the AvatarNFT contract
     const AvatarNFT = await ethers.getContractFactory('AvatarNFT');
-    nftToken = await AvatarNFT.deploy();
+    nftToken = await AvatarNFT.deploy('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6');
     await nftToken.deployed();
 
     // Mint 5 tokens to players
-    await nftToken.connect(owner).safeMint(await player1.getAddress(), 'https://example.com/fight/0');
-    await nftToken.connect(owner).safeMint(await player2.getAddress(), 'https://example.com/fight/1');
-    await nftToken.connect(owner).safeMint(await player3.getAddress(), 'https://example.com/fight/2');
-    await nftToken.connect(owner).safeMint(await player4.getAddress(), 'https://example.com/fight/3');
-    await nftToken.connect(owner).safeMint(await player5.getAddress(), 'https://example.com/fight/4');
+    await nftToken.connect(owner).safeMint(await player1.getAddress());
+    await nftToken.connect(owner).safeMint(await player2.getAddress());
+    await nftToken.connect(owner).safeMint(await player3.getAddress());
+    await nftToken.connect(owner).safeMint(await player4.getAddress());
+    await nftToken.connect(owner).safeMint(await player5.getAddress());
 
     // deploy the AvatarSmashEvent contract
     const AvatarSmashEvent = await ethers.getContractFactory('AvatarSmashEvent');
@@ -103,7 +103,7 @@ describe('AvatarSmashEvent', () => {
       let player6: Signer;
       [player6] = await ethers.getSigners();
 
-      await nftToken.connect(owner).safeMint(await player6.getAddress(), 'https://example.com/fight/6');
+      await nftToken.connect(owner).safeMint(await player6.getAddress());
 
       await expect(
         avatarSmashContract.connect(player6).enterFighterInFight(0, 0, { value: entryFee })
@@ -128,14 +128,14 @@ describe('AvatarSmashEvent', () => {
         let player: Signer;
         [player] = await ethers.getSigners();
 
-        await nftToken.connect(owner).safeMint(await player.getAddress(), `https://example.com/fight/${i}`);
+        await nftToken.connect(owner).safeMint(await player.getAddress());
         await avatarSmashContract.connect(player).enterFighterInFight(0, i, { value: entryFee });
       }
 
       let player20: Signer;
       [player20] = await ethers.getSigners();
 
-      await nftToken.connect(owner).safeMint(await player20.getAddress(), 'https://example.com/fight/20');
+      await nftToken.connect(owner).safeMint(await player20.getAddress());
 
       await expect(
         avatarSmashContract.connect(player20).enterFighterInFight(0, 20, { value: entryFee })
@@ -149,7 +149,7 @@ describe('AvatarSmashEvent', () => {
       let player6: Signer;
       [player6] = await ethers.getSigners();
 
-      await nftToken.connect(owner).safeMint(await player6.getAddress(), 'https://example.com/fight/5');
+      await nftToken.connect(owner).safeMint(await player6.getAddress());
 
       await expect(
         avatarSmashContract.connect(player6).enterFighterInFight(0, 5, { value: entryFee })
