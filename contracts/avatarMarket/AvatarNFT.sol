@@ -63,7 +63,9 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     string memory strTokenId = Strings.toString(tokenId);
     _tokenIdCounter.increment();
 
-    string memory newTokenURI = string(abi.encodePacked("/", strTokenId));
+    string memory newTokenURI = string(
+      abi.encodePacked("/", strTokenId, ".json")
+    );
 
     _safeMint(_to, tokenId);
     _setTokenURI(tokenId, newTokenURI);

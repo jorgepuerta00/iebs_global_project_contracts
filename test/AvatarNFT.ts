@@ -29,7 +29,7 @@ describe('AvatarNFT', () => {
     it('Should allow owner to mint new tokens', async () => {
       await nftContract.connect(owner).safeMint(await addr1.getAddress());
       expect(await nftContract.ownerOf(0)).to.equal(await addr1.getAddress());
-      expect(await nftContract.tokenURI(0)).to.equal('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/0');
+      expect(await nftContract.tokenURI(0)).to.equal('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/0.json');
     });
 
     it('Should revert if non-owner tries to mint', async () => {
@@ -55,7 +55,7 @@ describe('AvatarNFT', () => {
     it('Should return correct token URI', async () => {
       await nftContract.connect(owner).safeMint(await addr1.getAddress());
       const uri = await nftContract.tokenURI(0);
-      expect(uri).to.equal('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/0');
+      expect(uri).to.equal('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/0.json');
     });
 
     it('Should support ERC721 and ERC721URIStorage interfaces', async () => {
