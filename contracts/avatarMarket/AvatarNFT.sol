@@ -114,6 +114,19 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     return _ownedTokens[owner];
   }
 
+  function getTokenURLsByOwner(
+    address owner
+  ) public view returns (string[] memory) {
+    uint256[] memory tokenIds = getOwnedTokens(owner);
+    string[] memory tokenURIs = new string[](tokenIds.length);
+
+    for (uint256 i = 0; i < tokenIds.length; i++) {
+      tokenURIs[i] = tokenURI(tokenIds[i]);
+    }
+
+    return tokenURIs;
+  }
+
   function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
     _pause();
   }

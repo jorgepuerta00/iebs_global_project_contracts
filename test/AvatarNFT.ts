@@ -91,4 +91,41 @@ describe('AvatarNFT', () => {
       expect(ownedTokensNonOwner.length).to.equal(0);
     });
   });
+
+  describe('Token URI Management', () => {
+    it('Should return the correct list of token URIs for a given owner', async () => {
+      // Mint tokens to addr1
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
+
+      // Mint a token to addr2 for diversity
+      await nftContract.connect(owner).safeMint(await addr2.getAddress());
+
+      // Expected URIs for addr1's tokens
+      const expectedURIs = [
+        'https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/0.json',
+        'https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/1.json',
+        'https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/2.json'
+      ];
+
+      // Fetching the actual URIs for addr1's tokens using the new method
+      const actualURIs = await nftContract.getTokenURLsByOwner(await addr1.getAddress());
+
+      // Check if the expectedURIs match the actualURIs returned by the contract
+      expect(actualURIs.length).to.equal(expectedURIs.length);
+      for (let i = 0; i < actualURIs.length; i++) {
+        expect(actualURIs[i]).to.equal(expectedURIs[i]);
+      }
+
+      // Expected URIs for addr2's tokens
+      const addr2TokenURIs = await nftContract.getTokenURLsByOwner(await addr2.getAddress());
+      expect(addr2TokenURIs.length).to.equal(1);
+      expect(addr2TokenURIs[0]).to.equal('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/3.json');
+
+      // Expected URIs for addr3's tokens
+      const noTokenURIs = await nftContract.getTokenURLsByOwner(await addr3.getAddress());
+      expect(noTokenURIs.length).to.equal(0);
+    });
+  });
 });
