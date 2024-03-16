@@ -129,6 +129,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AvatarMarketplace__factory>;
     getContractFactory(
+      name: "AvatarRaceEvent",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AvatarRaceEvent__factory>;
+    getContractFactory(
       name: "AvatarSmashEvent",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AvatarSmashEvent__factory>;
@@ -290,6 +294,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.AvatarMarketplace>;
+    getContractAt(
+      name: "AvatarRaceEvent",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AvatarRaceEvent>;
     getContractAt(
       name: "AvatarSmashEvent",
       address: string,

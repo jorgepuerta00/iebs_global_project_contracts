@@ -460,8 +460,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/avatarMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1710525698576,
-      "contentHash": "df130459874ec789ddc3bd7a8953d003",
+      "lastModificationDate": 1710607202009,
+      "contentHash": "0baf5462618584fbb046ecfe5c4f8228",
       "sourceName": "contracts/avatarMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.23",
@@ -503,8 +503,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/avatarMarket/AvatarNFT.sol": {
-      "lastModificationDate": 1710527646197,
-      "contentHash": "dfcc1b8b41e184898629f1e8d2974b15",
+      "lastModificationDate": 1710551509650,
+      "contentHash": "b3c6bd8d0d08b635ed424ada6ad5d92e",
       "sourceName": "contracts/avatarMarket/AvatarNFT.sol",
       "solcConfig": {
         "version": "0.8.23",
@@ -1263,50 +1263,9 @@
         "IERC1155Receiver"
       ]
     },
-    "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/race/AvatarSmashEvent.sol": {
-      "lastModificationDate": 1704653529911,
-      "contentHash": "fe83c6dd0a1d131f30f4dd1893dd5ffc",
-      "sourceName": "contracts/race/AvatarSmashEvent.sol",
-      "solcConfig": {
-        "version": "0.8.23",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/utils/Counters.sol",
-        "@openzeppelin/contracts/security/Pausable.sol",
-        "./../avatarMarket/AvatarNFT.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.23"
-      ],
-      "artifacts": [
-        "AvatarSmashEvent"
-      ]
-    },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/race/BettingHub.sol": {
-      "lastModificationDate": 1704653532455,
-      "contentHash": "96db753ce241ecfbae88612d63d235fe",
+      "lastModificationDate": 1710608368513,
+      "contentHash": "19cc25a9feea81babf2165d2554167e8",
       "sourceName": "contracts/race/BettingHub.sol",
       "solcConfig": {
         "version": "0.8.23",
@@ -1336,7 +1295,7 @@
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/utils/Counters.sol",
         "@openzeppelin/contracts/security/Pausable.sol",
-        "./AvatarSmashEvent.sol"
+        "./AvatarRaceEvent.sol"
       ],
       "versionPragmas": [
         "^0.8.23"
@@ -1630,6 +1589,47 @@
       ],
       "artifacts": [
         "AssetsAuctionMarketplace"
+      ]
+    },
+    "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/race/AvatarRaceEvent.sol": {
+      "lastModificationDate": 1710608927900,
+      "contentHash": "69321a4da3b871a9f9b634f30683cd85",
+      "sourceName": "contracts/race/AvatarRaceEvent.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/utils/Counters.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
+        "./../avatarMarket/AvatarNFT.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.23"
+      ],
+      "artifacts": [
+        "AvatarRaceEvent"
       ]
     }
   }

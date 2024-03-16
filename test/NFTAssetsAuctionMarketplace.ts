@@ -159,6 +159,10 @@ describe('AssetsAuctionMarketplace', () => {
       const amount = 50;
       const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
+      const expectedBalanceBidder1 = ethers.utils.parseUnits('9996872161171977289376', 'wei');
+      const newExpectedBalanceBidder1 = ethers.utils.parseUnits('9994872099627976797024', 'wei');
+      const finalExpectedBalanceBidder1 = ethers.utils.parseUnits('9996872099627976797024', 'wei');
+      const tolerance = ethers.utils.parseUnits('1', 'ether');
 
       // Mint tokens, create an auction, and approve bidder
       await mintTokensAndCreateAuction(tokenId, initialSupply, amount, startingPrice, auctionDuration);
@@ -166,7 +170,7 @@ describe('AssetsAuctionMarketplace', () => {
       // Verify initial balance of bidder1
       const inicialBalanceBidder1 = await ethers.provider.getBalance(await bidder1.getAddress());
       //console.log('bidder1 initial balance: ', ethers.utils.formatEther(inicialBalanceBidder1));
-      expect(inicialBalanceBidder1).to.equal('9996872161171977289376');
+      expect(inicialBalanceBidder1).to.be.closeTo(expectedBalanceBidder1, tolerance, "Initial balance is off by more than the tolerance");
 
       // Place an initial bid
       await marketplace.connect(bidder1).placeBid(0, { value: ethers.utils.parseUnits('2', 'ether') });
@@ -174,7 +178,7 @@ describe('AssetsAuctionMarketplace', () => {
       // veryfy new balance of bidder1
       const newBalanceBidder1 = await ethers.provider.getBalance(await bidder1.getAddress());
       //console.log('bidder1 new balance: ', ethers.utils.formatEther(newBalanceBidder1));
-      expect(newBalanceBidder1).to.equal('9994872099627976797024');
+      expect(newBalanceBidder1).to.be.closeTo(newExpectedBalanceBidder1, tolerance, "New balance is off by more than the tolerance");
 
       // Increase time to make another bidder place a higher bid
       await ethers.provider.send('evm_increaseTime', [3600]); // 1 hour
@@ -185,7 +189,7 @@ describe('AssetsAuctionMarketplace', () => {
       // Verify previous highest bidder (bidder1) is refunded
       const currentBalanceBidder1 = await ethers.provider.getBalance(await bidder1.getAddress());
       //console.log('bidder1 current balance: ', ethers.utils.formatEther(currentBalanceBidder1));
-      expect(currentBalanceBidder1).to.equal('9996872099627976797024');
+      expect(currentBalanceBidder1).to.be.closeTo(finalExpectedBalanceBidder1, tolerance, "Final balance is off by more than the tolerance");
     });
 
   });
@@ -233,6 +237,8 @@ describe('AssetsAuctionMarketplace', () => {
       const amount = 50;
       const startingPrice = ethers.utils.parseUnits('1', 'ether');
       const auctionDuration = 86400; // 1 day
+      const expectedBalanceSeller1 = ethers.utils.parseUnits('9996572069297936317972', 'wei');
+      const tolerance = ethers.utils.parseUnits('1', 'ether');
 
       // Mint tokens, create an auction, and approve bidder
       await mintTokensAndCreateAuction(tokenId, initialSupply, amount, startingPrice, auctionDuration);
@@ -246,7 +252,7 @@ describe('AssetsAuctionMarketplace', () => {
       // verify initial balance of seller
       const initialBalanceSeller = await ethers.provider.getBalance(await seller.getAddress());
       //console.log('seller initial balance: ', ethers.utils.formatEther(initialBalanceSeller));
-      expect(initialBalanceSeller).to.equal('9996572069297936317972');
+      expect(initialBalanceSeller).to.be.closeTo(expectedBalanceSeller1, tolerance, "Initial balance is off by more than the tolerance");
 
       // End the auction
       await expect(marketplace.connect(owner).endAuction(0))

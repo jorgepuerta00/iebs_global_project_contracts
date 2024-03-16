@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import { BettingHub, AvatarSmashEvent, AvatarNFT } from '../typechain';
+import { BettingHub, AvatarRaceEvent, AvatarNFT } from '../typechain';
 
 describe('BettingHub', () => {
   let nftToken: AvatarNFT;
   let bettingHubContract: BettingHub;
-  let avatarSmashContract: AvatarSmashEvent;
+  let avatarRaceContract: AvatarRaceEvent;
   let owner: Signer;
   let player1: Signer;
   let bettot1: Signer;
@@ -29,34 +29,34 @@ describe('BettingHub', () => {
     await nftToken.connect(owner).safeMint(await player1.getAddress());
     await nftToken.connect(owner).safeMint(await player1.getAddress());
 
-    // deploy the AvatarSmashEvent contract
-    const AvatarSmashEvent = await ethers.getContractFactory('AvatarSmashEvent');
-    avatarSmashContract = await AvatarSmashEvent.deploy(nftToken.address);
-    await avatarSmashContract.deployed();
+    // deploy the AvatarRaceEvent contract
+    const AvatarRaceEvent = await ethers.getContractFactory('AvatarRaceEvent');
+    avatarRaceContract = await AvatarRaceEvent.deploy(nftToken.address);
+    await avatarRaceContract.deployed();
 
     // create race
     const entryFee = ethers.utils.parseEther("0.1");
     const prizeDistribution = [70, 30];
-    await avatarSmashContract.createFight(entryFee, prizeDistribution);
+    await avatarRaceContract.createRace(entryFee, prizeDistribution);
 
     // register horses
-    await avatarSmashContract.connect(player1).enterFighterInFight(0, 0, { value: entryFee });
-    await avatarSmashContract.connect(player1).enterFighterInFight(0, 1, { value: entryFee });
-    await avatarSmashContract.connect(player1).enterFighterInFight(0, 2, { value: entryFee });
-    await avatarSmashContract.connect(player1).enterFighterInFight(0, 3, { value: entryFee });
-    await avatarSmashContract.connect(player1).enterFighterInFight(0, 4, { value: entryFee });
-    await avatarSmashContract.connect(player1).enterFighterInFight(0, 5, { value: entryFee });
+    await avatarRaceContract.connect(player1).enterRacerInRace(0, 0, { value: entryFee });
+    await avatarRaceContract.connect(player1).enterRacerInRace(0, 1, { value: entryFee });
+    await avatarRaceContract.connect(player1).enterRacerInRace(0, 2, { value: entryFee });
+    await avatarRaceContract.connect(player1).enterRacerInRace(0, 3, { value: entryFee });
+    await avatarRaceContract.connect(player1).enterRacerInRace(0, 4, { value: entryFee });
+    await avatarRaceContract.connect(player1).enterRacerInRace(0, 5, { value: entryFee });
 
     // Deploy the AvatarNFT contract
     const BettingHub = await ethers.getContractFactory('BettingHub');
-    bettingHubContract = await BettingHub.deploy(avatarSmashContract.address);
+    bettingHubContract = await BettingHub.deploy(avatarRaceContract.address);
     await bettingHubContract.deployed();
   });
 
   describe('placeBet', () => {
     it("should revert if race is not active or already started", async function () {
       // start the race
-      await avatarSmashContract.startMatch(0);
+      await avatarRaceContract.startMatch(0);
 
       const betAmount = ethers.utils.parseEther("0.01");
 
@@ -86,8 +86,8 @@ describe('BettingHub', () => {
         .to.emit(bettingHubContract, "BetPlaced")
         .withArgs(0, 0, await bettot1.getAddress(), betAmount);
 
-      await avatarSmashContract.startMatch(0);
-      await avatarSmashContract.endMatch(0, [5, 3]);
+      await avatarRaceContract.startMatch(0);
+      await avatarRaceContract.endMatch(0, [5, 3]);
 
       await expect(bettingHubContract.connect(bettot2).claimWinnings(0, 0))
         .to.be.revertedWith("Not the bettor");
@@ -100,7 +100,7 @@ describe('BettingHub', () => {
         .to.emit(bettingHubContract, "BetPlaced")
         .withArgs(0, 0, await bettot1.getAddress(), betAmount);
 
-      await avatarSmashContract.startMatch(0);
+      await avatarRaceContract.startMatch(0);
 
       await expect(bettingHubContract.connect(bettot1).claimWinnings(0, 0))
         .to.be.revertedWith("Race is not ended");
@@ -113,8 +113,8 @@ describe('BettingHub', () => {
         .to.emit(bettingHubContract, "BetPlaced")
         .withArgs(0, 0, await bettot1.getAddress(), betAmount);
 
-      await avatarSmashContract.startMatch(0);
-      await avatarSmashContract.endMatch(0, [5, 3]);
+      await avatarRaceContract.startMatch(0);
+      await avatarRaceContract.endMatch(0, [5, 3]);
 
       await expect(bettingHubContract.connect(bettot1).claimWinnings(0, 0))
         .to.be.revertedWith("Bet did not win");
@@ -133,8 +133,8 @@ describe('BettingHub', () => {
         .to.emit(bettingHubContract, "BetPlaced")
         .withArgs(0, 1, await bettot2.getAddress(), betAmount);
 
-      await avatarSmashContract.startMatch(0);
-      await avatarSmashContract.endMatch(0, [5, 3]);
+      await avatarRaceContract.startMatch(0);
+      await avatarRaceContract.endMatch(0, [5, 3]);
 
       await bettingHubContract.connect(bettot1).claimWinnings(0, 0);
 
@@ -149,8 +149,8 @@ describe('BettingHub', () => {
         .to.emit(bettingHubContract, "BetPlaced")
         .withArgs(0, 0, await bettot1.getAddress(), betAmount);
 
-      await avatarSmashContract.startMatch(0);
-      await avatarSmashContract.endMatch(0, [5, 3]);
+      await avatarRaceContract.startMatch(0);
+      await avatarRaceContract.endMatch(0, [5, 3]);
 
       await expect(bettingHubContract.connect(bettot1).claimWinnings(0, 0))
         .to.be.revertedWith("Contract does not have enough funds");
@@ -179,8 +179,8 @@ describe('BettingHub', () => {
         .withArgs(0, 2, await bettot3.getAddress(), betAmount);
 
       // start and end race
-      await avatarSmashContract.startMatch(0);
-      await avatarSmashContract.endMatch(0, [5, 3]);
+      await avatarRaceContract.startMatch(0);
+      await avatarRaceContract.endMatch(0, [5, 3]);
 
       // assert
       await expect(bettingHubContract.connect(bettot1).claimWinnings(0, 0))
@@ -201,8 +201,8 @@ describe('BettingHub', () => {
         .to.emit(bettingHubContract, "BetPlaced")
         .withArgs(0, 1, await bettot2.getAddress(), betAmount);
 
-      await avatarSmashContract.startMatch(0);
-      await avatarSmashContract.endMatch(0, [5, 3]);
+      await avatarRaceContract.startMatch(0);
+      await avatarRaceContract.endMatch(0, [5, 3]);
 
       await expect(bettingHubContract.connect(bettot1).claimWinnings(0, 0))
         .to.emit(bettingHubContract, "BetClaimed")

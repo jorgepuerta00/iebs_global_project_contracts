@@ -27,6 +27,7 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "getOwnedTokens(address)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
@@ -66,6 +67,10 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getOwnedTokens",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
@@ -140,6 +145,10 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getOwnedTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -326,6 +335,11 @@ export class AvatarNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getOwnedTokens(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
+
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
 
     grantRole(
@@ -454,6 +468,11 @@ export class AvatarNFT extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getOwnedTokens(
+    owner: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
   grantRole(
@@ -572,6 +591,11 @@ export class AvatarNFT extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getOwnedTokens(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
@@ -835,6 +859,11 @@ export class AvatarNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getOwnedTokens(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getRoleAdmin(
       role: BytesLike,
       overrides?: CallOverrides
@@ -969,6 +998,11 @@ export class AvatarNFT extends BaseContract {
 
     getApproved(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getOwnedTokens(
+      owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

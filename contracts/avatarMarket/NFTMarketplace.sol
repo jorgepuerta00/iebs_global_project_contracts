@@ -46,6 +46,12 @@ contract AvatarMarketplace is
     string status
   );
 
+  event NFTsPurchasedPackage(
+    address indexed buyer,
+    uint256 numberOfNFTs,
+    uint256 totalAmount
+  );
+
   event NFTListingCancelled(
     uint256 indexed listingId,
     address indexed seller,
@@ -58,7 +64,7 @@ contract AvatarMarketplace is
   event SiliquaCoinUpdated(address indexed newSiliquaCoinAddress);
   event CommissionPercentageUpdated(uint256 newCommissionPercentage);
 
-  uint256 public mintPrice = 10 ether;
+  uint256 public mintPrice = 2 ether;
 
   constructor(address _nftContractAddress, uint256 _commissionPercentage) {
     nftToken = AvatarNFT(_nftContractAddress);
@@ -143,6 +149,22 @@ contract AvatarMarketplace is
     );
   }
 
+  function purchaseNFTsPackage(
+    uint256 _numberOfNFTs
+  ) external payable nonReentrant whenNotPaused {
+    uint256 totalCost = mintPrice * _numberOfNFTs;
+    require(
+      msg.value == totalCost,
+      "Must send the exact mint price for all NFTs"
+    );
+
+    for (uint256 i = 0; i < _numberOfNFTs; i++) {
+      nftToken.safeMint(msg.sender);
+    }
+
+    emit NFTsPurchasedPackage(msg.sender, _numberOfNFTs, totalCost);
+  }
+
   function getActiveListings()
     external
     view
@@ -166,13 +188,6 @@ contract AvatarMarketplace is
     }
 
     return activeListings;
-  }
-
-  function purchaseNFTsPackage() external payable nonReentrant whenNotPaused {
-    require(msg.value == mintPrice, "Must send the exact mint price");
-    for (uint i = 0; i < 5; i++) {
-      nftToken.safeMint(msg.sender);
-    }
   }
 
   function setNFTContract(

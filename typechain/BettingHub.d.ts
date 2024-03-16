@@ -22,7 +22,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface BettingHubInterface extends ethers.utils.Interface {
   functions: {
-    "betsByFight(uint256,uint256)": FunctionFragment;
+    "betsByRace(uint256,uint256)": FunctionFragment;
     "claimWinnings(uint256,uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
@@ -35,7 +35,7 @@ interface BettingHubInterface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(
-    functionFragment: "betsByFight",
+    functionFragment: "betsByRace",
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -63,10 +63,7 @@ interface BettingHubInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "betsByFight",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "betsByRace", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "claimWinnings",
     data: BytesLike
@@ -171,7 +168,7 @@ export class BettingHub extends BaseContract {
   interface: BettingHubInterface;
 
   functions: {
-    betsByFight(
+    betsByRace(
       arg0: BigNumberish,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -186,7 +183,7 @@ export class BettingHub extends BaseContract {
     >;
 
     claimWinnings(
-      _fightId: BigNumberish,
+      _raceId: BigNumberish,
       _betId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -200,7 +197,7 @@ export class BettingHub extends BaseContract {
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
     placeBet(
-      _fightId: BigNumberish,
+      _raceId: BigNumberish,
       _nftIds: BigNumberish[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -221,7 +218,7 @@ export class BettingHub extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  betsByFight(
+  betsByRace(
     arg0: BigNumberish,
     arg1: BigNumberish,
     overrides?: CallOverrides
@@ -236,7 +233,7 @@ export class BettingHub extends BaseContract {
   >;
 
   claimWinnings(
-    _fightId: BigNumberish,
+    _raceId: BigNumberish,
     _betId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -250,7 +247,7 @@ export class BettingHub extends BaseContract {
   paused(overrides?: CallOverrides): Promise<boolean>;
 
   placeBet(
-    _fightId: BigNumberish,
+    _raceId: BigNumberish,
     _nftIds: BigNumberish[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -271,7 +268,7 @@ export class BettingHub extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    betsByFight(
+    betsByRace(
       arg0: BigNumberish,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -286,7 +283,7 @@ export class BettingHub extends BaseContract {
     >;
 
     claimWinnings(
-      _fightId: BigNumberish,
+      _raceId: BigNumberish,
       _betId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -298,7 +295,7 @@ export class BettingHub extends BaseContract {
     paused(overrides?: CallOverrides): Promise<boolean>;
 
     placeBet(
-      _fightId: BigNumberish,
+      _raceId: BigNumberish,
       _nftIds: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
@@ -406,14 +403,14 @@ export class BettingHub extends BaseContract {
   };
 
   estimateGas: {
-    betsByFight(
+    betsByRace(
       arg0: BigNumberish,
       arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     claimWinnings(
-      _fightId: BigNumberish,
+      _raceId: BigNumberish,
       _betId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -427,7 +424,7 @@ export class BettingHub extends BaseContract {
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
     placeBet(
-      _fightId: BigNumberish,
+      _raceId: BigNumberish,
       _nftIds: BigNumberish[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -449,14 +446,14 @@ export class BettingHub extends BaseContract {
   };
 
   populateTransaction: {
-    betsByFight(
+    betsByRace(
       arg0: BigNumberish,
       arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     claimWinnings(
-      _fightId: BigNumberish,
+      _raceId: BigNumberish,
       _betId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -470,7 +467,7 @@ export class BettingHub extends BaseContract {
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     placeBet(
-      _fightId: BigNumberish,
+      _raceId: BigNumberish,
       _nftIds: BigNumberish[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

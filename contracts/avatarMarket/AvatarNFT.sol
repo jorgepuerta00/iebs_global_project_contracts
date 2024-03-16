@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.23;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -13,6 +13,8 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
   Counters.Counter private _tokenIdCounter;
   string private baseURI;
+
+  mapping(address => uint256[]) private _ownedTokens;
 
   constructor(string memory _initialBaseURI) ERC721("AvatarNFT", "AVA") {
     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -32,6 +34,16 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
 
   function burn(uint256 _tokenId) public onlyRole(MINTER_ROLE) whenNotPaused {
     _burn(_tokenId);
+
+    address owner = ownerOf(_tokenId);
+    uint256[] storage tokens = _ownedTokens[owner];
+    for (uint256 i = 0; i < tokens.length; i++) {
+      if (tokens[i] == _tokenId) {
+        tokens[i] = tokens[tokens.length - 1];
+        tokens.pop();
+        break;
+      }
+    }
   }
 
   function _burn(
@@ -55,6 +67,8 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
 
     _safeMint(_to, tokenId);
     _setTokenURI(tokenId, newTokenURI);
+
+    _ownedTokens[_to].push(tokenId);
   }
 
   function tokenURI(
@@ -90,6 +104,12 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
       "ERC721URIStorage: URI set of nonexistent token"
     );
     _setTokenURI(_tokenId, _uri);
+  }
+
+  function getOwnedTokens(
+    address owner
+  ) public view returns (uint256[] memory) {
+    return _ownedTokens[owner];
   }
 
   function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {

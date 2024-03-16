@@ -9,9 +9,10 @@ describe('AvatarNFT', () => {
   let owner: Signer;
   let addr1: Signer;
   let addr2: Signer;
+  let addr3: Signer;
 
   beforeEach(async () => {
-    [owner, addr1, addr2] = await ethers.getSigners();
+    [owner, addr1, addr2, addr3] = await ethers.getSigners();
     NFTFactory = await ethers.getContractFactory('AvatarNFT');
     nftContract = (await NFTFactory.deploy('https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6')) as AvatarNFT;
     await nftContract.deployed();
@@ -60,6 +61,34 @@ describe('AvatarNFT', () => {
     it('Should support ERC721 and ERC721URIStorage interfaces', async () => {
       expect(await nftContract.supportsInterface('0x80ac58cd')).to.be.true;
       expect(await nftContract.supportsInterface('0x5b5e139f')).to.be.true;
+    });
+  });
+
+  describe('Ownership Tracking', () => {
+    it('Should track token ownership correctly', async () => {
+      // Mint tokens to addr1
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
+
+      // Mint a token to addr2
+      await nftContract.connect(owner).safeMint(await addr2.getAddress());
+
+      // Get owned tokens for addr1 and addr2
+      const ownedTokensAddr1 = await nftContract.getOwnedTokens(await addr1.getAddress());
+      const ownedTokensAddr2 = await nftContract.getOwnedTokens(await addr2.getAddress());
+
+      // Check that addr1 owns 2 tokens and their IDs are correct
+      expect(ownedTokensAddr1.length).to.equal(2);
+      expect(ownedTokensAddr1[0]).to.equal(ethers.BigNumber.from(0));
+      expect(ownedTokensAddr1[1]).to.equal(ethers.BigNumber.from(1));
+
+      // Check that addr2 owns 1 token and its ID is correct
+      expect(ownedTokensAddr2.length).to.equal(1);
+      expect(ownedTokensAddr2[0]).to.equal(ethers.BigNumber.from(2));
+
+      // verify that querying a non-owner address returns an empty array
+      const ownedTokensNonOwner = await nftContract.getOwnedTokens(await addr3.getAddress());
+      expect(ownedTokensNonOwner.length).to.equal(0);
     });
   });
 });
