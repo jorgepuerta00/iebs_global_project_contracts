@@ -503,8 +503,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/avatarMarket/AvatarNFT.sol": {
-      "lastModificationDate": 1710551509650,
-      "contentHash": "b3c6bd8d0d08b635ed424ada6ad5d92e",
+      "lastModificationDate": 1710610168950,
+      "contentHash": "cf6d8d006452c77362a22348467d680f",
       "sourceName": "contracts/avatarMarket/AvatarNFT.sol",
       "solcConfig": {
         "version": "0.8.23",
@@ -535,7 +535,8 @@
         "@openzeppelin/contracts/access/AccessControl.sol",
         "@openzeppelin/contracts/utils/Counters.sol",
         "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        "@openzeppelin/contracts/security/Pausable.sol"
+        "@openzeppelin/contracts/security/Pausable.sol",
+        "@openzeppelin/contracts/utils/Strings.sol"
       ],
       "versionPragmas": [
         "^0.8.23"

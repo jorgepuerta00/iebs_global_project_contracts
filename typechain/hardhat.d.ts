@@ -133,10 +133,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AvatarRaceEvent__factory>;
     getContractFactory(
-      name: "AvatarSmashEvent",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AvatarSmashEvent__factory>;
-    getContractFactory(
       name: "BettingHub",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BettingHub__factory>;
@@ -299,11 +295,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.AvatarRaceEvent>;
-    getContractAt(
-      name: "AvatarSmashEvent",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AvatarSmashEvent>;
     getContractAt(
       name: "BettingHub",
       address: string,

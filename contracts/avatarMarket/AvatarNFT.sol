@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
   using Counters for Counters.Counter;
@@ -59,11 +60,10 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
 
   function safeMint(address _to) public onlyRole(MINTER_ROLE) whenNotPaused {
     uint256 tokenId = _tokenIdCounter.current();
+    string memory strTokenId = Strings.toString(tokenId);
     _tokenIdCounter.increment();
 
-    string memory newTokenURI = string(
-      abi.encodePacked("/", uint2str(tokenId))
-    );
+    string memory newTokenURI = string(abi.encodePacked("/", strTokenId));
 
     _safeMint(_to, tokenId);
     _setTokenURI(tokenId, newTokenURI);
@@ -118,24 +118,5 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
 
   function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
     _unpause();
-  }
-
-  function uint2str(uint256 _i) internal pure returns (string memory) {
-    if (_i == 0) {
-      return "0";
-    }
-    uint256 j = _i;
-    uint256 length;
-    while (j != 0) {
-      length++;
-      j /= 10;
-    }
-    bytes memory bstr = new bytes(length);
-    uint256 k = length;
-    while (_i != 0) {
-      bstr[--k] = bytes1(uint8(48 + (_i % 10)));
-      _i /= 10;
-    }
-    return string(bstr);
   }
 }
