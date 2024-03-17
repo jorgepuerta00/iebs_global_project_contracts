@@ -25,7 +25,6 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     "cancelListing(uint256)": FunctionFragment;
     "commissionPercentage()": FunctionFragment;
     "getActiveListings()": FunctionFragment;
-    "getContractBalance()": FunctionFragment;
     "listNFT(uint256,uint256)": FunctionFragment;
     "listingId()": FunctionFragment;
     "listings(uint256)": FunctionFragment;
@@ -59,10 +58,6 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getActiveListings",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getContractBalance",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -139,10 +134,6 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getActiveListings",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getContractBalance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "listNFT", data: BytesLike): Result;
@@ -359,8 +350,6 @@ export class AvatarMarketplace extends BaseContract {
       }
     >;
 
-    getContractBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     listNFT(
       _tokenId: BigNumberish,
       _price: BigNumberish,
@@ -482,8 +471,6 @@ export class AvatarMarketplace extends BaseContract {
     })[]
   >;
 
-  getContractBalance(overrides?: CallOverrides): Promise<BigNumber>;
-
   listNFT(
     _tokenId: BigNumberish,
     _price: BigNumberish,
@@ -604,8 +591,6 @@ export class AvatarMarketplace extends BaseContract {
         isActive: boolean;
       })[]
     >;
-
-    getContractBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     listNFT(
       _tokenId: BigNumberish,
@@ -888,8 +873,6 @@ export class AvatarMarketplace extends BaseContract {
 
     getActiveListings(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getContractBalance(overrides?: CallOverrides): Promise<BigNumber>;
-
     listNFT(
       _tokenId: BigNumberish,
       _price: BigNumberish,
@@ -992,10 +975,6 @@ export class AvatarMarketplace extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getActiveListings(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getContractBalance(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     listNFT(
       _tokenId: BigNumberish,

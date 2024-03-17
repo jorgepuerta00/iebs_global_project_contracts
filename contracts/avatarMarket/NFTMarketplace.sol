@@ -209,10 +209,6 @@ contract AvatarMarketplace is
     mintPrice = _newMintPrice;
   }
 
-  function getContractBalance() external view onlyOwner returns (uint) {
-    return address(this).balance;
-  }
-
   function withdraw(uint amount) external onlyOwner {
     payable(msg.sender).transfer(amount);
   }

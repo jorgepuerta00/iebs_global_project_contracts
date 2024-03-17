@@ -425,33 +425,4 @@ describe('AvatarMarketplace', () => {
     });
   });
 
-  describe('getContractBalance', function () {
-    it('should allow the owner to view the contract\'s Ether balance', async function () {
-      const buyer = addr2;
-
-      // Set the correct mint price per NFT in wei
-      const mintPricePerNFT = ethers.utils.parseUnits('2', 'ether'); // 2 MATIC in wei
-      console.log("mintPricePerNFT: ", mintPricePerNFT.toString());
-      const numberOfNFTs = 5;
-      const totalMintPrice = mintPricePerNFT.mul(numberOfNFTs); // Total price for 5 NFTs in wei
-
-      // Purchase the NFT package
-      await expect(marketplace.connect(buyer).purchaseNFTsPackage(numberOfNFTs, { value: totalMintPrice }))
-        .to.emit(marketplace, 'NFTsPurchasedPackage')
-        .withArgs(await buyer.getAddress(), numberOfNFTs, totalMintPrice);
-
-      // Now, the owner tries to get the contract balance
-      const contractBalance = await marketplace.connect(owner).getContractBalance();
-
-      // Check if the returned balance matches the sent value
-      expect(contractBalance).to.equal('10000000000000000000');
-    });
-
-    it('should not allow non-owners to view the contract\'s Ether balance', async function () {
-      // Attempt to call getContractBalance with a non-owner account
-      await expect(marketplace.connect(addr1).getContractBalance())
-        .to.be.revertedWith("Ownable: caller is not the owner");
-    });
-  });
-
 });
