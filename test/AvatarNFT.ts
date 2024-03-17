@@ -126,6 +126,10 @@ describe('AvatarNFT', () => {
       // Expected URIs for addr3's tokens
       const noTokenURIs = await nftContract.getTokenURLsByOwner(await addr3.getAddress());
       expect(noTokenURIs.length).to.equal(0);
+
+      // expected total token count 
+      const totalTokenCount = await nftContract.getTotalTokenCount();
+      expect(totalTokenCount).to.equal(4);
     });
   });
 });

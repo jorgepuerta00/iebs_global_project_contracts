@@ -30,6 +30,7 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     "getOwnedTokens(address)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "getTokenURLsByOwner(address)": FunctionFragment;
+    "getTotalTokenCount()": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
@@ -80,6 +81,10 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getTokenURLsByOwner",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTotalTokenCount",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "grantRole",
@@ -162,6 +167,10 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getTokenURLsByOwner",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTotalTokenCount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
@@ -356,6 +365,8 @@ export class AvatarNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string[]]>;
 
+    getTotalTokenCount(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     grantRole(
       role: BytesLike,
       account: string,
@@ -494,6 +505,8 @@ export class AvatarNFT extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string[]>;
 
+  getTotalTokenCount(overrides?: CallOverrides): Promise<BigNumber>;
+
   grantRole(
     role: BytesLike,
     account: string,
@@ -622,6 +635,8 @@ export class AvatarNFT extends BaseContract {
       owner: string,
       overrides?: CallOverrides
     ): Promise<string[]>;
+
+    getTotalTokenCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     grantRole(
       role: BytesLike,
@@ -898,6 +913,8 @@ export class AvatarNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getTotalTokenCount(overrides?: CallOverrides): Promise<BigNumber>;
+
     grantRole(
       role: BytesLike,
       account: string,
@@ -1042,6 +1059,10 @@ export class AvatarNFT extends BaseContract {
 
     getTokenURLsByOwner(
       owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getTotalTokenCount(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

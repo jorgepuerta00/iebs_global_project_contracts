@@ -127,6 +127,10 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     return tokenURIs;
   }
 
+  function getTotalTokenCount() public view returns (uint256) {
+    return _tokenIdCounter.current();
+  }
+
   function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
     _pause();
   }

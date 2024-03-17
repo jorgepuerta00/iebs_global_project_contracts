@@ -360,6 +360,7 @@ describe('AvatarMarketplace', () => {
 
       // Set the correct mint price per NFT in wei
       const mintPricePerNFT = ethers.utils.parseUnits('2', 'ether'); // 2 MATIC in wei
+      console.log("mintPricePerNFT: ", mintPricePerNFT.toString());
       const numberOfNFTs = 5;
       const totalMintPrice = mintPricePerNFT.mul(numberOfNFTs); // Total price for 5 NFTs in wei
 
