@@ -360,7 +360,6 @@ describe('AvatarMarketplace', () => {
 
       // Set the correct mint price per NFT in wei
       const mintPricePerNFT = ethers.utils.parseUnits('2', 'ether'); // 2 MATIC in wei
-      console.log("mintPricePerNFT: ", mintPricePerNFT.toString());
       const numberOfNFTs = 5;
       const totalMintPrice = mintPricePerNFT.mul(numberOfNFTs); // Total price for 5 NFTs in wei
 
@@ -390,6 +389,68 @@ describe('AvatarMarketplace', () => {
       // Verify that no NFTs were minted to the buyer as a result of the failed transaction
       const buyerBalance = await nftContract.balanceOf(await buyer.getAddress());
       expect(buyerBalance).to.equal(0);
+    });
+  });
+
+  describe('withdraw', function () {
+    it('should allow the owner to withdraw funds', async function () {
+      const initialOwnerBalance = await ethers.provider.getBalance(await owner.getAddress());
+      const contractBalance = await ethers.provider.getBalance(marketplace.address);
+      const withdrawAmount = contractBalance.div(2);
+
+      // Withdraw funds
+      const tx = await marketplace.connect(owner).withdraw(withdrawAmount);
+      const receipt = await tx.wait();
+      const gasUsed = receipt.gasUsed.mul(receipt.effectiveGasPrice);
+
+      const finalOwnerBalance = await ethers.provider.getBalance(await owner.getAddress());
+      const finalContractBalance = await ethers.provider.getBalance(marketplace.address);
+
+      // Validate the owner received the funds minus gas costs
+      expect(finalOwnerBalance.add(gasUsed), 'Owner did not receive the funds correctly').to.equal(initialOwnerBalance.add(withdrawAmount));
+      // Validate the contract's balance is reduced correctly
+      expect(finalContractBalance, 'Contract balance not reduced correctly').to.equal(contractBalance.sub(withdrawAmount));
+    });
+
+    it('should not allow non-owner to withdraw funds', async function () {
+      const contractBalance = await ethers.provider.getBalance(marketplace.address);
+      const withdrawAmount = ethers.utils.parseEther("1");
+
+      // Ensure withdrawal attempt by non-owner fails
+      await expect(marketplace.connect(addr1).withdraw(withdrawAmount)).to.be.revertedWith("Ownable: caller is not the owner");
+
+      // Validate the contract's balance remains unchanged
+      const finalContractBalance = await ethers.provider.getBalance(marketplace.address);
+      expect(finalContractBalance, 'Contract balance should not change').to.equal(contractBalance);
+    });
+  });
+
+  describe('getContractBalance', function () {
+    it('should allow the owner to view the contract\'s Ether balance', async function () {
+      const buyer = addr2;
+
+      // Set the correct mint price per NFT in wei
+      const mintPricePerNFT = ethers.utils.parseUnits('2', 'ether'); // 2 MATIC in wei
+      console.log("mintPricePerNFT: ", mintPricePerNFT.toString());
+      const numberOfNFTs = 5;
+      const totalMintPrice = mintPricePerNFT.mul(numberOfNFTs); // Total price for 5 NFTs in wei
+
+      // Purchase the NFT package
+      await expect(marketplace.connect(buyer).purchaseNFTsPackage(numberOfNFTs, { value: totalMintPrice }))
+        .to.emit(marketplace, 'NFTsPurchasedPackage')
+        .withArgs(await buyer.getAddress(), numberOfNFTs, totalMintPrice);
+
+      // Now, the owner tries to get the contract balance
+      const contractBalance = await marketplace.connect(owner).getContractBalance();
+
+      // Check if the returned balance matches the sent value
+      expect(contractBalance).to.equal('10000000000000000000');
+    });
+
+    it('should not allow non-owners to view the contract\'s Ether balance', async function () {
+      // Attempt to call getContractBalance with a non-owner account
+      await expect(marketplace.connect(addr1).getContractBalance())
+        .to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 

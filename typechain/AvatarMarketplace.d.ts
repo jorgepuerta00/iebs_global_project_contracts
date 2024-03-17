@@ -25,6 +25,7 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     "cancelListing(uint256)": FunctionFragment;
     "commissionPercentage()": FunctionFragment;
     "getActiveListings()": FunctionFragment;
+    "getContractBalance()": FunctionFragment;
     "listNFT(uint256,uint256)": FunctionFragment;
     "listingId()": FunctionFragment;
     "listings(uint256)": FunctionFragment;
@@ -45,6 +46,7 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     "transferOwnership(address)": FunctionFragment;
     "unpause()": FunctionFragment;
     "updateCommissionPercentage(uint256)": FunctionFragment;
+    "withdraw(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -57,6 +59,10 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getActiveListings",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getContractBalance",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -118,6 +124,10 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     functionFragment: "updateCommissionPercentage",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "withdraw",
+    values: [BigNumberish]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "cancelListing",
@@ -129,6 +139,10 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getActiveListings",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getContractBalance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "listNFT", data: BytesLike): Result;
@@ -184,6 +198,7 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     functionFragment: "updateCommissionPercentage",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "CommissionPercentageUpdated(uint256)": EventFragment;
@@ -344,6 +359,8 @@ export class AvatarMarketplace extends BaseContract {
       }
     >;
 
+    getContractBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     listNFT(
       _tokenId: BigNumberish,
       _price: BigNumberish,
@@ -439,6 +456,11 @@ export class AvatarMarketplace extends BaseContract {
       _newCommissionPercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    withdraw(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   cancelListing(
@@ -459,6 +481,8 @@ export class AvatarMarketplace extends BaseContract {
       isActive: boolean;
     })[]
   >;
+
+  getContractBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   listNFT(
     _tokenId: BigNumberish,
@@ -556,6 +580,11 @@ export class AvatarMarketplace extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  withdraw(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     cancelListing(
       _listingId: BigNumberish,
@@ -575,6 +604,8 @@ export class AvatarMarketplace extends BaseContract {
         isActive: boolean;
       })[]
     >;
+
+    getContractBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     listNFT(
       _tokenId: BigNumberish,
@@ -665,6 +696,8 @@ export class AvatarMarketplace extends BaseContract {
       _newCommissionPercentage: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    withdraw(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -855,6 +888,8 @@ export class AvatarMarketplace extends BaseContract {
 
     getActiveListings(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getContractBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
     listNFT(
       _tokenId: BigNumberish,
       _price: BigNumberish,
@@ -939,6 +974,11 @@ export class AvatarMarketplace extends BaseContract {
       _newCommissionPercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    withdraw(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -952,6 +992,10 @@ export class AvatarMarketplace extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getActiveListings(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getContractBalance(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     listNFT(
       _tokenId: BigNumberish,
@@ -1040,6 +1084,11 @@ export class AvatarMarketplace extends BaseContract {
 
     updateCommissionPercentage(
       _newCommissionPercentage: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdraw(
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
