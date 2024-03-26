@@ -36,7 +36,7 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "purchaseNFT(uint256)": FunctionFragment;
-    "purchaseNFTsPackage(uint256)": FunctionFragment;
+    "purchaseNFTsPackage(uint256,bool)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "setMintPrice(uint256)": FunctionFragment;
     "setNFTContract(address)": FunctionFragment;
@@ -88,7 +88,7 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "purchaseNFTsPackage",
-    values: [BigNumberish]
+    values: [BigNumberish, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -408,6 +408,7 @@ export class AvatarMarketplace extends BaseContract {
 
     purchaseNFTsPackage(
       _numberOfNFTs: BigNumberish,
+      isRevealed: boolean,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -529,6 +530,7 @@ export class AvatarMarketplace extends BaseContract {
 
   purchaseNFTsPackage(
     _numberOfNFTs: BigNumberish,
+    isRevealed: boolean,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -648,6 +650,7 @@ export class AvatarMarketplace extends BaseContract {
 
     purchaseNFTsPackage(
       _numberOfNFTs: BigNumberish,
+      isRevealed: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -920,6 +923,7 @@ export class AvatarMarketplace extends BaseContract {
 
     purchaseNFTsPackage(
       _numberOfNFTs: BigNumberish,
+      isRevealed: boolean,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1026,6 +1030,7 @@ export class AvatarMarketplace extends BaseContract {
 
     purchaseNFTsPackage(
       _numberOfNFTs: BigNumberish,
+      isRevealed: boolean,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

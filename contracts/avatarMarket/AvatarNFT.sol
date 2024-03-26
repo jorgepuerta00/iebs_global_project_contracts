@@ -13,7 +13,7 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
 
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
   Counters.Counter private _tokenIdCounter;
-  string private baseURI;
+  string public baseURI;
 
   mapping(address => uint256[]) private _ownedTokens;
 
@@ -58,14 +58,20 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     super._burn(_tokenId);
   }
 
-  function safeMint(address _to) public onlyRole(MINTER_ROLE) whenNotPaused {
+  function safeMint(
+    address _to,
+    bool isRevealed
+  ) public onlyRole(MINTER_ROLE) whenNotPaused {
     uint256 tokenId = _tokenIdCounter.current();
-    string memory strTokenId = Strings.toString(tokenId);
     _tokenIdCounter.increment();
 
-    string memory newTokenURI = string(
-      abi.encodePacked("/", strTokenId, ".json")
-    );
+    string memory newTokenURI;
+    if (isRevealed) {
+      string memory strTokenId = Strings.toString(tokenId);
+      newTokenURI = string(abi.encodePacked("/", strTokenId, ".json"));
+    } else {
+      newTokenURI = "/unknown.json";
+    }
 
     _safeMint(_to, tokenId);
     _setTokenURI(tokenId, newTokenURI);

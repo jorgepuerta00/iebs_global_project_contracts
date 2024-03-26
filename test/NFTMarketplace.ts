@@ -26,7 +26,7 @@ describe('AvatarMarketplace', () => {
 
     // Mint NFTs and transfer ownership to owner contract
     for (let i = 0; i < 5; i++) {
-      await nftContract.connect(owner).safeMint(await owner.getAddress());
+      await nftContract.connect(owner).safeMint(await owner.getAddress(), true);
     }
 
     // Approve the marketplace contract to spend the owner's NFTs
@@ -41,7 +41,7 @@ describe('AvatarMarketplace', () => {
       const sellerAddress = await addr1.getAddress();
 
       // Mint NFTs and transfer ownership to the contract or other accounts
-      await nftContract.connect(owner).safeMint(await addr1.getAddress());
+      await nftContract.connect(owner).safeMint(await addr1.getAddress(), true);
 
       // Approve the contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -67,7 +67,7 @@ describe('AvatarMarketplace', () => {
     it('should not allow listing NFTs if the caller does not own the token', async () => {
       const tokenId = 5;
       // Mint a new NFT for a different address
-      await nftContract.connect(owner).safeMint(await addr2.getAddress());
+      await nftContract.connect(owner).safeMint(await addr2.getAddress(), true);
 
       // Approve the marketplace contract to spend the NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -88,7 +88,7 @@ describe('AvatarMarketplace', () => {
       const tokenId = 5;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).safeMint(sellerAddress);
+      await nftContract.connect(owner).safeMint(sellerAddress, true);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -120,7 +120,7 @@ describe('AvatarMarketplace', () => {
       const tokenId = 5;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).safeMint(sellerAddress);
+      await nftContract.connect(owner).safeMint(sellerAddress, true);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -150,7 +150,7 @@ describe('AvatarMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).safeMint(sellerAddress);
+      await nftContract.connect(owner).safeMint(sellerAddress, true);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -200,7 +200,7 @@ describe('AvatarMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).safeMint(sellerAddress);
+      await nftContract.connect(owner).safeMint(sellerAddress, true);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -235,7 +235,7 @@ describe('AvatarMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).safeMint(sellerAddress);
+      await nftContract.connect(owner).safeMint(sellerAddress, true);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
@@ -262,7 +262,7 @@ describe('AvatarMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).safeMint(sellerAddress);
+      await nftContract.connect(owner).safeMint(sellerAddress, true);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
@@ -364,7 +364,7 @@ describe('AvatarMarketplace', () => {
       const totalMintPrice = mintPricePerNFT.mul(numberOfNFTs); // Total price for 5 NFTs in wei
 
       // Purchase the NFT package
-      await expect(marketplace.connect(buyer).purchaseNFTsPackage(numberOfNFTs, { value: totalMintPrice }))
+      await expect(marketplace.connect(buyer).purchaseNFTsPackage(numberOfNFTs, true, { value: totalMintPrice }))
         .to.emit(marketplace, 'NFTsPurchasedPackage')
         .withArgs(await buyer.getAddress(), numberOfNFTs, totalMintPrice);
 
@@ -383,7 +383,7 @@ describe('AvatarMarketplace', () => {
       const insufficientAmount = mintPrice.sub(ethers.utils.parseEther("1")); // 1 ether less than the mint price
 
       // Attempt to purchase the NFT package with insufficient funds
-      await expect(marketplace.connect(buyer).purchaseNFTsPackage(5, { value: insufficientAmount }))
+      await expect(marketplace.connect(buyer).purchaseNFTsPackage(5, true, { value: insufficientAmount }))
         .to.be.revertedWith("Must send the exact mint price");
 
       // Verify that no NFTs were minted to the buyer as a result of the failed transaction

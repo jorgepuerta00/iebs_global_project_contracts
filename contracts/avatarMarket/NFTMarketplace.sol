@@ -150,7 +150,8 @@ contract AvatarMarketplace is
   }
 
   function purchaseNFTsPackage(
-    uint256 _numberOfNFTs
+    uint256 _numberOfNFTs,
+    bool isRevealed
   ) external payable nonReentrant whenNotPaused {
     uint256 totalCost = mintPrice * _numberOfNFTs;
     require(
@@ -159,7 +160,7 @@ contract AvatarMarketplace is
     );
 
     for (uint256 i = 0; i < _numberOfNFTs; i++) {
-      nftToken.safeMint(msg.sender);
+      nftToken.safeMint(msg.sender, isRevealed);
     }
 
     emit NFTsPurchasedPackage(msg.sender, _numberOfNFTs, totalCost);

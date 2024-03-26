@@ -25,6 +25,7 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     "MINTER_ROLE()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
+    "baseURI()": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getOwnedTokens(address)": FunctionFragment;
@@ -40,7 +41,7 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     "paused()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
-    "safeMint(address)": FunctionFragment;
+    "safeMint(address,bool)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setBaseURI(string)": FunctionFragment;
@@ -65,6 +66,7 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
+  encodeFunctionData(functionFragment: "baseURI", values?: undefined): string;
   encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "getApproved",
@@ -113,7 +115,10 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     functionFragment: "revokeRole",
     values: [BytesLike, string]
   ): string;
-  encodeFunctionData(functionFragment: "safeMint", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "safeMint",
+    values: [string, boolean]
+  ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
     values: [string, string, BigNumberish]
@@ -152,6 +157,7 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "baseURI", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
@@ -343,6 +349,8 @@ export class AvatarNFT extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    baseURI(overrides?: CallOverrides): Promise<[string]>;
+
     burn(
       _tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -412,6 +420,7 @@ export class AvatarNFT extends BaseContract {
 
     safeMint(
       _to: string,
+      isRevealed: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -483,6 +492,8 @@ export class AvatarNFT extends BaseContract {
 
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+  baseURI(overrides?: CallOverrides): Promise<string>;
+
   burn(
     _tokenId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -549,6 +560,7 @@ export class AvatarNFT extends BaseContract {
 
   safeMint(
     _to: string,
+    isRevealed: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -617,6 +629,8 @@ export class AvatarNFT extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    baseURI(overrides?: CallOverrides): Promise<string>;
+
     burn(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     getApproved(
@@ -676,7 +690,11 @@ export class AvatarNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    safeMint(_to: string, overrides?: CallOverrides): Promise<void>;
+    safeMint(
+      _to: string,
+      isRevealed: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -888,6 +906,8 @@ export class AvatarNFT extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    baseURI(overrides?: CallOverrides): Promise<BigNumber>;
+
     burn(
       _tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -960,6 +980,7 @@ export class AvatarNFT extends BaseContract {
 
     safeMint(
       _to: string,
+      isRevealed: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1037,6 +1058,8 @@ export class AvatarNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    baseURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     burn(
       _tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1111,6 +1134,7 @@ export class AvatarNFT extends BaseContract {
 
     safeMint(
       _to: string,
+      isRevealed: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

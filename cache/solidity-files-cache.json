@@ -460,8 +460,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/avatarMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1710704971041,
-      "contentHash": "05e0668ffcae089cbbcf966299a966c2",
+      "lastModificationDate": 1711494717925,
+      "contentHash": "acaebfb43f3a9251baf21446e6f5b42f",
       "sourceName": "contracts/avatarMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.23",
@@ -503,8 +503,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/avatarMarket/AvatarNFT.sol": {
-      "lastModificationDate": 1710698055805,
-      "contentHash": "5a1b043b2a044ff32834bb73c75964f6",
+      "lastModificationDate": 1711494636807,
+      "contentHash": "d236820e0076d411679c3fa1e61b8bb1",
       "sourceName": "contracts/avatarMarket/AvatarNFT.sol",
       "solcConfig": {
         "version": "0.8.23",

@@ -22,12 +22,12 @@ describe('BettingHub', () => {
     await nftToken.deployed();
 
     // Mint 5 tokens to players
-    await nftToken.connect(owner).safeMint(await player1.getAddress());
-    await nftToken.connect(owner).safeMint(await player1.getAddress());
-    await nftToken.connect(owner).safeMint(await player1.getAddress());
-    await nftToken.connect(owner).safeMint(await player1.getAddress());
-    await nftToken.connect(owner).safeMint(await player1.getAddress());
-    await nftToken.connect(owner).safeMint(await player1.getAddress());
+    await nftToken.connect(owner).safeMint(await player1.getAddress(), true);
+    await nftToken.connect(owner).safeMint(await player1.getAddress(), true);
+    await nftToken.connect(owner).safeMint(await player1.getAddress(), true);
+    await nftToken.connect(owner).safeMint(await player1.getAddress(), true);
+    await nftToken.connect(owner).safeMint(await player1.getAddress(), true);
+    await nftToken.connect(owner).safeMint(await player1.getAddress(), true);
 
     // deploy the AvatarRaceEvent contract
     const AvatarRaceEvent = await ethers.getContractFactory('AvatarRaceEvent');
