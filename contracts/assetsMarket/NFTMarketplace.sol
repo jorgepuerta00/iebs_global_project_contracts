@@ -196,6 +196,10 @@ contract AssetsMarketplace is
     emit CommissionPercentageUpdated(_newCommissionPercentage);
   }
 
+  function withdraw(uint amount) external onlyOwner {
+    payable(msg.sender).transfer(amount);
+  }
+
   function pause() public onlyOwner {
     _pause();
   }

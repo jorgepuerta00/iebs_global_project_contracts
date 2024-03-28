@@ -30,6 +30,7 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     "getApproved(uint256)": FunctionFragment;
     "getOwnedTokens(address)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
+    "getTokenCount(string)": FunctionFragment;
     "getTokenURLsByOwner(address)": FunctionFragment;
     "getTotalTokenCount()": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
@@ -41,7 +42,8 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     "paused()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
-    "safeMint(address,bool)": FunctionFragment;
+    "safeMint(address)": FunctionFragment;
+    "safeMintExistingNFT(address,string)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setBaseURI(string)": FunctionFragment;
@@ -51,6 +53,7 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     "tokenURI(uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "unpause()": FunctionFragment;
+    "withdraw(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -79,6 +82,10 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
     values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTokenCount",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "getTokenURLsByOwner",
@@ -115,9 +122,10 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     functionFragment: "revokeRole",
     values: [BytesLike, string]
   ): string;
+  encodeFunctionData(functionFragment: "safeMint", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "safeMint",
-    values: [string, boolean]
+    functionFragment: "safeMintExistingNFT",
+    values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
@@ -146,6 +154,10 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "withdraw",
+    values: [BigNumberish]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "DEFAULT_ADMIN_ROLE",
@@ -169,6 +181,10 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getRoleAdmin",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTokenCount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -196,6 +212,10 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "safeMint", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "safeMintExistingNFT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "safeTransferFrom",
     data: BytesLike
   ): Result;
@@ -219,16 +239,19 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "BatchMetadataUpdate(uint256,uint256)": EventFragment;
+    "ExistingTokenMinted(address,uint256,string,string)": EventFragment;
     "MetadataUpdate(uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
+    "TokenMinted(address,uint256,string)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
   };
@@ -236,11 +259,13 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BatchMetadataUpdate"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ExistingTokenMinted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MetadataUpdate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TokenMinted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
@@ -265,6 +290,15 @@ export type BatchMetadataUpdateEvent = TypedEvent<
   [BigNumber, BigNumber] & { _fromTokenId: BigNumber; _toTokenId: BigNumber }
 >;
 
+export type ExistingTokenMintedEvent = TypedEvent<
+  [string, BigNumber, string, string] & {
+    to: string;
+    tokenId: BigNumber;
+    copyTokenId: string;
+    tokenURI: string;
+  }
+>;
+
 export type MetadataUpdateEvent = TypedEvent<
   [BigNumber] & { _tokenId: BigNumber }
 >;
@@ -285,6 +319,14 @@ export type RoleGrantedEvent = TypedEvent<
 
 export type RoleRevokedEvent = TypedEvent<
   [string, string, string] & { role: string; account: string; sender: string }
+>;
+
+export type TokenMintedEvent = TypedEvent<
+  [string, BigNumber, string] & {
+    to: string;
+    tokenId: BigNumber;
+    tokenURI: string;
+  }
 >;
 
 export type TransferEvent = TypedEvent<
@@ -368,6 +410,11 @@ export class AvatarNFT extends BaseContract {
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
 
+    getTokenCount(
+      tokenId: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     getTokenURLsByOwner(
       owner: string,
       overrides?: CallOverrides
@@ -420,7 +467,12 @@ export class AvatarNFT extends BaseContract {
 
     safeMint(
       _to: string,
-      isRevealed: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    safeMintExistingNFT(
+      _to: string,
+      copyTokenId: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -478,6 +530,11 @@ export class AvatarNFT extends BaseContract {
     unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    withdraw(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -510,6 +567,8 @@ export class AvatarNFT extends BaseContract {
   ): Promise<BigNumber[]>;
 
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
+
+  getTokenCount(tokenId: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   getTokenURLsByOwner(
     owner: string,
@@ -560,7 +619,12 @@ export class AvatarNFT extends BaseContract {
 
   safeMint(
     _to: string,
-    isRevealed: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  safeMintExistingNFT(
+    _to: string,
+    copyTokenId: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -616,6 +680,11 @@ export class AvatarNFT extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  withdraw(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
@@ -644,6 +713,11 @@ export class AvatarNFT extends BaseContract {
     ): Promise<BigNumber[]>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
+
+    getTokenCount(
+      tokenId: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     getTokenURLsByOwner(
       owner: string,
@@ -690,9 +764,11 @@ export class AvatarNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    safeMint(
+    safeMint(_to: string, overrides?: CallOverrides): Promise<void>;
+
+    safeMintExistingNFT(
       _to: string,
-      isRevealed: boolean,
+      copyTokenId: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -745,6 +821,8 @@ export class AvatarNFT extends BaseContract {
     ): Promise<void>;
 
     unpause(overrides?: CallOverrides): Promise<void>;
+
+    withdraw(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -798,6 +876,26 @@ export class AvatarNFT extends BaseContract {
     ): TypedEventFilter<
       [BigNumber, BigNumber],
       { _fromTokenId: BigNumber; _toTokenId: BigNumber }
+    >;
+
+    "ExistingTokenMinted(address,uint256,string,string)"(
+      to?: string | null,
+      tokenId?: BigNumberish | null,
+      copyTokenId?: null,
+      tokenURI?: null
+    ): TypedEventFilter<
+      [string, BigNumber, string, string],
+      { to: string; tokenId: BigNumber; copyTokenId: string; tokenURI: string }
+    >;
+
+    ExistingTokenMinted(
+      to?: string | null,
+      tokenId?: BigNumberish | null,
+      copyTokenId?: null,
+      tokenURI?: null
+    ): TypedEventFilter<
+      [string, BigNumber, string, string],
+      { to: string; tokenId: BigNumber; copyTokenId: string; tokenURI: string }
     >;
 
     "MetadataUpdate(uint256)"(
@@ -868,6 +966,24 @@ export class AvatarNFT extends BaseContract {
       { role: string; account: string; sender: string }
     >;
 
+    "TokenMinted(address,uint256,string)"(
+      to?: string | null,
+      tokenId?: BigNumberish | null,
+      tokenURI?: null
+    ): TypedEventFilter<
+      [string, BigNumber, string],
+      { to: string; tokenId: BigNumber; tokenURI: string }
+    >;
+
+    TokenMinted(
+      to?: string | null,
+      tokenId?: BigNumberish | null,
+      tokenURI?: null
+    ): TypedEventFilter<
+      [string, BigNumber, string],
+      { to: string; tokenId: BigNumber; tokenURI: string }
+    >;
+
     "Transfer(address,address,uint256)"(
       from?: string | null,
       to?: string | null,
@@ -928,6 +1044,11 @@ export class AvatarNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getTokenCount(
+      tokenId: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getTokenURLsByOwner(
       owner: string,
       overrides?: CallOverrides
@@ -980,7 +1101,12 @@ export class AvatarNFT extends BaseContract {
 
     safeMint(
       _to: string,
-      isRevealed: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    safeMintExistingNFT(
+      _to: string,
+      copyTokenId: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1038,6 +1164,11 @@ export class AvatarNFT extends BaseContract {
     unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    withdraw(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1077,6 +1208,11 @@ export class AvatarNFT extends BaseContract {
 
     getRoleAdmin(
       role: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getTokenCount(
+      tokenId: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1134,7 +1270,12 @@ export class AvatarNFT extends BaseContract {
 
     safeMint(
       _to: string,
-      isRevealed: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeMintExistingNFT(
+      _to: string,
+      copyTokenId: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1190,6 +1331,11 @@ export class AvatarNFT extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdraw(
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

@@ -40,6 +40,7 @@ interface AssetsNFTInterface extends ethers.utils.Interface {
     "transferOwnership(address)": FunctionFragment;
     "unpause()": FunctionFragment;
     "uri(uint256)": FunctionFragment;
+    "withdraw(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -103,6 +104,10 @@ interface AssetsNFTInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "withdraw",
+    values: [BigNumberish]
+  ): string;
 
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
@@ -156,6 +161,7 @@ interface AssetsNFTInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "ApprovalForAll(address,address,bool)": EventFragment;
@@ -367,6 +373,11 @@ export class AssetsNFT extends BaseContract {
     ): Promise<ContractTransaction>;
 
     uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+
+    withdraw(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   balanceOf(
@@ -477,6 +488,11 @@ export class AssetsNFT extends BaseContract {
 
   uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  withdraw(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     balanceOf(
       account: string,
@@ -579,6 +595,8 @@ export class AssetsNFT extends BaseContract {
     unpause(overrides?: CallOverrides): Promise<void>;
 
     uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    withdraw(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -815,6 +833,11 @@ export class AssetsNFT extends BaseContract {
     ): Promise<BigNumber>;
 
     uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+    withdraw(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -927,6 +950,11 @@ export class AssetsNFT extends BaseContract {
     uri(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    withdraw(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

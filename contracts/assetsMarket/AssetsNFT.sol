@@ -83,6 +83,10 @@ contract AssetsNFT is ERC1155, Ownable, Pausable {
     safeBatchTransferFrom(_from, _to, _tokenIds, _amount, "");
   }
 
+  function withdraw(uint amount) external onlyOwner {
+    payable(msg.sender).transfer(amount);
+  }
+
   function pause() public onlyOwner {
     _pause();
   }
