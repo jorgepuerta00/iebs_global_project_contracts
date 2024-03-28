@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "./AvatarNFT.sol";
 import "./../SiliquaCoin.sol";
+import "hardhat/console.sol";
 
 contract AvatarMarketplace is
   Ownable,
@@ -52,6 +53,12 @@ contract AvatarMarketplace is
     uint256 totalAmount
   );
 
+  event PurchasedExistingNFT(
+    address indexed buyer,
+    string tokenId,
+    uint256 totalAmount
+  );
+
   event NFTListingCancelled(
     uint256 indexed listingId,
     address indexed seller,
@@ -64,7 +71,8 @@ contract AvatarMarketplace is
   event SiliquaCoinUpdated(address indexed newSiliquaCoinAddress);
   event CommissionPercentageUpdated(uint256 newCommissionPercentage);
 
-  uint256 public mintPrice = 2 ether;
+  uint256 public mintPrice = 0.1 ether;
+  mapping(string => uint256) public mintCounts;
 
   constructor(address _nftContractAddress, uint256 _commissionPercentage) {
     nftToken = AvatarNFT(_nftContractAddress);
@@ -149,9 +157,29 @@ contract AvatarMarketplace is
     );
   }
 
+  function purchaseExistingNFT(
+    string memory copyTokenId
+  ) external payable nonReentrant whenNotPaused {
+    uint256 currentMintCount = mintCounts[copyTokenId] + 1;
+
+    // Calculate the percentage increase based on the currentMintCount
+    // Each mint increases the price by an additional 10% of the base mintPrice.
+    uint256 percentageIncrease = currentMintCount * 10;
+
+    // Calculate the total cost with the percentage increase
+    uint256 totalCost = (mintPrice * (100 + percentageIncrease)) / 100;
+
+    require(msg.value == totalCost, "Must send the exact price for the NFT");
+
+    mintCounts[copyTokenId] = currentMintCount;
+
+    nftToken.safeMintExistingNFT(msg.sender, copyTokenId);
+
+    emit PurchasedExistingNFT(msg.sender, copyTokenId, totalCost);
+  }
+
   function purchaseNFTsPackage(
-    uint256 _numberOfNFTs,
-    bool isRevealed
+    uint256 _numberOfNFTs
   ) external payable nonReentrant whenNotPaused {
     uint256 totalCost = mintPrice * _numberOfNFTs;
     require(
@@ -160,7 +188,7 @@ contract AvatarMarketplace is
     );
 
     for (uint256 i = 0; i < _numberOfNFTs; i++) {
-      nftToken.safeMint(msg.sender, isRevealed);
+      nftToken.safeMint(msg.sender);
     }
 
     emit NFTsPurchasedPackage(msg.sender, _numberOfNFTs, totalCost);

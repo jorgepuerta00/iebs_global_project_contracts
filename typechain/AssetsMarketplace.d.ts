@@ -42,6 +42,7 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     "transferOwnership(address)": FunctionFragment;
     "unpause()": FunctionFragment;
     "updateCommissionPercentage(uint256)": FunctionFragment;
+    "withdraw(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -106,6 +107,10 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     functionFragment: "updateCommissionPercentage",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "withdraw",
+    values: [BigNumberish]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "cancelListing",
@@ -163,6 +168,7 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     functionFragment: "updateCommissionPercentage",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "CommissionPercentageUpdated(uint256)": EventFragment;
@@ -410,6 +416,11 @@ export class AssetsMarketplace extends BaseContract {
       _newCommissionPercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    withdraw(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   cancelListing(
@@ -518,6 +529,11 @@ export class AssetsMarketplace extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  withdraw(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     cancelListing(
       _listingId: BigNumberish,
@@ -618,6 +634,8 @@ export class AssetsMarketplace extends BaseContract {
       _newCommissionPercentage: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    withdraw(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -875,6 +893,11 @@ export class AssetsMarketplace extends BaseContract {
       _newCommissionPercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    withdraw(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -965,6 +988,11 @@ export class AssetsMarketplace extends BaseContract {
 
     updateCommissionPercentage(
       _newCommissionPercentage: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdraw(
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

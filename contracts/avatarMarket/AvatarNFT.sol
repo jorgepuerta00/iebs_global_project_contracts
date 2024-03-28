@@ -16,6 +16,19 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
   string public baseURI;
 
   mapping(address => uint256[]) private _ownedTokens;
+  mapping(string => uint256) private _tokenCounts;
+
+  event TokenMinted(
+    address indexed to,
+    uint256 indexed tokenId,
+    string tokenURI
+  );
+  event ExistingTokenMinted(
+    address indexed to,
+    uint256 indexed tokenId,
+    string copyTokenId,
+    string tokenURI
+  );
 
   constructor(string memory _initialBaseURI) ERC721("AvatarNFT", "AVA") {
     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -58,25 +71,50 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     super._burn(_tokenId);
   }
 
-  function safeMint(
+  function safeMintExistingNFT(
     address _to,
-    bool isRevealed
+    string memory copyTokenId
   ) public onlyRole(MINTER_ROLE) whenNotPaused {
     uint256 tokenId = _tokenIdCounter.current();
+
+    uint256 _copyTokenId = stringToUint(copyTokenId);
+    require(
+      _exists(_copyTokenId),
+      "TokenId does not exist, cannot copy metadata"
+    );
+    string memory existingTokenURI = string(
+      abi.encodePacked("/", copyTokenId, ".json")
+    );
+
+    if (_tokenCounts[copyTokenId] == 0) {
+      _tokenCounts[copyTokenId] = 2;
+    } else {
+      _tokenCounts[copyTokenId]++;
+    }
+
+    _safeMint(_to, tokenId);
+    _setTokenURI(tokenId, existingTokenURI);
+
+    _ownedTokens[_to].push(tokenId);
     _tokenIdCounter.increment();
 
-    string memory newTokenURI;
-    if (isRevealed) {
-      string memory strTokenId = Strings.toString(tokenId);
-      newTokenURI = string(abi.encodePacked("/", strTokenId, ".json"));
-    } else {
-      newTokenURI = "/unknown.json";
-    }
+    emit ExistingTokenMinted(_to, tokenId, copyTokenId, existingTokenURI);
+  }
+
+  function safeMint(address _to) public onlyRole(MINTER_ROLE) whenNotPaused {
+    uint256 tokenId = _tokenIdCounter.current();
+    string memory strTokenId = Strings.toString(tokenId);
+    string memory newTokenURI = string(
+      abi.encodePacked("/", strTokenId, ".json")
+    );
 
     _safeMint(_to, tokenId);
     _setTokenURI(tokenId, newTokenURI);
 
     _ownedTokens[_to].push(tokenId);
+    _tokenIdCounter.increment();
+
+    emit TokenMinted(_to, tokenId, newTokenURI);
   }
 
   function tokenURI(
@@ -135,6 +173,27 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
 
   function getTotalTokenCount() public view returns (uint256) {
     return _tokenIdCounter.current();
+  }
+
+  function getTokenCount(string memory tokenId) public view returns (uint256) {
+    return _tokenCounts[tokenId];
+  }
+
+  function stringToUint(string memory s) private pure returns (uint256) {
+    uint256 result;
+    bytes memory b = bytes(s);
+    for (uint i = 0; i < b.length; i++) {
+      if (uint8(b[i]) >= 48 && uint8(b[i]) <= 57) {
+        result = result * 10 + (uint8(b[i]) - 48);
+      } else {
+        revert("Invalid TokenId");
+      }
+    }
+    return result;
+  }
+
+  function withdraw(uint amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    payable(msg.sender).transfer(amount);
   }
 
   function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {

@@ -22,11 +22,11 @@ describe('AvatarRaceEvent', () => {
     await nftToken.deployed();
 
     // Mint 5 tokens to players
-    await nftToken.connect(owner).safeMint(await player1.getAddress(), true);
-    await nftToken.connect(owner).safeMint(await player2.getAddress(), true);
-    await nftToken.connect(owner).safeMint(await player3.getAddress(), true);
-    await nftToken.connect(owner).safeMint(await player4.getAddress(), true);
-    await nftToken.connect(owner).safeMint(await player5.getAddress(), true);
+    await nftToken.connect(owner).safeMint(await player1.getAddress());
+    await nftToken.connect(owner).safeMint(await player2.getAddress());
+    await nftToken.connect(owner).safeMint(await player3.getAddress());
+    await nftToken.connect(owner).safeMint(await player4.getAddress());
+    await nftToken.connect(owner).safeMint(await player5.getAddress());
 
     // deploy the AvatarRaceEvent contract
     const AvatarRaceEvent = await ethers.getContractFactory('AvatarRaceEvent');
@@ -103,7 +103,7 @@ describe('AvatarRaceEvent', () => {
       let player6: Signer;
       [player6] = await ethers.getSigners();
 
-      await nftToken.connect(owner).safeMint(await player6.getAddress(), true);
+      await nftToken.connect(owner).safeMint(await player6.getAddress());
 
       await expect(
         avatarRaceContract.connect(player6).enterRacerInRace(0, 0, { value: entryFee })
@@ -128,14 +128,14 @@ describe('AvatarRaceEvent', () => {
         let player: Signer;
         [player] = await ethers.getSigners();
 
-        await nftToken.connect(owner).safeMint(await player.getAddress(), true);
+        await nftToken.connect(owner).safeMint(await player.getAddress());
         await avatarRaceContract.connect(player).enterRacerInRace(0, i, { value: entryFee });
       }
 
       let player20: Signer;
       [player20] = await ethers.getSigners();
 
-      await nftToken.connect(owner).safeMint(await player20.getAddress(), true);
+      await nftToken.connect(owner).safeMint(await player20.getAddress());
 
       await expect(
         avatarRaceContract.connect(player20).enterRacerInRace(0, 20, { value: entryFee })
@@ -149,7 +149,7 @@ describe('AvatarRaceEvent', () => {
       let player6: Signer;
       [player6] = await ethers.getSigners();
 
-      await nftToken.connect(owner).safeMint(await player6.getAddress(), true);
+      await nftToken.connect(owner).safeMint(await player6.getAddress());
 
       await expect(
         avatarRaceContract.connect(player6).enterRacerInRace(0, 5, { value: entryFee })
