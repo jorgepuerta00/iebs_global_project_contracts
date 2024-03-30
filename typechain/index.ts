@@ -32,6 +32,7 @@ export type { AvatarAuctionMarketplace } from "./AvatarAuctionMarketplace";
 export type { AvatarMarketplace } from "./AvatarMarketplace";
 export type { AvatarRaceEvent } from "./AvatarRaceEvent";
 export type { BettingHub } from "./BettingHub";
+export type { ChainCustomsManagerNFT } from "./ChainCustomsManagerNFT";
 export type { ISiliquaCoin } from "./ISiliquaCoin";
 export type { SiliquaCoin } from "./SiliquaCoin";
 
@@ -66,5 +67,6 @@ export { AvatarAuctionMarketplace__factory } from "./factories/AvatarAuctionMark
 export { AvatarMarketplace__factory } from "./factories/AvatarMarketplace__factory";
 export { AvatarRaceEvent__factory } from "./factories/AvatarRaceEvent__factory";
 export { BettingHub__factory } from "./factories/BettingHub__factory";
+export { ChainCustomsManagerNFT__factory } from "./factories/ChainCustomsManagerNFT__factory";
 export { ISiliquaCoin__factory } from "./factories/ISiliquaCoin__factory";
 export { SiliquaCoin__factory } from "./factories/SiliquaCoin__factory";

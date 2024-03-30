@@ -158,9 +158,9 @@ contract AvatarMarketplace is
   }
 
   function purchaseExistingNFT(
-    string memory copyTokenId
+    string memory copyTokenUrl
   ) external payable nonReentrant whenNotPaused {
-    uint256 currentMintCount = mintCounts[copyTokenId] + 1;
+    uint256 currentMintCount = mintCounts[copyTokenUrl] + 1;
 
     // Calculate the percentage increase based on the currentMintCount
     // Each mint increases the price by an additional 10% of the base mintPrice.
@@ -171,11 +171,11 @@ contract AvatarMarketplace is
 
     require(msg.value == totalCost, "Must send the exact price for the NFT");
 
-    mintCounts[copyTokenId] = currentMintCount;
+    nftToken.safeMintExistingNFT(msg.sender, copyTokenUrl);
 
-    nftToken.safeMintExistingNFT(msg.sender, copyTokenId);
+    mintCounts[copyTokenUrl] = currentMintCount;
 
-    emit PurchasedExistingNFT(msg.sender, copyTokenId, totalCost);
+    emit PurchasedExistingNFT(msg.sender, copyTokenUrl, totalCost);
   }
 
   function purchaseNFTsPackage(

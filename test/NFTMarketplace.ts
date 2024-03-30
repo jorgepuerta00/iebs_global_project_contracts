@@ -430,7 +430,7 @@ describe('AvatarMarketplace', () => {
     it('should increase the total cost by the correct percentage at each mint count', async function () {
       const buyer = addr1; // Use addr1 as the buyer's signer object
       const buyerAddress = await addr1.getAddress();
-      const copyTokenId = "1"; // Unique ID for the NFT
+      const copyTokenId = "https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/1.json"; // Unique ID for the NFT
       const baseMintPrice = await marketplace.mintPrice(); // Fetch the base mint price from the contract
 
       // Simulate the minting process and validate the price at each step

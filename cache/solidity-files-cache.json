@@ -460,8 +460,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/avatarMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1711664737247,
-      "contentHash": "2ee1a9fb85ce55d1f6052ed219181f4d",
+      "lastModificationDate": 1711755067053,
+      "contentHash": "bdceaf8406b8cf56038115a80e7bd712",
       "sourceName": "contracts/avatarMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.23",
@@ -504,8 +504,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/avatarMarket/AvatarNFT.sol": {
-      "lastModificationDate": 1711665791056,
-      "contentHash": "f99bc4237c474ba1edb7ec7aca7c1f98",
+      "lastModificationDate": 1711760726551,
+      "contentHash": "5b8c13654e2a33f0e879bb00c2f0134e",
       "sourceName": "contracts/avatarMarket/AvatarNFT.sol",
       "solcConfig": {
         "version": "0.8.23",
@@ -1510,7 +1510,7 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/avatarMarket/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1711665692017,
+      "lastModificationDate": 1711666404532,
       "contentHash": "5ccc1e624fc4869ce4e7630093657998",
       "sourceName": "contracts/avatarMarket/NFTAuctionMarketplace.sol",
       "solcConfig": {
@@ -1668,6 +1668,46 @@
       ],
       "artifacts": [
         "console"
+      ]
+    },
+    "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/race/GarageNFTManager.sol": {
+      "lastModificationDate": 1711753685406,
+      "contentHash": "6ea39d4be2d54372fd8c6febea53308b",
+      "sourceName": "contracts/race/GarageNFTManager.sol",
+      "solcConfig": {
+        "version": "0.8.23",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/security/ReentrancyGuard.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ChainCustomsManagerNFT"
       ]
     }
   }

@@ -30,7 +30,6 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     "getApproved(uint256)": FunctionFragment;
     "getOwnedTokens(address)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
-    "getTokenCount(string)": FunctionFragment;
     "getTokenURLsByOwner(address)": FunctionFragment;
     "getTotalTokenCount()": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
@@ -53,6 +52,7 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     "tokenURI(uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "unpause()": FunctionFragment;
+    "urlExists(string)": FunctionFragment;
     "withdraw(uint256)": FunctionFragment;
   };
 
@@ -82,10 +82,6 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
     values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getTokenCount",
-    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "getTokenURLsByOwner",
@@ -154,6 +150,7 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "urlExists", values: [string]): string;
   encodeFunctionData(
     functionFragment: "withdraw",
     values: [BigNumberish]
@@ -181,10 +178,6 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getRoleAdmin",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getTokenCount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -239,13 +232,14 @@ interface AvatarNFTInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "urlExists", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "BatchMetadataUpdate(uint256,uint256)": EventFragment;
-    "ExistingTokenMinted(address,uint256,string,string)": EventFragment;
+    "ExistingTokenMinted(address,uint256,string)": EventFragment;
     "MetadataUpdate(uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
@@ -291,11 +285,10 @@ export type BatchMetadataUpdateEvent = TypedEvent<
 >;
 
 export type ExistingTokenMintedEvent = TypedEvent<
-  [string, BigNumber, string, string] & {
+  [string, BigNumber, string] & {
     to: string;
     tokenId: BigNumber;
-    copyTokenId: string;
-    tokenURI: string;
+    existingTokenURI: string;
   }
 >;
 
@@ -410,11 +403,6 @@ export class AvatarNFT extends BaseContract {
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
 
-    getTokenCount(
-      tokenId: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     getTokenURLsByOwner(
       owner: string,
       overrides?: CallOverrides
@@ -472,7 +460,7 @@ export class AvatarNFT extends BaseContract {
 
     safeMintExistingNFT(
       _to: string,
-      copyTokenId: string,
+      copyTokenUrl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -531,6 +519,8 @@ export class AvatarNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    urlExists(url: string, overrides?: CallOverrides): Promise<[boolean]>;
+
     withdraw(
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -567,8 +557,6 @@ export class AvatarNFT extends BaseContract {
   ): Promise<BigNumber[]>;
 
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
-
-  getTokenCount(tokenId: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   getTokenURLsByOwner(
     owner: string,
@@ -624,7 +612,7 @@ export class AvatarNFT extends BaseContract {
 
   safeMintExistingNFT(
     _to: string,
-    copyTokenId: string,
+    copyTokenUrl: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -680,6 +668,8 @@ export class AvatarNFT extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  urlExists(url: string, overrides?: CallOverrides): Promise<boolean>;
+
   withdraw(
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -713,11 +703,6 @@ export class AvatarNFT extends BaseContract {
     ): Promise<BigNumber[]>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
-
-    getTokenCount(
-      tokenId: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     getTokenURLsByOwner(
       owner: string,
@@ -768,7 +753,7 @@ export class AvatarNFT extends BaseContract {
 
     safeMintExistingNFT(
       _to: string,
-      copyTokenId: string,
+      copyTokenUrl: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -821,6 +806,8 @@ export class AvatarNFT extends BaseContract {
     ): Promise<void>;
 
     unpause(overrides?: CallOverrides): Promise<void>;
+
+    urlExists(url: string, overrides?: CallOverrides): Promise<boolean>;
 
     withdraw(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
   };
@@ -878,24 +865,22 @@ export class AvatarNFT extends BaseContract {
       { _fromTokenId: BigNumber; _toTokenId: BigNumber }
     >;
 
-    "ExistingTokenMinted(address,uint256,string,string)"(
+    "ExistingTokenMinted(address,uint256,string)"(
       to?: string | null,
       tokenId?: BigNumberish | null,
-      copyTokenId?: null,
-      tokenURI?: null
+      existingTokenURI?: null
     ): TypedEventFilter<
-      [string, BigNumber, string, string],
-      { to: string; tokenId: BigNumber; copyTokenId: string; tokenURI: string }
+      [string, BigNumber, string],
+      { to: string; tokenId: BigNumber; existingTokenURI: string }
     >;
 
     ExistingTokenMinted(
       to?: string | null,
       tokenId?: BigNumberish | null,
-      copyTokenId?: null,
-      tokenURI?: null
+      existingTokenURI?: null
     ): TypedEventFilter<
-      [string, BigNumber, string, string],
-      { to: string; tokenId: BigNumber; copyTokenId: string; tokenURI: string }
+      [string, BigNumber, string],
+      { to: string; tokenId: BigNumber; existingTokenURI: string }
     >;
 
     "MetadataUpdate(uint256)"(
@@ -1044,11 +1029,6 @@ export class AvatarNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getTokenCount(
-      tokenId: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getTokenURLsByOwner(
       owner: string,
       overrides?: CallOverrides
@@ -1106,7 +1086,7 @@ export class AvatarNFT extends BaseContract {
 
     safeMintExistingNFT(
       _to: string,
-      copyTokenId: string,
+      copyTokenUrl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1165,6 +1145,8 @@ export class AvatarNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    urlExists(url: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     withdraw(
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1208,11 +1190,6 @@ export class AvatarNFT extends BaseContract {
 
     getRoleAdmin(
       role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getTokenCount(
-      tokenId: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1275,7 +1252,7 @@ export class AvatarNFT extends BaseContract {
 
     safeMintExistingNFT(
       _to: string,
-      copyTokenId: string,
+      copyTokenUrl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1332,6 +1309,11 @@ export class AvatarNFT extends BaseContract {
 
     unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    urlExists(
+      url: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     withdraw(

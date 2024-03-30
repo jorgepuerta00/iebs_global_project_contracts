@@ -426,7 +426,7 @@ export class AvatarMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
     purchaseExistingNFT(
-      copyTokenId: string,
+      copyTokenUrl: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -554,7 +554,7 @@ export class AvatarMarketplace extends BaseContract {
   paused(overrides?: CallOverrides): Promise<boolean>;
 
   purchaseExistingNFT(
-    copyTokenId: string,
+    copyTokenUrl: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -680,7 +680,7 @@ export class AvatarMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<boolean>;
 
     purchaseExistingNFT(
-      copyTokenId: string,
+      copyTokenUrl: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -977,7 +977,7 @@ export class AvatarMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
     purchaseExistingNFT(
-      copyTokenId: string,
+      copyTokenUrl: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1093,7 +1093,7 @@ export class AvatarMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     purchaseExistingNFT(
-      copyTokenId: string,
+      copyTokenUrl: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

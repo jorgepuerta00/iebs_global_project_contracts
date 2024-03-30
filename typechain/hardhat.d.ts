@@ -137,6 +137,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BettingHub__factory>;
     getContractFactory(
+      name: "ChainCustomsManagerNFT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ChainCustomsManagerNFT__factory>;
+    getContractFactory(
       name: "ISiliquaCoin",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISiliquaCoin__factory>;
@@ -300,6 +304,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.BettingHub>;
+    getContractAt(
+      name: "ChainCustomsManagerNFT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ChainCustomsManagerNFT>;
     getContractAt(
       name: "ISiliquaCoin",
       address: string,
