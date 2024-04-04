@@ -58,6 +58,7 @@ contract AssetsNFT is ERC1155, AccessControl, Pausable {
       );
   }
 
+  // Function to set base URI
   function setBaseURI(
     string memory newBaseURI
   ) public onlyRole(DEFAULT_ADMIN_ROLE) {

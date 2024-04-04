@@ -47,7 +47,7 @@ describe('AvatarNFT', () => {
 
     it('Should revert if non-owner tries to burn tokens', async () => {
       await nftContract.connect(owner).safeMint(await addr1.getAddress());
-      await expect(nftContract.connect(addr1).burn(1)).to.be.revertedWith('AccessControl: account 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 is missing role 0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6');
+      await expect(nftContract.connect(addr2).burn(0)).to.be.revertedWith('Caller is not owner nor approved');
     });
   });
 
@@ -128,7 +128,7 @@ describe('AvatarNFT', () => {
       expect(noTokenURIs.length).to.equal(0);
 
       // expected total token count 
-      const totalTokenCount = await nftContract.getTotalTokenCount();
+      const totalTokenCount = await nftContract.totalSupply();
       expect(totalTokenCount).to.equal(4);
     });
   });
@@ -137,30 +137,35 @@ describe('AvatarNFT', () => {
     it('Should mint an NFT with the metadata of an existing NFT', async () => {
       // Mint an original NFT to copy
       await nftContract.connect(owner).safeMint(await addr1.getAddress());
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
+      await nftContract.connect(owner).safeMint(await addr1.getAddress());
       const originalTokenURI = await nftContract.tokenURI(0);
       const buyerAddress = await addr2.getAddress();
 
       // Mint a new NFT copying the first one's metadata
-      await expect(nftContract.connect(owner).safeMintExistingNFT(await addr2.getAddress(), "https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/0.json"))
+      await expect(nftContract.connect(owner).safeMintExistingNFT(await addr2.getAddress(), 0))
         .to.emit(nftContract, 'ExistingTokenMinted')
-        .withArgs(buyerAddress, 1, originalTokenURI);
+        .withArgs(buyerAddress, 3, originalTokenURI);
 
       // Verify ownership of the copied NFT
-      expect(await nftContract.ownerOf(1)).to.equal(await addr2.getAddress());
+      expect(await nftContract.ownerOf(3)).to.equal(await addr2.getAddress());
+
+      // Verify the token URI of the copied NFT
+      expect(await nftContract.tokenURI(3)).to.equal(originalTokenURI);
     });
 
     it('Should revert if copying a non-existent token ID', async () => {
       // Attempt to mint an NFT with metadata copied from a non-existent token
-      await expect(nftContract.connect(owner).safeMintExistingNFT(await addr2.getAddress(), "https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/999.json"))
-        .to.be.revertedWith("Token URL does not exist, cannot copy metadata");
+      await expect(nftContract.connect(owner).safeMintExistingNFT(await addr2.getAddress(), 999))
+        .to.be.revertedWith("AvatarNFT: existing token ID does not exist");
     });
 
-    it('Should revert if non-owner tries to mint an existing NFT', async () => {
+    it('Should revert if non minter rol tries to mint an existing NFT', async () => {
       // Mint an original NFT to setup
       await nftContract.connect(owner).safeMint(await addr1.getAddress());
 
-      // Attempt to mint a copy of the NFT as a non-owner
-      await expect(nftContract.connect(addr2).safeMintExistingNFT(await addr3.getAddress(), "https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/0.json"))
+      // Attempt to mint a copy of the NFT as a non minter rol
+      await expect(nftContract.connect(addr2).safeMintExistingNFT(await addr3.getAddress(), 0))
         .to.be.revertedWith('AccessControl: account');
     });
   });

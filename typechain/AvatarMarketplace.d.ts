@@ -26,9 +26,8 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     "commissionPercentage()": FunctionFragment;
     "getActiveListings()": FunctionFragment;
     "listNFT(uint256,uint256)": FunctionFragment;
-    "listingId()": FunctionFragment;
     "listings(uint256)": FunctionFragment;
-    "mintCounts(string)": FunctionFragment;
+    "mintCounts(uint256)": FunctionFragment;
     "mintPrice()": FunctionFragment;
     "nftToken()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
@@ -36,7 +35,7 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
-    "purchaseExistingNFT(string)": FunctionFragment;
+    "purchaseExistingNFT(uint256)": FunctionFragment;
     "purchaseNFT(uint256)": FunctionFragment;
     "purchaseNFTsPackage(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
@@ -66,12 +65,14 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     functionFragment: "listNFT",
     values: [BigNumberish, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "listingId", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "listings",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "mintCounts", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "mintCounts",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "mintPrice", values?: undefined): string;
   encodeFunctionData(functionFragment: "nftToken", values?: undefined): string;
   encodeFunctionData(
@@ -87,7 +88,7 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "purchaseExistingNFT",
-    values: [string]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "purchaseNFT",
@@ -144,7 +145,6 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "listNFT", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "listingId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "listings", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mintCounts", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mintPrice", data: BytesLike): Result;
@@ -206,14 +206,11 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
   events: {
     "CommissionPercentageUpdated(uint256)": EventFragment;
     "NFTContractUpdated(address)": EventFragment;
-    "NFTListed(uint256,address,uint256,uint256,string)": EventFragment;
-    "NFTListingCancelled(uint256,address,uint256,uint256,string)": EventFragment;
-    "NFTPurchased(uint256,address,address,uint256,uint256,string)": EventFragment;
-    "NFTsPurchasedPackage(address,uint256,uint256)": EventFragment;
+    "NFTListed(uint256,address,uint256)": EventFragment;
+    "NFTListingCancelled(uint256,address,uint256)": EventFragment;
+    "NFTPurchased(uint256,address,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
-    "PurchasedExistingNFT(address,string,uint256)": EventFragment;
-    "SiliquaCoinUpdated(address)": EventFragment;
     "Unpaused(address)": EventFragment;
   };
 
@@ -224,11 +221,8 @@ interface AvatarMarketplaceInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "NFTListed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTListingCancelled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTPurchased"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTsPurchasedPackage"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "PurchasedExistingNFT"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SiliquaCoinUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
@@ -241,41 +235,27 @@ export type NFTContractUpdatedEvent = TypedEvent<
 >;
 
 export type NFTListedEvent = TypedEvent<
-  [BigNumber, string, BigNumber, BigNumber, string] & {
-    listingId: BigNumber;
-    seller: string;
+  [BigNumber, string, BigNumber] & {
     tokenId: BigNumber;
+    seller: string;
     price: BigNumber;
-    status: string;
   }
 >;
 
 export type NFTListingCancelledEvent = TypedEvent<
-  [BigNumber, string, BigNumber, BigNumber, string] & {
-    listingId: BigNumber;
-    seller: string;
+  [BigNumber, string, BigNumber] & {
     tokenId: BigNumber;
+    seller: string;
     price: BigNumber;
-    status: string;
   }
 >;
 
 export type NFTPurchasedEvent = TypedEvent<
-  [BigNumber, string, string, BigNumber, BigNumber, string] & {
-    listingId: BigNumber;
+  [BigNumber, string, string, BigNumber] & {
+    tokenId: BigNumber;
     buyer: string;
     seller: string;
-    tokenId: BigNumber;
     price: BigNumber;
-    status: string;
-  }
->;
-
-export type NFTsPurchasedPackageEvent = TypedEvent<
-  [string, BigNumber, BigNumber] & {
-    buyer: string;
-    numberOfNFTs: BigNumber;
-    totalAmount: BigNumber;
   }
 >;
 
@@ -284,18 +264,6 @@ export type OwnershipTransferredEvent = TypedEvent<
 >;
 
 export type PausedEvent = TypedEvent<[string] & { account: string }>;
-
-export type PurchasedExistingNFTEvent = TypedEvent<
-  [string, string, BigNumber] & {
-    buyer: string;
-    tokenId: string;
-    totalAmount: BigNumber;
-  }
->;
-
-export type SiliquaCoinUpdatedEvent = TypedEvent<
-  [string] & { newSiliquaCoinAddress: string }
->;
 
 export type UnpausedEvent = TypedEvent<[string] & { account: string }>;
 
@@ -344,7 +312,7 @@ export class AvatarMarketplace extends BaseContract {
 
   functions: {
     cancelListing(
-      _listingId: BigNumberish,
+      _listingIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -354,22 +322,13 @@ export class AvatarMarketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [
-        ([BigNumber, string, BigNumber, BigNumber, boolean] & {
-          listingId: BigNumber;
-          seller: string;
+        ([BigNumber, string, BigNumber, boolean] & {
           tokenId: BigNumber;
+          seller: string;
           price: BigNumber;
           isActive: boolean;
         })[]
-      ] & {
-        activeListings: ([BigNumber, string, BigNumber, BigNumber, boolean] & {
-          listingId: BigNumber;
-          seller: string;
-          tokenId: BigNumber;
-          price: BigNumber;
-          isActive: boolean;
-        })[];
-      }
+      ]
     >;
 
     listNFT(
@@ -378,22 +337,22 @@ export class AvatarMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    listingId(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     listings(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, string, BigNumber, BigNumber, boolean] & {
-        listingId: BigNumber;
-        seller: string;
+      [BigNumber, string, BigNumber, boolean] & {
         tokenId: BigNumber;
+        seller: string;
         price: BigNumber;
         isActive: boolean;
       }
     >;
 
-    mintCounts(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+    mintCounts(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     mintPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -426,12 +385,12 @@ export class AvatarMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
     purchaseExistingNFT(
-      copyTokenUrl: string,
+      existingTokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     purchaseNFT(
-      _listingId: BigNumberish,
+      _listingIndex: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -482,7 +441,7 @@ export class AvatarMarketplace extends BaseContract {
   };
 
   cancelListing(
-    _listingId: BigNumberish,
+    _listingIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -491,10 +450,9 @@ export class AvatarMarketplace extends BaseContract {
   getActiveListings(
     overrides?: CallOverrides
   ): Promise<
-    ([BigNumber, string, BigNumber, BigNumber, boolean] & {
-      listingId: BigNumber;
-      seller: string;
+    ([BigNumber, string, BigNumber, boolean] & {
       tokenId: BigNumber;
+      seller: string;
       price: BigNumber;
       isActive: boolean;
     })[]
@@ -506,22 +464,19 @@ export class AvatarMarketplace extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  listingId(overrides?: CallOverrides): Promise<BigNumber>;
-
   listings(
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, string, BigNumber, BigNumber, boolean] & {
-      listingId: BigNumber;
-      seller: string;
+    [BigNumber, string, BigNumber, boolean] & {
       tokenId: BigNumber;
+      seller: string;
       price: BigNumber;
       isActive: boolean;
     }
   >;
 
-  mintCounts(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+  mintCounts(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
   mintPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -554,12 +509,12 @@ export class AvatarMarketplace extends BaseContract {
   paused(overrides?: CallOverrides): Promise<boolean>;
 
   purchaseExistingNFT(
-    copyTokenUrl: string,
+    existingTokenId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   purchaseNFT(
-    _listingId: BigNumberish,
+    _listingIndex: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -610,7 +565,7 @@ export class AvatarMarketplace extends BaseContract {
 
   callStatic: {
     cancelListing(
-      _listingId: BigNumberish,
+      _listingIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -619,10 +574,9 @@ export class AvatarMarketplace extends BaseContract {
     getActiveListings(
       overrides?: CallOverrides
     ): Promise<
-      ([BigNumber, string, BigNumber, BigNumber, boolean] & {
-        listingId: BigNumber;
-        seller: string;
+      ([BigNumber, string, BigNumber, boolean] & {
         tokenId: BigNumber;
+        seller: string;
         price: BigNumber;
         isActive: boolean;
       })[]
@@ -634,22 +588,22 @@ export class AvatarMarketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    listingId(overrides?: CallOverrides): Promise<BigNumber>;
-
     listings(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, string, BigNumber, BigNumber, boolean] & {
-        listingId: BigNumber;
-        seller: string;
+      [BigNumber, string, BigNumber, boolean] & {
         tokenId: BigNumber;
+        seller: string;
         price: BigNumber;
         isActive: boolean;
       }
     >;
 
-    mintCounts(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    mintCounts(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     mintPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -680,12 +634,12 @@ export class AvatarMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<boolean>;
 
     purchaseExistingNFT(
-      copyTokenUrl: string,
+      existingTokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     purchaseNFT(
-      _listingId: BigNumberish,
+      _listingIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -738,135 +692,67 @@ export class AvatarMarketplace extends BaseContract {
     ): TypedEventFilter<[BigNumber], { newCommissionPercentage: BigNumber }>;
 
     "NFTContractUpdated(address)"(
-      newNFTContractAddress?: string | null
+      newNFTContractAddress?: null
     ): TypedEventFilter<[string], { newNFTContractAddress: string }>;
 
     NFTContractUpdated(
-      newNFTContractAddress?: string | null
+      newNFTContractAddress?: null
     ): TypedEventFilter<[string], { newNFTContractAddress: string }>;
 
-    "NFTListed(uint256,address,uint256,uint256,string)"(
-      listingId?: BigNumberish | null,
-      seller?: string | null,
+    "NFTListed(uint256,address,uint256)"(
       tokenId?: BigNumberish | null,
-      price?: null,
-      status?: null
+      seller?: string | null,
+      price?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string, BigNumber],
+      { tokenId: BigNumber; seller: string; price: BigNumber }
     >;
 
     NFTListed(
-      listingId?: BigNumberish | null,
-      seller?: string | null,
       tokenId?: BigNumberish | null,
-      price?: null,
-      status?: null
+      seller?: string | null,
+      price?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string, BigNumber],
+      { tokenId: BigNumber; seller: string; price: BigNumber }
     >;
 
-    "NFTListingCancelled(uint256,address,uint256,uint256,string)"(
-      listingId?: BigNumberish | null,
-      seller?: string | null,
+    "NFTListingCancelled(uint256,address,uint256)"(
       tokenId?: BigNumberish | null,
-      price?: null,
-      status?: null
+      seller?: string | null,
+      price?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string, BigNumber],
+      { tokenId: BigNumber; seller: string; price: BigNumber }
     >;
 
     NFTListingCancelled(
-      listingId?: BigNumberish | null,
-      seller?: string | null,
       tokenId?: BigNumberish | null,
-      price?: null,
-      status?: null
+      seller?: string | null,
+      price?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string, BigNumber],
+      { tokenId: BigNumber; seller: string; price: BigNumber }
     >;
 
-    "NFTPurchased(uint256,address,address,uint256,uint256,string)"(
-      listingId?: BigNumberish | null,
+    "NFTPurchased(uint256,address,address,uint256)"(
+      tokenId?: BigNumberish | null,
       buyer?: string | null,
       seller?: string | null,
-      tokenId?: null,
-      price?: null,
-      status?: null
+      price?: null
     ): TypedEventFilter<
-      [BigNumber, string, string, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        buyer: string;
-        seller: string;
-        tokenId: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string, string, BigNumber],
+      { tokenId: BigNumber; buyer: string; seller: string; price: BigNumber }
     >;
 
     NFTPurchased(
-      listingId?: BigNumberish | null,
+      tokenId?: BigNumberish | null,
       buyer?: string | null,
       seller?: string | null,
-      tokenId?: null,
-      price?: null,
-      status?: null
+      price?: null
     ): TypedEventFilter<
-      [BigNumber, string, string, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        buyer: string;
-        seller: string;
-        tokenId: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
-    >;
-
-    "NFTsPurchasedPackage(address,uint256,uint256)"(
-      buyer?: string | null,
-      numberOfNFTs?: null,
-      totalAmount?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { buyer: string; numberOfNFTs: BigNumber; totalAmount: BigNumber }
-    >;
-
-    NFTsPurchasedPackage(
-      buyer?: string | null,
-      numberOfNFTs?: null,
-      totalAmount?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { buyer: string; numberOfNFTs: BigNumber; totalAmount: BigNumber }
+      [BigNumber, string, string, BigNumber],
+      { tokenId: BigNumber; buyer: string; seller: string; price: BigNumber }
     >;
 
     "OwnershipTransferred(address,address)"(
@@ -891,32 +777,6 @@ export class AvatarMarketplace extends BaseContract {
 
     Paused(account?: null): TypedEventFilter<[string], { account: string }>;
 
-    "PurchasedExistingNFT(address,string,uint256)"(
-      buyer?: string | null,
-      tokenId?: null,
-      totalAmount?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber],
-      { buyer: string; tokenId: string; totalAmount: BigNumber }
-    >;
-
-    PurchasedExistingNFT(
-      buyer?: string | null,
-      tokenId?: null,
-      totalAmount?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber],
-      { buyer: string; tokenId: string; totalAmount: BigNumber }
-    >;
-
-    "SiliquaCoinUpdated(address)"(
-      newSiliquaCoinAddress?: string | null
-    ): TypedEventFilter<[string], { newSiliquaCoinAddress: string }>;
-
-    SiliquaCoinUpdated(
-      newSiliquaCoinAddress?: string | null
-    ): TypedEventFilter<[string], { newSiliquaCoinAddress: string }>;
-
     "Unpaused(address)"(
       account?: null
     ): TypedEventFilter<[string], { account: string }>;
@@ -926,7 +786,7 @@ export class AvatarMarketplace extends BaseContract {
 
   estimateGas: {
     cancelListing(
-      _listingId: BigNumberish,
+      _listingIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -940,11 +800,12 @@ export class AvatarMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    listingId(overrides?: CallOverrides): Promise<BigNumber>;
-
     listings(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-    mintCounts(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    mintCounts(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     mintPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -977,12 +838,12 @@ export class AvatarMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
     purchaseExistingNFT(
-      copyTokenUrl: string,
+      existingTokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     purchaseNFT(
-      _listingId: BigNumberish,
+      _listingIndex: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1034,7 +895,7 @@ export class AvatarMarketplace extends BaseContract {
 
   populateTransaction: {
     cancelListing(
-      _listingId: BigNumberish,
+      _listingIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1050,15 +911,13 @@ export class AvatarMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    listingId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     listings(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     mintCounts(
-      arg0: string,
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1093,12 +952,12 @@ export class AvatarMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     purchaseExistingNFT(
-      copyTokenUrl: string,
+      existingTokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     purchaseNFT(
-      _listingId: BigNumberish,
+      _listingIndex: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

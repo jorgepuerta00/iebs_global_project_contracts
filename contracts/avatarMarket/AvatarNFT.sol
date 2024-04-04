@@ -1,23 +1,15 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "hardhat/console.sol";
 
-contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
+contract AvatarNFT is ERC721Enumerable, AccessControl, Pausable {
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-
-  using Counters for Counters.Counter;
-  Counters.Counter private _tokenIdCounter;
-
-  string public baseURI;
-
-  mapping(string => address) private _urlToTokenId;
-  mapping(address => uint256[]) private _ownedTokens;
+  string private baseURI;
 
   event TokenMinted(
     address indexed to,
@@ -30,150 +22,109 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     string existingTokenURI
   );
 
-  constructor(string memory _initialBaseURI) ERC721("AvatarNFT", "AVA") {
+  mapping(uint256 => uint256) private _originalTokenId;
+  mapping(uint256 => bool) private _hasOriginalToken;
+
+  constructor(string memory initialBaseURI) ERC721("AvatarNFT", "AVA") {
     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     _grantRole(MINTER_ROLE, msg.sender);
-    setBaseURI(_initialBaseURI);
+    baseURI = initialBaseURI;
   }
 
-  // Function to mint new tokens from existing token metadata
+  // Function to burn a token
+  function burn(uint256 tokenId) public whenNotPaused {
+    require(
+      _isApprovedOrOwner(_msgSender(), tokenId),
+      "Caller is not owner nor approved"
+    );
+    _burn(tokenId);
+  }
+
+  // Mint a new NFT
+  function safeMint(address to) public onlyRole(MINTER_ROLE) whenNotPaused {
+    uint256 tokenId = totalSupply();
+    _safeMint(to, tokenId);
+    emit TokenMinted(to, tokenId, tokenURI(tokenId));
+  }
+
+  // Mint a new NFT with an existing token ID
   function safeMintExistingNFT(
-    address _to,
-    string memory copyTokenUrl
+    address to,
+    uint256 existingTokenId
   ) public onlyRole(MINTER_ROLE) whenNotPaused {
     require(
-      urlExists(copyTokenUrl),
-      "Token URL does not exist, cannot copy metadata"
+      _exists(existingTokenId),
+      "AvatarNFT: existing token ID does not exist"
     );
+    uint256 newTokenId = totalSupply();
+    _safeMint(to, newTokenId);
 
-    uint256 tokenId = _tokenIdCounter.current();
+    // Map the new token to the original token's URI
+    _originalTokenId[newTokenId] = existingTokenId;
+    _hasOriginalToken[newTokenId] = true;
 
-    _safeMint(_to, tokenId);
-    _setTokenURI(tokenId, copyTokenUrl);
-
-    _ownedTokens[_to].push(tokenId);
-    _tokenIdCounter.increment();
-
-    emit ExistingTokenMinted(_to, tokenId, copyTokenUrl);
+    emit ExistingTokenMinted(to, newTokenId, tokenURI(existingTokenId));
   }
 
-  // Function to check if a URL exists
-  function urlExists(string memory url) public view returns (bool) {
-    return _urlToTokenId[url] != address(0);
-  }
-
-  // Function to mint new tokens
-  function safeMint(address _to) public onlyRole(MINTER_ROLE) whenNotPaused {
-    uint256 tokenId = _tokenIdCounter.current();
-    string memory strTokenId = Strings.toString(tokenId);
-    string memory newTokenURI = string(
-      abi.encodePacked("/", strTokenId, ".json")
-    );
-    string memory Url = string(
-      abi.encodePacked(_baseURI(), "/", strTokenId, ".json")
-    );
-
-    _safeMint(_to, tokenId);
-    _setTokenURI(tokenId, newTokenURI);
-
-    _ownedTokens[_to].push(tokenId);
-    _tokenIdCounter.increment();
-    _urlToTokenId[Url] = _to;
-
-    emit TokenMinted(_to, tokenId, newTokenURI);
-  }
-
-  // Function to burn tokens
-  function burn(uint256 _tokenId) public onlyRole(MINTER_ROLE) whenNotPaused {
-    _burn(_tokenId);
-
-    string memory uri = tokenURI(_tokenId);
-    delete _urlToTokenId[uri];
-
-    address owner = ownerOf(_tokenId);
-    uint256[] storage tokens = _ownedTokens[owner];
-    for (uint256 i = 0; i < tokens.length; i++) {
-      if (tokens[i] == _tokenId) {
-        tokens[i] = tokens[tokens.length - 1];
-        tokens.pop();
-        break;
-      }
-    }
-  }
-
-  // Function to burn tokens
-  function _burn(
-    uint256 _tokenId
-  )
-    internal
-    override(ERC721, ERC721URIStorage)
-    onlyRole(MINTER_ROLE)
-    whenNotPaused
-  {
-    super._burn(_tokenId);
-  }
-
-  // Function to set the base URI
+  // set the base URI for the token
   function setBaseURI(
-    string memory _newBaseURI
+    string calldata newBaseURI
   ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-    baseURI = _newBaseURI;
+    baseURI = newBaseURI;
   }
 
-  // Function to set the token URI
-  function setTokenURI(
-    uint256 _tokenId,
-    string memory _uri
-  ) public onlyRole(DEFAULT_ADMIN_ROLE) whenNotPaused {
-    require(
-      _exists(_tokenId),
-      "ERC721URIStorage: URI set of nonexistent token"
-    );
-    _setTokenURI(_tokenId, _uri);
+  // get the base URI for the token
+  function tokenURI(uint256 id) public view override returns (string memory) {
+    require(_exists(id), "ERC721Metadata: URI query for nonexistent token");
+
+    // Determine the correct ID to use for URI construction
+    uint256 tokenId = id;
+    if (_hasOriginalToken[id]) {
+      tokenId = _originalTokenId[id];
+    }
+
+    // Construct and return the URI
+    return
+      string(
+        abi.encodePacked(baseURI, "/", Strings.toString(tokenId), ".json")
+      );
   }
 
-  // Function to get the token URI
-  function tokenURI(
-    uint256 _tokenId
-  )
-    public
-    view
-    override(ERC721, ERC721URIStorage)
-    whenNotPaused
-    returns (string memory)
-  {
-    return super.tokenURI(_tokenId);
-  }
-
-  // Function to get the base URI
-  function _baseURI() internal view override returns (string memory) {
-    return baseURI;
-  }
-
-  // Function to get the owned tokens
+  // Function to get the list of all token IDs owned by an address
   function getOwnedTokens(
     address owner
   ) public view returns (uint256[] memory) {
-    return _ownedTokens[owner];
+    uint256 tokenCount = balanceOf(owner);
+    uint256[] memory tokensId = new uint256[](tokenCount);
+    for (uint256 i = 0; i < tokenCount; i++) {
+      tokensId[i] = tokenOfOwnerByIndex(owner, i);
+    }
+    return tokensId;
   }
 
-  // Function to get the token URLs by owner
+  // Function to get the list of all token metadata URLs owned by an address
   function getTokenURLsByOwner(
     address owner
   ) public view returns (string[] memory) {
-    uint256[] memory tokenIds = getOwnedTokens(owner);
-    string[] memory tokenURIs = new string[](tokenIds.length);
+    uint256 tokenCount = balanceOf(owner);
+    string[] memory tokenURIs = new string[](tokenCount);
 
-    for (uint256 i = 0; i < tokenIds.length; i++) {
-      tokenURIs[i] = tokenURI(tokenIds[i]);
+    for (uint256 i = 0; i < tokenCount; i++) {
+      uint256 tokenId = tokenOfOwnerByIndex(owner, i);
+      tokenURIs[i] = tokenURI(tokenId);
     }
 
     return tokenURIs;
   }
 
-  // Function to get the total token count
-  function getTotalTokenCount() public view returns (uint256) {
-    return _tokenIdCounter.current();
+  // pause the contract
+  function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    _pause();
+  }
+
+  // unpause the contract
+  function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    _unpause();
   }
 
   // Function to withdraw funds from the contract
@@ -181,26 +132,10 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     payable(msg.sender).transfer(amount);
   }
 
-  // Function to pause the contract
-  function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
-    _pause();
-  }
-
-  // Function to unpause the contract
-  function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
-    _unpause();
-  }
-
-  // Function to check if an address supports an interface
+  // check if the contract is paused
   function supportsInterface(
-    bytes4 _interfaceId
-  )
-    public
-    view
-    override(ERC721, ERC721URIStorage, AccessControl)
-    whenNotPaused
-    returns (bool)
-  {
-    return super.supportsInterface(_interfaceId);
+    bytes4 interfaceId
+  ) public view override(ERC721Enumerable, AccessControl) returns (bool) {
+    return super.supportsInterface(interfaceId);
   }
 }
