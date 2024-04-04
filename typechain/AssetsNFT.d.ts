@@ -29,8 +29,8 @@ interface AssetsNFTInterface extends ethers.utils.Interface {
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "mint(address,uint256,uint256,string)": FunctionFragment;
-    "mintBatch(address,uint256[],uint256[],string[])": FunctionFragment;
+    "mint(address,uint256,uint256)": FunctionFragment;
+    "mintBatch(address,uint256[],uint256[])": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
@@ -38,7 +38,7 @@ interface AssetsNFTInterface extends ethers.utils.Interface {
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
-    "setTokenURI(uint256,string)": FunctionFragment;
+    "setBaseURI(string)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "unpause()": FunctionFragment;
     "uri(uint256)": FunctionFragment;
@@ -79,11 +79,11 @@ interface AssetsNFTInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
-    values: [string, BigNumberish, BigNumberish, string]
+    values: [string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "mintBatch",
-    values: [string, BigNumberish[], BigNumberish[], string[]]
+    values: [string, BigNumberish[], BigNumberish[]]
   ): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
@@ -107,10 +107,7 @@ interface AssetsNFTInterface extends ethers.utils.Interface {
     functionFragment: "setApprovalForAll",
     values: [string, boolean]
   ): string;
-  encodeFunctionData(
-    functionFragment: "setTokenURI",
-    values: [BigNumberish, string]
-  ): string;
+  encodeFunctionData(functionFragment: "setBaseURI", values: [string]): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
@@ -166,10 +163,7 @@ interface AssetsNFTInterface extends ethers.utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "setTokenURI",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "setBaseURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -184,6 +178,8 @@ interface AssetsNFTInterface extends ethers.utils.Interface {
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
+    "TokensBatchMinted(address,uint256[],uint256[])": EventFragment;
+    "TokensMinted(address,uint256,uint256)": EventFragment;
     "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
     "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
     "URI(string,uint256)": EventFragment;
@@ -195,6 +191,8 @@ interface AssetsNFTInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TokensBatchMinted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TokensMinted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
@@ -225,6 +223,22 @@ export type RoleGrantedEvent = TypedEvent<
 
 export type RoleRevokedEvent = TypedEvent<
   [string, string, string] & { role: string; account: string; sender: string }
+>;
+
+export type TokensBatchMintedEvent = TypedEvent<
+  [string, BigNumber[], BigNumber[]] & {
+    to: string;
+    ids: BigNumber[];
+    amounts: BigNumber[];
+  }
+>;
+
+export type TokensMintedEvent = TypedEvent<
+  [string, BigNumber, BigNumber] & {
+    account: string;
+    tokenId: BigNumber;
+    amount: BigNumber;
+  }
 >;
 
 export type TransferBatchEvent = TypedEvent<
@@ -334,18 +348,16 @@ export class AssetsNFT extends BaseContract {
     ): Promise<[boolean]>;
 
     mint(
-      _account: string,
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _uri: string,
+      account: string,
+      id: BigNumberish,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     mintBatch(
-      _to: string,
-      _tokenIds: BigNumberish[],
-      _amounts: BigNumberish[],
-      _uris: string[],
+      to: string,
+      ids: BigNumberish[],
+      amounts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -391,9 +403,8 @@ export class AssetsNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setTokenURI(
-      _tokenId: BigNumberish,
-      _uri: string,
+    setBaseURI(
+      newBaseURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -406,7 +417,7 @@ export class AssetsNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+    uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     withdraw(
       amount: BigNumberish,
@@ -451,18 +462,16 @@ export class AssetsNFT extends BaseContract {
   ): Promise<boolean>;
 
   mint(
-    _account: string,
-    _tokenId: BigNumberish,
-    _amount: BigNumberish,
-    _uri: string,
+    account: string,
+    id: BigNumberish,
+    amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   mintBatch(
-    _to: string,
-    _tokenIds: BigNumberish[],
-    _amounts: BigNumberish[],
-    _uris: string[],
+    to: string,
+    ids: BigNumberish[],
+    amounts: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -508,9 +517,8 @@ export class AssetsNFT extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setTokenURI(
-    _tokenId: BigNumberish,
-    _uri: string,
+  setBaseURI(
+    newBaseURI: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -523,7 +531,7 @@ export class AssetsNFT extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+  uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   withdraw(
     amount: BigNumberish,
@@ -568,18 +576,16 @@ export class AssetsNFT extends BaseContract {
     ): Promise<boolean>;
 
     mint(
-      _account: string,
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _uri: string,
+      account: string,
+      id: BigNumberish,
+      amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     mintBatch(
-      _to: string,
-      _tokenIds: BigNumberish[],
-      _amounts: BigNumberish[],
-      _uris: string[],
+      to: string,
+      ids: BigNumberish[],
+      amounts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -623,11 +629,7 @@ export class AssetsNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setTokenURI(
-      _tokenId: BigNumberish,
-      _uri: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    setBaseURI(newBaseURI: string, overrides?: CallOverrides): Promise<void>;
 
     supportsInterface(
       _interfaceId: BytesLike,
@@ -636,7 +638,7 @@ export class AssetsNFT extends BaseContract {
 
     unpause(overrides?: CallOverrides): Promise<void>;
 
-    uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+    uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     withdraw(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
   };
@@ -718,6 +720,42 @@ export class AssetsNFT extends BaseContract {
     ): TypedEventFilter<
       [string, string, string],
       { role: string; account: string; sender: string }
+    >;
+
+    "TokensBatchMinted(address,uint256[],uint256[])"(
+      to?: string | null,
+      ids?: BigNumberish[] | null,
+      amounts?: null
+    ): TypedEventFilter<
+      [string, BigNumber[], BigNumber[]],
+      { to: string; ids: BigNumber[]; amounts: BigNumber[] }
+    >;
+
+    TokensBatchMinted(
+      to?: string | null,
+      ids?: BigNumberish[] | null,
+      amounts?: null
+    ): TypedEventFilter<
+      [string, BigNumber[], BigNumber[]],
+      { to: string; ids: BigNumber[]; amounts: BigNumber[] }
+    >;
+
+    "TokensMinted(address,uint256,uint256)"(
+      account?: string | null,
+      tokenId?: BigNumberish | null,
+      amount?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber],
+      { account: string; tokenId: BigNumber; amount: BigNumber }
+    >;
+
+    TokensMinted(
+      account?: string | null,
+      tokenId?: BigNumberish | null,
+      amount?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber],
+      { account: string; tokenId: BigNumber; amount: BigNumber }
     >;
 
     "TransferBatch(address,address,address,uint256[],uint256[])"(
@@ -846,18 +884,16 @@ export class AssetsNFT extends BaseContract {
     ): Promise<BigNumber>;
 
     mint(
-      _account: string,
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _uri: string,
+      account: string,
+      id: BigNumberish,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     mintBatch(
-      _to: string,
-      _tokenIds: BigNumberish[],
-      _amounts: BigNumberish[],
-      _uris: string[],
+      to: string,
+      ids: BigNumberish[],
+      amounts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -903,9 +939,8 @@ export class AssetsNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setTokenURI(
-      _tokenId: BigNumberish,
-      _uri: string,
+    setBaseURI(
+      newBaseURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -918,7 +953,7 @@ export class AssetsNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+    uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
       amount: BigNumberish,
@@ -969,18 +1004,16 @@ export class AssetsNFT extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     mint(
-      _account: string,
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _uri: string,
+      account: string,
+      id: BigNumberish,
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     mintBatch(
-      _to: string,
-      _tokenIds: BigNumberish[],
-      _amounts: BigNumberish[],
-      _uris: string[],
+      to: string,
+      ids: BigNumberish[],
+      amounts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1026,9 +1059,8 @@ export class AssetsNFT extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setTokenURI(
-      _tokenId: BigNumberish,
-      _uri: string,
+    setBaseURI(
+      newBaseURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1042,7 +1074,7 @@ export class AssetsNFT extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     uri(
-      _tokenId: BigNumberish,
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

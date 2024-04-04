@@ -17,7 +17,7 @@ describe('AssetsMarketplace', () => {
 
     // Deploy the AssetsNFT token
     const AssetsNFT = await ethers.getContractFactory('AssetsNFT');
-    nftContract = await AssetsNFT.deploy();
+    nftContract = await AssetsNFT.deploy('https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53');
     await nftContract.deployed();
 
     // Deploy the AssetsMarketplace contract
@@ -26,39 +26,39 @@ describe('AssetsMarketplace', () => {
       .then(contract => contract.deployed());
 
     assets = [
-      { id: 0, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/0.json', amount: 1 },     // SADDLE_GOLD
-      { id: 1, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/1.json', amount: 10 },    // SADDLE_SILVER
-      { id: 2, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/2.json', amount: 100 },   // SADDLE_BRONZE
-      { id: 3, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/3.json', amount: 1 },     // HORSESHOE_GOLD
-      { id: 4, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/4.json', amount: 10 },    // HORSESHOE_SILVER
-      { id: 5, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/5.json', amount: 100 },   // HORSESHOE_BRONZE
-      { id: 6, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/6.json', amount: 1 },     // BIT_GOLD
-      { id: 7, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/7.json', amount: 10 },    // BIT_SILVER
-      { id: 8, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/8.json', amount: 100 },   // BIT_BRONZE
-      { id: 9, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/9.json', amount: 1 },     // REINS_GOLD
-      { id: 10, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/10.json', amount: 10 },  // REINS_SILVER
-      { id: 11, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/11.json', amount: 100 }, // REINS_BRONZE
-      { id: 12, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/12.json', amount: 1 },   // STIRRUPS_GOLD
-      { id: 13, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/13.json', amount: 10 },  // STIRRUPS_SILVER
-      { id: 14, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/14.json', amount: 100 }, // STIRRUPS_BRONZE
-      { id: 15, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/15.json', amount: 1 },   // GIRTH_GOLD
-      { id: 16, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/16.json', amount: 10 },  // GIRTH_SILVER
-      { id: 17, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/17.json', amount: 100 }, // GIRTH_BRONZE
-      { id: 18, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/18.json', amount: 1 },   // BREASTPLATE_GOLD
-      { id: 19, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/19.json', amount: 10 },  // BREASTPLATE_SILVER
-      { id: 20, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/20.json', amount: 100 }, // BREASTPLATE_BRONZE
-      { id: 21, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/21.json', amount: 1 },   // LEGWRAPS_GOLD
-      { id: 22, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/22.json', amount: 10 },  // LEGWRAPS_SILVER
-      { id: 23, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/23.json', amount: 100 }, // LEGWRAPS_BRONZE
-      { id: 24, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/24.json', amount: 1 },   // NOSEBAND_GOLD
-      { id: 25, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/25.json', amount: 10 },  // NOSEBAND_SILVER
-      { id: 26, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/26.json', amount: 100 }, // NOSEBAND_BRONZE
-      { id: 27, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/27.json', amount: 1 },   // BLANKET_GOLD
-      { id: 28, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/28.json', amount: 10 },  // BLANKET_SILVER
-      { id: 29, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/29.json', amount: 100 }, // BLANKET_BRONZE
-      { id: 30, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/30.json', amount: 1 },   // SKIN_GOLD
-      { id: 31, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/31.json', amount: 10 },  // SKIN_SILVER
-      { id: 32, uri: 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/32.json', amount: 100 }  // SKIN_BRONZE
+      { id: 0, amount: 1 },    // SADDLE_GOLD
+      { id: 1, amount: 10 },   // SADDLE_SILVER
+      { id: 2, amount: 100 },  // SADDLE_BRONZE
+      { id: 3, amount: 1 },    // HORSESHOE_GOLD
+      { id: 4, amount: 10 },   // HORSESHOE_SILVER
+      { id: 5, amount: 100 },  // HORSESHOE_BRONZE
+      { id: 6, amount: 1 },    // BIT_GOLD
+      { id: 7, amount: 10 },   // BIT_SILVER
+      { id: 8, amount: 100 },  // BIT_BRONZE
+      { id: 9, amount: 1 },    // REINS_GOLD
+      { id: 10, amount: 10 },  // REINS_SILVER
+      { id: 11, amount: 100 }, // REINS_BRONZE
+      { id: 12, amount: 1 },   // STIRRUPS_GOLD
+      { id: 13, amount: 10 },  // STIRRUPS_SILVER
+      { id: 14, amount: 100 }, // STIRRUPS_BRONZE
+      { id: 15, amount: 1 },   // GIRTH_GOLD
+      { id: 16, amount: 10 },  // GIRTH_SILVER
+      { id: 17, amount: 100 }, // GIRTH_BRONZE
+      { id: 18, amount: 1 },   // BREASTPLATE_GOLD
+      { id: 19, amount: 10 },  // BREASTPLATE_SILVER
+      { id: 20, amount: 100 }, // BREASTPLATE_BRONZE
+      { id: 21, amount: 1 },   // LEGWRAPS_GOLD
+      { id: 22, amount: 10 },  // LEGWRAPS_SILVER
+      { id: 23, amount: 100 }, // LEGWRAPS_BRONZE
+      { id: 24, amount: 1 },   // NOSEBAND_GOLD
+      { id: 25, amount: 10 },  // NOSEBAND_SILVER
+      { id: 26, amount: 100 }, // NOSEBAND_BRONZE
+      { id: 27, amount: 1 },   // BLANKET_GOLD
+      { id: 28, amount: 10 },  // BLANKET_SILVER
+      { id: 29, amount: 100 }, // BLANKET_BRONZE
+      { id: 30, amount: 1 },   // SKIN_GOLD
+      { id: 31, amount: 10 },  // SKIN_SILVER
+      { id: 32, amount: 100 }  // SKIN_BRONZE
     ];
 
     // Mint NFTs and transfer ownership to owner contract
@@ -66,8 +66,7 @@ describe('AssetsMarketplace', () => {
       await nftContract.connect(owner).mint(
         await owner.getAddress(),
         asset.id,
-        asset.amount,
-        asset.uri
+        asset.amount
       );
     }
   });
@@ -79,7 +78,7 @@ describe('AssetsMarketplace', () => {
       const sellerAddress = await addr1.getAddress();
 
       // Mint NFTs and transfer ownership to the contract or other accounts
-      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 1000, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 1000);
 
       // Approve the contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -107,7 +106,7 @@ describe('AssetsMarketplace', () => {
       const tokenId = 33;
 
       // Mint a new NFT for a different address
-      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 200, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 200);
 
       // Approve the marketplace contract to spend the NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -124,7 +123,7 @@ describe('AssetsMarketplace', () => {
       const tokenId = 33;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 200, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 200);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -146,7 +145,7 @@ describe('AssetsMarketplace', () => {
       const amount = 1;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 400, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 400);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -179,7 +178,7 @@ describe('AssetsMarketplace', () => {
       const amount = 1;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 400, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 400);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -210,7 +209,7 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -261,7 +260,7 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
@@ -296,7 +295,7 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 80, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 80);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
@@ -323,7 +322,7 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/33.json');
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100);
 
       // Approve the marketplace contract to spend the seller's NFTs
       await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);

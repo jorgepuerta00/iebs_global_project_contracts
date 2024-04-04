@@ -8,78 +8,78 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract AssetsNFT is ERC1155, AccessControl, Pausable {
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+  string private baseURI;
 
-  using Strings for uint256;
+  event TokensMinted(
+    address indexed account,
+    uint256 indexed tokenId,
+    uint256 amount
+  );
 
-  // Mapping from token ID to token URI
-  mapping(uint256 => string) private _tokenURIs;
+  event TokensBatchMinted(
+    address indexed to,
+    uint256[] indexed ids,
+    uint256[] amounts
+  );
 
-  constructor() ERC1155("") {
+  constructor(string memory _initialBaseURI) ERC1155("") {
     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     _grantRole(MINTER_ROLE, msg.sender);
+    baseURI = _initialBaseURI;
   }
 
   // Function to mint new tokens
   function mint(
-    address _account,
-    uint256 _tokenId,
-    uint256 _amount,
-    string memory _uri
+    address account,
+    uint256 id,
+    uint256 amount
   ) public onlyRole(MINTER_ROLE) whenNotPaused {
-    require(
-      bytes(_tokenURIs[_tokenId]).length == 0,
-      "Asset already minted with this id"
-    );
-    _mint(_account, _tokenId, _amount, "");
-    setTokenURI(_tokenId, _uri);
+    _mint(account, id, amount, bytes(""));
+
+    emit TokensMinted(account, id, amount);
   }
 
   // Function to mint batch tokens
   function mintBatch(
-    address _to,
-    uint256[] memory _tokenIds,
-    uint256[] memory _amounts,
-    string[] memory _uris
+    address to,
+    uint256[] memory ids,
+    uint256[] memory amounts
   ) public onlyRole(MINTER_ROLE) whenNotPaused {
-    require(_tokenIds.length == _uris.length, "IDs and URIs length mismatch");
-    _mintBatch(_to, _tokenIds, _amounts, "");
+    _mintBatch(to, ids, amounts, bytes(""));
 
-    for (uint256 i = 0; i < _tokenIds.length; i++) {
-      setTokenURI(_tokenIds[i], _uris[i]);
-    }
+    emit TokensBatchMinted(to, ids, amounts);
   }
 
-  // Function to set the URI of a token type
-  function setTokenURI(
-    uint256 _tokenId,
-    string memory _uri
-  ) public onlyRole(DEFAULT_ADMIN_ROLE) whenNotPaused {
-    _tokenURIs[_tokenId] = _uri;
+  // Function to set uri for each token type
+  function uri(uint256 tokenId) public view override returns (string memory) {
+    return
+      string(
+        abi.encodePacked(baseURI, "/", Strings.toString(tokenId), ".json")
+      );
   }
 
-  // Override for the URI function to return the token URI for each token type
-  function uri(
-    uint256 _tokenId
-  ) public view override whenNotPaused returns (string memory) {
-    require(
-      bytes(_tokenURIs[_tokenId]).length != 0,
-      "Asset not minted or URI not set"
-    );
-    return _tokenURIs[_tokenId];
+  function setBaseURI(
+    string memory newBaseURI
+  ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    baseURI = newBaseURI;
   }
 
+  // Function to withdraw funds from the contract
   function withdraw(uint amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
     payable(msg.sender).transfer(amount);
   }
 
+  // Function to pause the contract
   function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
     _pause();
   }
 
+  // Function to unpause the contract
   function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
     _unpause();
   }
 
+  // Function to check if an address supports an interface
   function supportsInterface(
     bytes4 _interfaceId
   ) public view override(ERC1155, AccessControl) whenNotPaused returns (bool) {

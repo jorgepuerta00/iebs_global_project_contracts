@@ -16,7 +16,7 @@ describe('AssetsAuctionMarketplace', () => {
 
     // Deploy the AssetsNFT token
     const AssetsNFT = await ethers.getContractFactory('AssetsNFT');
-    nftContract = await AssetsNFT.deploy();
+    nftContract = await AssetsNFT.deploy('https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53');
     await nftContract.deployed();
 
     // Deploy the NFTMarketplace contract
@@ -34,7 +34,7 @@ describe('AssetsAuctionMarketplace', () => {
       const auctionDuration = 86400; // 1 day
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/0.json');
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100);
 
       // Ensure the seller has approved the marketplace contract to spend their NFTs
       await nftContract.connect(seller).setApprovalForAll(marketplace.address, true);
@@ -82,7 +82,7 @@ describe('AssetsAuctionMarketplace', () => {
 
       // Mint a new NFT for the seller
       const tokenId = 0;
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 10, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/0.json');
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 10);
 
       // Ensure the seller has approved the marketplace contract to spend their NFTs
       await nftContract.connect(seller).setApprovalForAll(marketplace.address, true);
@@ -318,7 +318,7 @@ describe('AssetsAuctionMarketplace', () => {
 
   async function mintTokensAndCreateAuction(tokenId: BigNumberish, initialSupply: BigNumberish, amount: BigNumberish, startingPrice: BigNumberish, auctionDuration: BigNumberish) {
     // Mint a new NFT for the seller
-    await nftContract.connect(owner).mint(await seller.getAddress(), tokenId, initialSupply, `https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/${tokenId}.json`);
+    await nftContract.connect(owner).mint(await seller.getAddress(), tokenId, initialSupply);
 
     // Ensure the seller has approved the marketplace contract to spend their NFTs
     await nftContract.connect(seller).setApprovalForAll(marketplace.address, true);

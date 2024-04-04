@@ -36,6 +36,7 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     setBaseURI(_initialBaseURI);
   }
 
+  // Function to mint new tokens from existing token metadata
   function safeMintExistingNFT(
     address _to,
     string memory copyTokenUrl
@@ -56,10 +57,12 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     emit ExistingTokenMinted(_to, tokenId, copyTokenUrl);
   }
 
+  // Function to check if a URL exists
   function urlExists(string memory url) public view returns (bool) {
     return _urlToTokenId[url] != address(0);
   }
 
+  // Function to mint new tokens
   function safeMint(address _to) public onlyRole(MINTER_ROLE) whenNotPaused {
     uint256 tokenId = _tokenIdCounter.current();
     string memory strTokenId = Strings.toString(tokenId);
@@ -80,6 +83,7 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     emit TokenMinted(_to, tokenId, newTokenURI);
   }
 
+  // Function to burn tokens
   function burn(uint256 _tokenId) public onlyRole(MINTER_ROLE) whenNotPaused {
     _burn(_tokenId);
 
@@ -97,6 +101,7 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     }
   }
 
+  // Function to burn tokens
   function _burn(
     uint256 _tokenId
   )
@@ -108,12 +113,14 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     super._burn(_tokenId);
   }
 
+  // Function to set the base URI
   function setBaseURI(
     string memory _newBaseURI
   ) public onlyRole(DEFAULT_ADMIN_ROLE) {
     baseURI = _newBaseURI;
   }
 
+  // Function to set the token URI
   function setTokenURI(
     uint256 _tokenId,
     string memory _uri
@@ -125,6 +132,7 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     _setTokenURI(_tokenId, _uri);
   }
 
+  // Function to get the token URI
   function tokenURI(
     uint256 _tokenId
   )
@@ -137,16 +145,19 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     return super.tokenURI(_tokenId);
   }
 
+  // Function to get the base URI
   function _baseURI() internal view override returns (string memory) {
     return baseURI;
   }
 
+  // Function to get the owned tokens
   function getOwnedTokens(
     address owner
   ) public view returns (uint256[] memory) {
     return _ownedTokens[owner];
   }
 
+  // Function to get the token URLs by owner
   function getTokenURLsByOwner(
     address owner
   ) public view returns (string[] memory) {
@@ -160,22 +171,27 @@ contract AvatarNFT is ERC721, ERC721URIStorage, AccessControl, Pausable {
     return tokenURIs;
   }
 
+  // Function to get the total token count
   function getTotalTokenCount() public view returns (uint256) {
     return _tokenIdCounter.current();
   }
 
+  // Function to withdraw funds from the contract
   function withdraw(uint amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
     payable(msg.sender).transfer(amount);
   }
 
+  // Function to pause the contract
   function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
     _pause();
   }
 
+  // Function to unpause the contract
   function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
     _unpause();
   }
 
+  // Function to check if an address supports an interface
   function supportsInterface(
     bytes4 _interfaceId
   )
