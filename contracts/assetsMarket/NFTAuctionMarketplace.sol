@@ -82,7 +82,13 @@ contract AssetsAuctionMarketplace is
       ended: false
     });
 
-    nftToken.transferFrom(msg.sender, address(this), _tokenId, _amount);
+    nftToken.safeTransferFrom(
+      msg.sender,
+      address(this),
+      _tokenId,
+      _amount,
+      bytes("")
+    );
 
     emit AuctionCreated(
       auctionId,
@@ -139,11 +145,12 @@ contract AssetsAuctionMarketplace is
       payable(auction.seller).transfer(sellerAmount);
 
       // Transfer NFT to the highest bidder
-      nftToken.transferFrom(
+      nftToken.safeTransferFrom(
         address(this),
         auction.highestBidder,
         auction.tokenId,
-        auction.amount
+        auction.amount,
+        bytes("")
       );
 
       emit AuctionEnded(
@@ -153,11 +160,12 @@ contract AssetsAuctionMarketplace is
       );
     } else {
       // If no bids were placed, transfer the NFT back to the seller
-      nftToken.transferFrom(
+      nftToken.safeTransferFrom(
         address(this),
         auction.seller,
         auction.tokenId,
-        auction.amount
+        auction.amount,
+        bytes("")
       );
       emit AuctionEnded(auction.auctionId, address(0), 0);
     }

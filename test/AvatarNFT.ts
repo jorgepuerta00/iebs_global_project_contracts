@@ -18,14 +18,14 @@ describe('AvatarNFT', () => {
     await nftContract.deployed();
   });
 
-  xdescribe('Deployment', () => {
+  describe('Deployment', () => {
     it('Should set the correct name and symbol', async () => {
       expect(await nftContract.name()).to.equal('AvatarNFT');
       expect(await nftContract.symbol()).to.equal('AVA');
     });
   });
 
-  xdescribe('Minting', () => {
+  describe('Minting', () => {
     it('Should allow owner to mint new tokens', async () => {
       await nftContract.connect(owner).safeMint(await addr1.getAddress());
       expect(await nftContract.ownerOf(0)).to.equal(await addr1.getAddress());
@@ -39,7 +39,7 @@ describe('AvatarNFT', () => {
     });
   });
 
-  xdescribe('Token Burning', () => {
+  describe('Token Burning', () => {
     it('Should allow owner to burn tokens', async () => {
       await nftContract.connect(owner).safeMint(await owner.getAddress());
       await expect(nftContract.connect(owner).burn(1)).to.be.revertedWith('ERC721: invalid token ID');
@@ -51,7 +51,7 @@ describe('AvatarNFT', () => {
     });
   });
 
-  xdescribe('URI and Interface', () => {
+  describe('URI and Interface', () => {
     it('Should return correct token URI', async () => {
       await nftContract.connect(owner).safeMint(await addr1.getAddress());
       const uri = await nftContract.tokenURI(0);
@@ -64,7 +64,7 @@ describe('AvatarNFT', () => {
     });
   });
 
-  xdescribe('Ownership Tracking', () => {
+  describe('Ownership Tracking', () => {
     it('Should track token ownership correctly', async () => {
       // Mint tokens to addr1
       await nftContract.connect(owner).safeMint(await addr1.getAddress());
@@ -92,7 +92,7 @@ describe('AvatarNFT', () => {
     });
   });
 
-  xdescribe('Token URI Management', () => {
+  describe('Token URI Management', () => {
     it('Should return the correct list of token URIs for a given owner', async () => {
       // Mint tokens to addr1
       await nftContract.connect(owner).safeMint(await addr1.getAddress());
@@ -149,13 +149,13 @@ describe('AvatarNFT', () => {
       expect(await nftContract.ownerOf(1)).to.equal(await addr2.getAddress());
     });
 
-    xit('Should revert if copying a non-existent token ID', async () => {
+    it('Should revert if copying a non-existent token ID', async () => {
       // Attempt to mint an NFT with metadata copied from a non-existent token
       await expect(nftContract.connect(owner).safeMintExistingNFT(await addr2.getAddress(), "https://ipfs.io/ipfs/QmNtQKh7qGRyQau3oeWeHQBc4Y71uUy2t6N9DkuKT3T9p6/999.json"))
         .to.be.revertedWith("Token URL does not exist, cannot copy metadata");
     });
 
-    xit('Should revert if non-owner tries to mint an existing NFT', async () => {
+    it('Should revert if non-owner tries to mint an existing NFT', async () => {
       // Mint an original NFT to setup
       await nftContract.connect(owner).safeMint(await addr1.getAddress());
 

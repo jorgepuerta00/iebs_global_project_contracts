@@ -87,7 +87,7 @@ describe('AssetsNFT', () => {
 
     it('Should revert if non-owner tries to mint', async () => {
       await expect(nftContract.connect(addr1).mint(await addr2.getAddress(), 34, 500, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53/34.json')).to.be.revertedWith(
-        'Ownable: caller is not the owner'
+        'AccessControl: account 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 is missing role 0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6'
       );
     });
   });
@@ -100,20 +100,20 @@ describe('AssetsNFT', () => {
 
     it('Should revert if non-owner tries to update URI', async () => {
       await expect(nftContract.connect(addr1).setTokenURI(0, 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW51/0.json')).to.be.revertedWith(
-        'Ownable: caller is not the owner'
+        'AccessControl: account 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 is missing role 0x0000000000000000000000000000000000000000000000000000000000000000'
       );
     });
   });
 
   describe('Token Transfers', () => {
     it('Should allow token transfers between accounts', async () => {
-      await nftContract.connect(owner).transferFrom(await owner.getAddress(), await addr1.getAddress(), 2, 100);
+      await nftContract.connect(owner).safeTransferFrom(await owner.getAddress(), await addr1.getAddress(), 2, 100, "0x");
       expect(await nftContract.balanceOf(await addr1.getAddress(), 2)).to.equal(100);
     });
 
     it('Should revert if sender doesn’t have enough tokens', async () => {
       await expect(
-        nftContract.connect(addr1).transferFrom(await addr1.getAddress(), await addr2.getAddress(), 1, 500)
+        nftContract.connect(addr1).safeTransferFrom(await addr1.getAddress(), await addr2.getAddress(), 1, 500, "0x")
       ).to.be.revertedWith('ERC1155: insufficient balance for transfer');
     });
   });
@@ -134,7 +134,7 @@ describe('AssetsNFT', () => {
 
     it('Should revert if non-owner tries to mint batch', async () => {
       await expect(nftContract.connect(addr1).mintBatch(await addr2.getAddress(), [1, 2], [50, 50], ['https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW51/35.json', 'https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW51/36.json'])).to.be.revertedWith(
-        'Ownable: caller is not the owner'
+        'AccessControl: account 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 is missing role 0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6'
       );
     });
   });
@@ -144,11 +144,12 @@ describe('AssetsNFT', () => {
       var ownerAddress = await owner.getAddress();
       var addr1Address = await addr1.getAddress();
 
-      await nftContract.connect(owner).batchTransferFrom(
+      await nftContract.connect(owner).safeBatchTransferFrom(
         ownerAddress,
         addr1Address,
         [0, 1, 2],
-        [1, 1, 1]
+        [1, 1, 1],
+        "0x"
       );
       const balances = await nftContract.balanceOfBatch([
         addr1Address,
@@ -162,11 +163,12 @@ describe('AssetsNFT', () => {
 
     it('Should revert if sender doesn’t have enough tokens for batch transfer', async () => {
       await expect(
-        nftContract.connect(addr1).batchTransferFrom(
+        nftContract.connect(addr1).safeBatchTransferFrom(
           await addr1.getAddress(),
           await addr2.getAddress(),
           [1, 2],
-          [500, 500]
+          [500, 500],
+          "0x"
         )
       ).to.be.revertedWith('ERC1155: insufficient balance for transfer');
     });
@@ -175,7 +177,7 @@ describe('AssetsNFT', () => {
   describe('Safe Transfer', () => {
     it('Should allow safe transfer of a token', async () => {
       const tokenId = 1;
-      await nftContract.connect(owner).transferFrom(await owner.getAddress(), await addr1.getAddress(), tokenId, 1);
+      await nftContract.connect(owner).safeTransferFrom(await owner.getAddress(), await addr1.getAddress(), tokenId, 1, "0x");
       const balance = await nftContract.balanceOf(await addr1.getAddress(), tokenId);
       expect(balance).to.equal(1);
     });
@@ -186,7 +188,7 @@ describe('AssetsNFT', () => {
 
       // Attempt to transfer the token from addr1 to addr2
       await expect(
-        nftContract.connect(owner).transferFrom(await addr1.getAddress(), await addr2.getAddress(), 38, 1)
+        nftContract.connect(owner).safeTransferFrom(await addr1.getAddress(), await addr2.getAddress(), 38, 1, "0x")
       ).to.be.revertedWith('ERC1155: caller is not token owner or approved');
     });
   });

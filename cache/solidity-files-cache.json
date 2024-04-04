@@ -1426,8 +1426,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/assetsMarket/AssetsNFT.sol": {
-      "lastModificationDate": 1711665700767,
-      "contentHash": "3553d65b56a405b8da70568de09d8e5b",
+      "lastModificationDate": 1712231787908,
+      "contentHash": "00d6e672a3b2bdde8a8b6fc9eb9d74e2",
       "sourceName": "contracts/assetsMarket/AssetsNFT.sol",
       "solcConfig": {
         "version": "0.8.23",
@@ -1455,9 +1455,9 @@
       },
       "imports": [
         "@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/utils/Strings.sol",
-        "@openzeppelin/contracts/security/Pausable.sol"
+        "@openzeppelin/contracts/security/Pausable.sol",
+        "@openzeppelin/contracts/access/AccessControl.sol"
       ],
       "versionPragmas": [
         "^0.8.23"
@@ -1467,8 +1467,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/assetsMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1711665710083,
-      "contentHash": "c5ce0708a44ad79257db94f70c1b2553",
+      "lastModificationDate": 1712232113326,
+      "contentHash": "ef20378333b3c1b1ae973e6b63891ae3",
       "sourceName": "contracts/assetsMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.23",
@@ -1552,8 +1552,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/assetsMarket/NFTAuctionMarketplace.sol": {
-      "lastModificationDate": 1711665705894,
-      "contentHash": "ea541a1993cd73855f50424668ec2158",
+      "lastModificationDate": 1712232096582,
+      "contentHash": "85e008e6c91311d3a7a907e8a28fb2bd",
       "sourceName": "contracts/assetsMarket/NFTAuctionMarketplace.sol",
       "solcConfig": {
         "version": "0.8.23",

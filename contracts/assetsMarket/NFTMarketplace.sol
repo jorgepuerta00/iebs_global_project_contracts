@@ -78,7 +78,13 @@ contract AssetsMarketplace is
     );
 
     // Transfer the NFT tokens to the contract
-    nftToken.transferFrom(msg.sender, address(this), _tokenId, _amount);
+    nftToken.safeTransferFrom(
+      msg.sender,
+      address(this),
+      _tokenId,
+      _amount,
+      bytes("")
+    );
 
     // Create a new listing
     listings[listingId] = Listing(
@@ -136,11 +142,12 @@ contract AssetsMarketplace is
     payable(listing.seller).transfer(sellerAmount);
 
     // Transfer the NFT to the buyer
-    nftToken.transferFrom(
+    nftToken.safeTransferFrom(
       address(this),
       msg.sender,
       listing.tokenId,
-      listing.amount
+      listing.amount,
+      bytes("")
     );
 
     // Update the listing as inactive
