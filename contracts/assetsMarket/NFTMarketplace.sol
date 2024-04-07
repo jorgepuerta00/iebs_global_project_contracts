@@ -106,7 +106,7 @@ contract AssetsMarketplace is
   }
 
   // Function to buy a package of 5 NFTs
-  function purchaseNFTBundle() external payable whenNotPaused {
+  function purchaseBundleNFT() external payable whenNotPaused {
     require(msg.value == bundlePrice, "Incorrect value for bundle");
 
     uint256[] memory ids = new uint256[](5);

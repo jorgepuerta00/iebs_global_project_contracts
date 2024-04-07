@@ -35,8 +35,8 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
+    "purchaseBundleNFT()": FunctionFragment;
     "purchaseNFT(uint256)": FunctionFragment;
-    "purchaseNFTBundle()": FunctionFragment;
     "purchaseSingleNFT(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -90,12 +90,12 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "purchaseNFT",
-    values: [BigNumberish]
+    functionFragment: "purchaseBundleNFT",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "purchaseNFTBundle",
-    values?: undefined
+    functionFragment: "purchaseNFT",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "purchaseSingleNFT",
@@ -170,11 +170,11 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "purchaseNFT",
+    functionFragment: "purchaseBundleNFT",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "purchaseNFTBundle",
+    functionFragment: "purchaseNFT",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -373,12 +373,12 @@ export class AssetsMarketplace extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
-    purchaseNFT(
-      listingId: BigNumberish,
+    purchaseBundleNFT(
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    purchaseNFTBundle(
+    purchaseNFT(
+      listingId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -504,12 +504,12 @@ export class AssetsMarketplace extends BaseContract {
 
   paused(overrides?: CallOverrides): Promise<boolean>;
 
-  purchaseNFT(
-    listingId: BigNumberish,
+  purchaseBundleNFT(
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  purchaseNFTBundle(
+  purchaseNFT(
+    listingId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -633,12 +633,12 @@ export class AssetsMarketplace extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<boolean>;
 
+    purchaseBundleNFT(overrides?: CallOverrides): Promise<void>;
+
     purchaseNFT(
       listingId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    purchaseNFTBundle(overrides?: CallOverrides): Promise<void>;
 
     purchaseSingleNFT(
       tokenId: BigNumberish,
@@ -812,12 +812,12 @@ export class AssetsMarketplace extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
-    purchaseNFT(
-      listingId: BigNumberish,
+    purchaseBundleNFT(
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    purchaseNFTBundle(
+    purchaseNFT(
+      listingId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -926,12 +926,12 @@ export class AssetsMarketplace extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    purchaseNFT(
-      listingId: BigNumberish,
+    purchaseBundleNFT(
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    purchaseNFTBundle(
+    purchaseNFT(
+      listingId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

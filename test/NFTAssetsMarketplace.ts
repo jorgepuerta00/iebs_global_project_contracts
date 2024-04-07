@@ -480,7 +480,7 @@ describe('AssetsMarketplace', () => {
       const bundlePriceInWei = await marketplace.bundlePrice();
 
       // Execute purchaseNFTBundle transaction
-      await expect(marketplace.connect(buyer).purchaseNFTBundle({ value: bundlePriceInWei }))
+      await expect(marketplace.connect(buyer).purchaseBundleNFT({ value: bundlePriceInWei }))
         .to.emit(marketplace, 'BundleMinted');
     });
 
@@ -489,7 +489,7 @@ describe('AssetsMarketplace', () => {
       const incorrectValue = ethers.utils.parseUnits('0.0001', 'ether'); // Less than bundle price
 
       // Attempt to purchase a bundle with incorrect value
-      await expect(marketplace.connect(buyer).purchaseNFTBundle({ value: incorrectValue }))
+      await expect(marketplace.connect(buyer).purchaseBundleNFT({ value: incorrectValue }))
         .to.be.revertedWith("Incorrect value for bundle");
     });
   });
