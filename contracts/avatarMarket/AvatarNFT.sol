@@ -128,7 +128,7 @@ contract AvatarNFT is ERC721Enumerable, AccessControl, Pausable {
   }
 
   // Function to withdraw funds from the contract
-  function withdraw(uint amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
+  function withdrawFunds(uint amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
     payable(msg.sender).transfer(amount);
   }
 

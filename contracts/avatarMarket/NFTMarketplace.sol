@@ -26,21 +26,12 @@ contract AvatarMarketplace is
 
   Listing[] public listings;
 
-  event NFTListed(
-    uint256 indexed tokenId,
+  event ListingUpdated(
+    uint256 indexed listingIndex,
+    uint256 tokenId,
     address indexed seller,
-    uint256 price
-  );
-  event NFTPurchased(
-    uint256 indexed tokenId,
-    address indexed buyer,
-    address indexed seller,
-    uint256 price
-  );
-  event NFTListingCancelled(
-    uint256 indexed tokenId,
-    address indexed seller,
-    uint256 price
+    uint256 price,
+    string status
   );
   event NFTContractUpdated(address newNFTContractAddress);
   event CommissionPercentageUpdated(uint256 newCommissionPercentage);
@@ -54,41 +45,53 @@ contract AvatarMarketplace is
   }
 
   // Function to list an NFT
-  function listNFT(uint256 _tokenId, uint256 _price) external whenNotPaused {
-    require(nftToken.ownerOf(_tokenId) == msg.sender, "Only owner can list");
-    nftToken.transferFrom(msg.sender, address(this), _tokenId);
+  function listNFT(uint256 tokenId, uint256 price) external whenNotPaused {
+    require(nftToken.ownerOf(tokenId) == msg.sender, "Only owner can list");
+    nftToken.transferFrom(msg.sender, address(this), tokenId);
 
     listings.push(
       Listing({
-        tokenId: _tokenId,
+        tokenId: tokenId,
         seller: msg.sender,
-        price: _price,
+        price: price,
         isActive: true
       })
     );
 
-    emit NFTListed(_tokenId, msg.sender, _price);
+    emit ListingUpdated(
+      listings.length - 1,
+      tokenId,
+      msg.sender,
+      price,
+      "Listed"
+    );
   }
 
   // Function to cancel a listing
-  function cancelListing(uint256 _listingIndex) external whenNotPaused {
-    require(_listingIndex < listings.length, "Invalid listing ID");
-    Listing storage listing = listings[_listingIndex];
+  function cancelListing(uint256 listingIndex) external whenNotPaused {
+    require(listingIndex < listings.length, "Invalid listing ID");
+    Listing storage listing = listings[listingIndex];
     require(listing.seller == msg.sender, "Not the seller");
     require(listing.isActive, "Inactive listing");
 
     listing.isActive = false;
     nftToken.transferFrom(address(this), msg.sender, listing.tokenId);
 
-    emit NFTListingCancelled(listing.tokenId, msg.sender, listing.price);
+    emit ListingUpdated(
+      listingIndex,
+      listing.tokenId,
+      msg.sender,
+      listing.price,
+      "Cancelled"
+    );
   }
 
   // Function to purchase an NFT
   function purchaseNFT(
-    uint256 _listingIndex
+    uint256 listingIndex
   ) external payable nonReentrant whenNotPaused {
-    require(_listingIndex < listings.length, "Invalid listing ID");
-    Listing storage listing = listings[_listingIndex];
+    require(listingIndex < listings.length, "Invalid listing ID");
+    Listing storage listing = listings[listingIndex];
     require(listing.isActive, "Inactive listing");
     require(msg.value == listing.price, "Incorrect value");
 
@@ -99,7 +102,13 @@ contract AvatarMarketplace is
     nftToken.safeTransferFrom(address(this), msg.sender, listing.tokenId);
 
     listing.isActive = false;
-    emit NFTPurchased(listing.tokenId, msg.sender, listing.seller, msg.value);
+    emit ListingUpdated(
+      listingIndex,
+      listing.tokenId,
+      listing.seller,
+      listing.price,
+      "Purchased"
+    );
   }
 
   // Function to get all active listings

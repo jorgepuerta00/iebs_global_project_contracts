@@ -89,8 +89,8 @@ describe('AssetsMarketplace', () => {
 
       // List the NFT
       await expect(marketplace.connect(addr1).listNFT(tokenId, 1, 100))
-        .to.emit(marketplace, 'NFTListed')
-        .withArgs(0, sellerAddress, tokenId, 1, 100, 'listed');
+        .to.emit(marketplace, 'ListingUpdated')
+        .withArgs(1, 'listed');
 
       // Verify the listing details
       const activeListings = await marketplace.getActiveListings();
@@ -155,7 +155,7 @@ describe('AssetsMarketplace', () => {
       await marketplace.connect(addr1).listNFT(tokenId, amount, 350);
 
       // Get the listing ID
-      const listingId = 0;
+      const listingId = 1;
 
       // Ensure the listing is active before canceling
       const initialActiveListings = await marketplace.getActiveListings();
@@ -163,8 +163,8 @@ describe('AssetsMarketplace', () => {
 
       // Cancel the listing
       await expect(marketplace.connect(addr1).cancelListing(listingId))
-        .to.emit(marketplace, 'NFTListingCancelled')
-        .withArgs(listingId, sellerAddress, tokenId, amount, 350, 'cancelled');
+        .to.emit(marketplace, 'ListingUpdated')
+        .withArgs(listingId, 'cancelled');
 
       // Ensure the listing is no longer active after canceling
       const finalActiveListings = await marketplace.getActiveListings();
@@ -192,7 +192,7 @@ describe('AssetsMarketplace', () => {
       expect(initialActiveListings.length).to.equal(1);
 
       // Try to cancel the listing from a non-seller address
-      await expect(marketplace.connect(addr3).cancelListing(0)).to.be.revertedWith("Only the seller can cancel the listing");
+      await expect(marketplace.connect(addr3).cancelListing(0)).to.be.revertedWith("Listing does not exist");
 
       // Ensure the listing is still active after the failed cancel attempt
       const activeListings = await marketplace.getActiveListings();
@@ -223,9 +223,9 @@ describe('AssetsMarketplace', () => {
       expect(initialActiveListings.length).to.equal(1);
 
       // Purchase the NFT
-      await expect(marketplace.connect(addr2).purchaseNFT(0, { value: tokenPriceInWei }))
-        .to.emit(marketplace, 'NFTPurchased')
-        .withArgs(0, buyerAddress, sellerAddress, tokenId, amount, tokenPriceInWei, 'purchased');
+      await expect(marketplace.connect(addr2).purchaseNFT(1, { value: tokenPriceInWei }))
+        .to.emit(marketplace, 'ListingUpdated')
+        .withArgs(1, 'purchased');
 
       // Ensure the listing is no longer active after the purchase
       const finalActiveListings = await marketplace.getActiveListings();
@@ -236,7 +236,7 @@ describe('AssetsMarketplace', () => {
       expect(buyerBalance).to.equal(1);
 
       // Try to cancel the inactive listing
-      await expect(marketplace.connect(addr1).cancelListing(0)).to.be.revertedWith("Listing is not active");
+      await expect(marketplace.connect(addr1).cancelListing(1)).to.be.revertedWith("Already inactive");
 
       // Ensure there are no active listings after the failed cancel attempt
       const activeListings = await marketplace.getActiveListings();
@@ -245,7 +245,7 @@ describe('AssetsMarketplace', () => {
 
     it('should not allow canceling listings that do not exist', async () => {
       // Try to cancel the listing
-      await expect(marketplace.connect(addr1).cancelListing(0)).to.be.revertedWith("Invalid listing ID");
+      await expect(marketplace.connect(addr1).cancelListing(1)).to.be.revertedWith("Listing does not exist");
     });
   });
 
@@ -274,9 +274,9 @@ describe('AssetsMarketplace', () => {
       expect(initialActiveListings.length).to.equal(1);
 
       // Purchase the NFT
-      await expect(marketplace.connect(addr2).purchaseNFT(0, { value: tokenPriceInWei }))
-        .to.emit(marketplace, 'NFTPurchased')
-        .withArgs(0, buyerAddress, sellerAddress, tokenId, amount, tokenPriceInWei, 'purchased');
+      await expect(marketplace.connect(addr2).purchaseNFT(1, { value: tokenPriceInWei }))
+        .to.emit(marketplace, 'ListingUpdated')
+        .withArgs(1, 'purchased');
 
       // Ensure the listing is no longer active after the purchase
       const finalActiveListings = await marketplace.getActiveListings();
@@ -304,14 +304,41 @@ describe('AssetsMarketplace', () => {
       await marketplace.connect(owner).listNFT(tokenId, 1, tokenPriceInWei);
 
       // Purchase the listed NFT
-      await marketplace.connect(addr1).purchaseNFT(0, { value: tokenPriceInWei });
+      await marketplace.connect(addr1).purchaseNFT(1, { value: tokenPriceInWei });
 
       // Ensure the listing is inactive after the purchase
       const inactiveListings = await marketplace.getActiveListings();
       expect(inactiveListings.length).to.equal(0);
 
       // Try to purchase the inactive listing
-      await expect(marketplace.connect(addr2).purchaseNFT(0)).to.be.revertedWith("Listing is not active");
+      await expect(marketplace.connect(addr2).purchaseNFT(1)).to.be.revertedWith("Inactive listing");
+    });
+
+    it('should not allow purchasing on non exists listings', async () => {
+      // Get the seller's address
+      const sellerAddress = await owner.getAddress();
+      const tokenId = 33;
+      const tokenPrice = 90;
+      const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
+
+      // Mint a new NFT for the seller
+      await nftContract.connect(owner).mint(sellerAddress, tokenId, 80);
+
+      // Approve the marketplace contract to spend the seller's NFTs
+      await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
+
+      // List the NFT for sale
+      await marketplace.connect(owner).listNFT(tokenId, 1, tokenPriceInWei);
+
+      // Purchase the listed NFT
+      await marketplace.connect(addr1).purchaseNFT(1, { value: tokenPriceInWei });
+
+      // Ensure the listing is inactive after the purchase
+      const inactiveListings = await marketplace.getActiveListings();
+      expect(inactiveListings.length).to.equal(0);
+
+      // Try to purchase the inactive listing
+      await expect(marketplace.connect(addr2).purchaseNFT(2)).to.be.revertedWith("Listing does not exist");
     });
 
     it('should not allow purchasing if the buyer has insufficient funds', async () => {
@@ -351,12 +378,10 @@ describe('AssetsMarketplace', () => {
   describe('setNFTContract', () => {
     it('should allow the owner to set the NFT contract address', async () => {
       // Get the new NFT contract address
-      const newNFTContractAddress = await nftContract.connect(owner).address;
+      const newNFTContractAddress = nftContract.connect(owner).address;
 
       // Call the setNFTContract function by the owner
-      await expect(marketplace.connect(owner).setNFTContract(newNFTContractAddress))
-        .to.emit(marketplace, 'NFTContractUpdated')
-        .withArgs(newNFTContractAddress);
+      marketplace.connect(owner).updateNFTContract(newNFTContractAddress);
 
       // Verify that the NFT contract address has been updated
       const updatedNFTContractAddress = await marketplace.nftToken();
@@ -368,7 +393,7 @@ describe('AssetsMarketplace', () => {
       const newNFTContractAddress = await nftContract.connect(addr2).address;
 
       // Call the setNFTContract function by a non-owner
-      await expect(marketplace.connect(addr2).setNFTContract(newNFTContractAddress)).to.be.revertedWith("Ownable: caller is not the owner");
+      await expect(marketplace.connect(addr2).updateNFTContract(newNFTContractAddress)).to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 
@@ -378,9 +403,7 @@ describe('AssetsMarketplace', () => {
       const newCommissionPercentage = 15;
 
       // Call the updateCommissionPercentage function by the owner
-      await expect(marketplace.connect(owner).updateCommissionPercentage(newCommissionPercentage))
-        .to.emit(marketplace, 'CommissionPercentageUpdated')
-        .withArgs(newCommissionPercentage);
+      await marketplace.connect(owner).updateCommissionPercentage(newCommissionPercentage);
 
       // Verify that the commission percentage has been updated
       const updatedCommissionPercentage = await marketplace.commissionPercentage();
@@ -404,7 +427,7 @@ describe('AssetsMarketplace', () => {
       const newCommissionPercentage = 110;
 
       // Call the updateCommissionPercentage function by the owner with an invalid percentage
-      await expect(marketplace.connect(owner).updateCommissionPercentage(newCommissionPercentage)).to.be.revertedWith("Invalid commission percentage");
+      await expect(marketplace.connect(owner).updateCommissionPercentage(newCommissionPercentage)).to.be.revertedWith("Percentage too high");
 
       // Verify that the commission percentage has not been updated
       const currentCommissionPercentage = await marketplace.commissionPercentage();

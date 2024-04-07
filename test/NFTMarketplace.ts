@@ -53,8 +53,8 @@ describe('AvatarMarketplace', () => {
 
       // List the NFT
       await expect(marketplace.connect(addr1).listNFT(tokenId, 100))
-        .to.emit(marketplace, 'NFTListed')
-        .withArgs(tokenId, sellerAddress, 100);
+        .to.emit(marketplace, 'ListingUpdated')
+        .withArgs(0, tokenId, sellerAddress, 100, "Listed");
 
       // Verify the listing details
       const activeListings = await marketplace.getActiveListings();
@@ -107,8 +107,8 @@ describe('AvatarMarketplace', () => {
 
       // Cancel the listing
       await expect(marketplace.connect(addr1).cancelListing(listingId))
-        .to.emit(marketplace, 'NFTListingCancelled')
-        .withArgs(tokenId, sellerAddress, 400);
+        .to.emit(marketplace, 'ListingUpdated')
+        .withArgs(0, tokenId, sellerAddress, 400, "Cancelled");
 
       // Ensure the listing is no longer active after canceling
       const finalActiveListings = await marketplace.getActiveListings();
@@ -166,8 +166,8 @@ describe('AvatarMarketplace', () => {
 
       // Purchase the NFT
       await expect(marketplace.connect(addr2).purchaseNFT(0, { value: tokenPriceInWei }))
-        .to.emit(marketplace, 'NFTPurchased')
-        .withArgs(tokenId, buyerAddress, sellerAddress, tokenPriceInWei);
+        .to.emit(marketplace, 'ListingUpdated')
+        .withArgs(0, tokenId, sellerAddress, tokenPriceInWei, "Purchased");
 
       // Ensure the listing is no longer active after the purchase
       const finalActiveListings = await marketplace.getActiveListings();
@@ -216,8 +216,8 @@ describe('AvatarMarketplace', () => {
 
       // Purchase the NFT
       await expect(marketplace.connect(addr2).purchaseNFT(0, { value: tokenPriceInWei }))
-        .to.emit(marketplace, 'NFTPurchased')
-        .withArgs(tokenId, buyerAddress, sellerAddress, tokenPriceInWei);
+        .to.emit(marketplace, 'ListingUpdated')
+        .withArgs(0, tokenId, sellerAddress, tokenPriceInWei, "Purchased");
 
       // Ensure the listing is no longer active after the purchase
       const finalActiveListings = await marketplace.getActiveListings();

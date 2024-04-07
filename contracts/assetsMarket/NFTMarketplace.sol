@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "./AssetsNFT.sol";
-import "./../SiliquaCoin.sol";
 
 contract AssetsMarketplace is
   Ownable,
@@ -28,39 +27,9 @@ contract AssetsMarketplace is
   }
 
   mapping(uint256 => Listing) public listings;
-  uint256 public listingId = 0;
+  uint256 private nextListingId = 1;
 
-  event NFTListed(
-    uint256 indexed listingId,
-    address indexed seller,
-    uint256 indexed tokenId,
-    uint256 amount,
-    uint256 price,
-    string status
-  );
-
-  event NFTPurchased(
-    uint256 indexed listingId,
-    address indexed buyer,
-    address indexed seller,
-    uint256 tokenId,
-    uint256 amount,
-    uint256 price,
-    string status
-  );
-
-  event NFTListingCancelled(
-    uint256 indexed listingId,
-    address indexed seller,
-    uint256 indexed tokenId,
-    uint256 amount,
-    uint256 price,
-    string status
-  );
-
-  event NFTContractUpdated(address indexed newNFTContractAddress);
-  event SiliquaCoinUpdated(address indexed newSiliquaCoinAddress);
-  event CommissionPercentageUpdated(uint256 newCommissionPercentage);
+  event ListingUpdated(uint256 indexed listingId, string status);
 
   constructor(address _nftContractAddress, uint256 _commissionPercentage) {
     nftToken = AssetsNFT(_nftContractAddress);
@@ -68,142 +37,112 @@ contract AssetsMarketplace is
   }
 
   function listNFT(
-    uint256 _tokenId,
-    uint256 _amount,
-    uint256 _price
+    uint256 tokenId,
+    uint256 amount,
+    uint256 price
   ) external whenNotPaused {
     require(
-      nftToken.balanceOf(msg.sender, _tokenId) >= _amount,
+      nftToken.balanceOf(msg.sender, tokenId) >= amount,
       "Insufficient balance"
     );
+    nftToken.safeTransferFrom(msg.sender, address(this), tokenId, amount, "");
 
-    // Transfer the NFT tokens to the contract
-    nftToken.safeTransferFrom(
+    listings[nextListingId] = Listing(
+      nextListingId,
       msg.sender,
-      address(this),
-      _tokenId,
-      _amount,
-      bytes("")
-    );
-
-    // Create a new listing
-    listings[listingId] = Listing(
-      listingId,
-      msg.sender,
-      _tokenId,
-      _amount,
-      _price,
+      tokenId,
+      amount,
+      price,
       true
     );
-    emit NFTListed(listingId, msg.sender, _tokenId, _amount, _price, "listed");
-    listingId++;
+    emit ListingUpdated(nextListingId, "listed");
+    nextListingId++;
   }
 
-  function cancelListing(uint256 _listingId) external whenNotPaused {
-    require(_listingId < listingId, "Invalid listing ID");
-    Listing storage listing = listings[_listingId];
-    require(
-      msg.sender == listing.seller,
-      "Only the seller can cancel the listing"
-    );
-    require(listing.isActive, "Listing is not active");
+  function cancelListing(uint256 listingId) external whenNotPaused {
+    Listing storage listing = listings[listingId];
+    require(listing.seller != address(0), "Listing does not exist");
+    require(listing.seller == msg.sender, "Not seller");
+    require(listing.isActive, "Already inactive");
 
-    // Deactivate the listing
     listing.isActive = false;
-
-    // Emit an event indicating the cancellation of the listing
-    emit NFTListingCancelled(
-      _listingId,
-      msg.sender,
-      listing.tokenId,
-      listing.amount,
-      listing.price,
-      "cancelled"
-    );
+    emit ListingUpdated(listingId, "cancelled");
   }
 
   function purchaseNFT(
-    uint256 _listingId
+    uint256 listingId
   ) external payable nonReentrant whenNotPaused {
-    require(_listingId < listingId, "ID doesn't exist");
-    Listing storage listing = listings[_listingId];
-    require(listing.isActive, "Listing is not active");
+    Listing storage listing = listings[listingId];
+    require(listing.seller != address(0), "Listing does not exist");
+    require(listing.isActive, "Inactive listing");
     require(msg.value == listing.price, "Incorrect price");
 
-    // Calculate commission amount
-    uint256 feeAmount = (listing.price * commissionPercentage) / 100;
+    uint256 feeAmount = (msg.value * commissionPercentage) / 100;
     totalCommissionEarned += feeAmount;
 
-    // Transfer commission from the sale price
     payable(owner()).transfer(feeAmount);
-
-    // Transfer the remaining amount to the seller
-    uint256 sellerAmount = listing.price - feeAmount;
-    payable(listing.seller).transfer(sellerAmount);
-
-    // Transfer the NFT to the buyer
+    payable(listing.seller).transfer(listing.price - feeAmount);
     nftToken.safeTransferFrom(
       address(this),
       msg.sender,
       listing.tokenId,
       listing.amount,
-      bytes("")
+      ""
     );
 
-    // Update the listing as inactive
     listing.isActive = false;
-    emit NFTPurchased(
-      _listingId,
-      msg.sender,
-      listing.seller,
-      listing.tokenId,
-      listing.amount,
-      listing.price,
-      "purchased"
-    );
+    emit ListingUpdated(listingId, "purchased");
   }
 
-  function getActiveListings()
-    external
-    view
-    whenNotPaused
-    returns (Listing[] memory activeListings)
-  {
-    uint256 activeListingCount = 0;
-    for (uint256 i = 0; i < listingId; i++) {
-      if (listings[i].isActive) {
-        activeListingCount++;
-      }
-    }
-
-    activeListings = new Listing[](activeListingCount);
+  function getActiveListings() external view returns (Listing[] memory) {
+    uint256 count = _countActiveListings();
+    Listing[] memory activeListings = new Listing[](count);
     uint256 currentIndex = 0;
-    for (uint256 i = 0; i < listingId; i++) {
+    for (uint256 i = 1; i < nextListingId; i++) {
       if (listings[i].isActive) {
         activeListings[currentIndex] = listings[i];
         currentIndex++;
       }
     }
-
     return activeListings;
   }
 
-  function setNFTContract(
-    address _nftContractAddress
-  ) external onlyOwner whenNotPaused {
-    nftToken = AssetsNFT(_nftContractAddress);
-    emit NFTContractUpdated(_nftContractAddress);
+  function getListingById(
+    uint256 listingId
+  ) external view returns (uint256, address, uint256, uint256, uint256, bool) {
+    Listing memory listing = listings[listingId];
+    return (
+      listing.listingId,
+      listing.seller,
+      listing.tokenId,
+      listing.amount,
+      listing.price,
+      listing.isActive
+    );
+  }
+
+  function _countActiveListings() private view returns (uint256) {
+    uint256 count = 0;
+    for (uint256 i = 1; i < nextListingId; i++) {
+      if (listings[i].isActive) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  function updateNFTContract(address newContract) external onlyOwner {
+    nftToken = AssetsNFT(newContract);
   }
 
   function updateCommissionPercentage(
-    uint256 _newCommissionPercentage
-  ) external onlyOwner whenNotPaused {
-    require(_newCommissionPercentage <= 100, "Invalid commission percentage");
-    commissionPercentage = _newCommissionPercentage;
-    emit CommissionPercentageUpdated(_newCommissionPercentage);
+    uint256 newPercentage
+  ) external onlyOwner {
+    require(newPercentage <= 100, "Percentage too high");
+    commissionPercentage = newPercentage;
   }
 
-  function withdraw(uint amount) external onlyOwner {
+  function withdrawFunds(uint256 amount) external onlyOwner {
     payable(msg.sender).transfer(amount);
   }
 

@@ -25,8 +25,8 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     "cancelListing(uint256)": FunctionFragment;
     "commissionPercentage()": FunctionFragment;
     "getActiveListings()": FunctionFragment;
+    "getListingById(uint256)": FunctionFragment;
     "listNFT(uint256,uint256,uint256)": FunctionFragment;
-    "listingId()": FunctionFragment;
     "listings(uint256)": FunctionFragment;
     "nftToken()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
@@ -36,13 +36,13 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     "paused()": FunctionFragment;
     "purchaseNFT(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "setNFTContract(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "totalCommissionEarned()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unpause()": FunctionFragment;
     "updateCommissionPercentage(uint256)": FunctionFragment;
-    "withdraw(uint256)": FunctionFragment;
+    "updateNFTContract(address)": FunctionFragment;
+    "withdrawFunds(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -58,10 +58,13 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getListingById",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "listNFT",
     values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "listingId", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "listings",
     values: [BigNumberish]
@@ -87,10 +90,6 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setNFTContract",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
@@ -108,7 +107,11 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "withdraw",
+    functionFragment: "updateNFTContract",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawFunds",
     values: [BigNumberish]
   ): string;
 
@@ -124,8 +127,11 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     functionFragment: "getActiveListings",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getListingById",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "listNFT", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "listingId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "listings", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nftToken", data: BytesLike): Result;
   decodeFunctionResult(
@@ -148,10 +154,6 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setNFTContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
@@ -168,73 +170,30 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     functionFragment: "updateCommissionPercentage",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "updateNFTContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawFunds",
+    data: BytesLike
+  ): Result;
 
   events: {
-    "CommissionPercentageUpdated(uint256)": EventFragment;
-    "NFTContractUpdated(address)": EventFragment;
-    "NFTListed(uint256,address,uint256,uint256,uint256,string)": EventFragment;
-    "NFTListingCancelled(uint256,address,uint256,uint256,uint256,string)": EventFragment;
-    "NFTPurchased(uint256,address,address,uint256,uint256,uint256,string)": EventFragment;
+    "ListingUpdated(uint256,string)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
-    "SiliquaCoinUpdated(address)": EventFragment;
     "Unpaused(address)": EventFragment;
   };
 
-  getEvent(
-    nameOrSignatureOrTopic: "CommissionPercentageUpdated"
-  ): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTContractUpdated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTListed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTListingCancelled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTPurchased"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ListingUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SiliquaCoinUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
-export type CommissionPercentageUpdatedEvent = TypedEvent<
-  [BigNumber] & { newCommissionPercentage: BigNumber }
->;
-
-export type NFTContractUpdatedEvent = TypedEvent<
-  [string] & { newNFTContractAddress: string }
->;
-
-export type NFTListedEvent = TypedEvent<
-  [BigNumber, string, BigNumber, BigNumber, BigNumber, string] & {
-    listingId: BigNumber;
-    seller: string;
-    tokenId: BigNumber;
-    amount: BigNumber;
-    price: BigNumber;
-    status: string;
-  }
->;
-
-export type NFTListingCancelledEvent = TypedEvent<
-  [BigNumber, string, BigNumber, BigNumber, BigNumber, string] & {
-    listingId: BigNumber;
-    seller: string;
-    tokenId: BigNumber;
-    amount: BigNumber;
-    price: BigNumber;
-    status: string;
-  }
->;
-
-export type NFTPurchasedEvent = TypedEvent<
-  [BigNumber, string, string, BigNumber, BigNumber, BigNumber, string] & {
-    listingId: BigNumber;
-    buyer: string;
-    seller: string;
-    tokenId: BigNumber;
-    amount: BigNumber;
-    price: BigNumber;
-    status: string;
-  }
+export type ListingUpdatedEvent = TypedEvent<
+  [BigNumber, string] & { listingId: BigNumber; status: string }
 >;
 
 export type OwnershipTransferredEvent = TypedEvent<
@@ -242,10 +201,6 @@ export type OwnershipTransferredEvent = TypedEvent<
 >;
 
 export type PausedEvent = TypedEvent<[string] & { account: string }>;
-
-export type SiliquaCoinUpdatedEvent = TypedEvent<
-  [string] & { newSiliquaCoinAddress: string }
->;
 
 export type UnpausedEvent = TypedEvent<[string] & { account: string }>;
 
@@ -294,7 +249,7 @@ export class AssetsMarketplace extends BaseContract {
 
   functions: {
     cancelListing(
-      _listingId: BigNumberish,
+      listingId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -312,33 +267,20 @@ export class AssetsMarketplace extends BaseContract {
           price: BigNumber;
           isActive: boolean;
         })[]
-      ] & {
-        activeListings: ([
-          BigNumber,
-          string,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          boolean
-        ] & {
-          listingId: BigNumber;
-          seller: string;
-          tokenId: BigNumber;
-          amount: BigNumber;
-          price: BigNumber;
-          isActive: boolean;
-        })[];
-      }
+      ]
     >;
 
+    getListingById(
+      listingId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber, string, BigNumber, BigNumber, BigNumber, boolean]>;
+
     listNFT(
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _price: BigNumberish,
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      price: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    listingId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     listings(
       arg0: BigNumberish,
@@ -383,16 +325,11 @@ export class AssetsMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
     purchaseNFT(
-      _listingId: BigNumberish,
+      listingId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setNFTContract(
-      _nftContractAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -413,18 +350,23 @@ export class AssetsMarketplace extends BaseContract {
     ): Promise<ContractTransaction>;
 
     updateCommissionPercentage(
-      _newCommissionPercentage: BigNumberish,
+      newPercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    withdraw(
+    updateNFTContract(
+      newContract: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    withdrawFunds(
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
   cancelListing(
-    _listingId: BigNumberish,
+    listingId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -443,14 +385,17 @@ export class AssetsMarketplace extends BaseContract {
     })[]
   >;
 
+  getListingById(
+    listingId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<[BigNumber, string, BigNumber, BigNumber, BigNumber, boolean]>;
+
   listNFT(
-    _tokenId: BigNumberish,
-    _amount: BigNumberish,
-    _price: BigNumberish,
+    tokenId: BigNumberish,
+    amount: BigNumberish,
+    price: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  listingId(overrides?: CallOverrides): Promise<BigNumber>;
 
   listings(
     arg0: BigNumberish,
@@ -495,16 +440,11 @@ export class AssetsMarketplace extends BaseContract {
   paused(overrides?: CallOverrides): Promise<boolean>;
 
   purchaseNFT(
-    _listingId: BigNumberish,
+    listingId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   renounceOwnership(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setNFTContract(
-    _nftContractAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -525,18 +465,23 @@ export class AssetsMarketplace extends BaseContract {
   ): Promise<ContractTransaction>;
 
   updateCommissionPercentage(
-    _newCommissionPercentage: BigNumberish,
+    newPercentage: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  withdraw(
+  updateNFTContract(
+    newContract: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  withdrawFunds(
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
     cancelListing(
-      _listingId: BigNumberish,
+      listingId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -555,14 +500,17 @@ export class AssetsMarketplace extends BaseContract {
       })[]
     >;
 
+    getListingById(
+      listingId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber, string, BigNumber, BigNumber, BigNumber, boolean]>;
+
     listNFT(
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _price: BigNumberish,
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      price: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    listingId(overrides?: CallOverrides): Promise<BigNumber>;
 
     listings(
       arg0: BigNumberish,
@@ -605,16 +553,11 @@ export class AssetsMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<boolean>;
 
     purchaseNFT(
-      _listingId: BigNumberish,
+      listingId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    setNFTContract(
-      _nftContractAddress: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -631,146 +574,36 @@ export class AssetsMarketplace extends BaseContract {
     unpause(overrides?: CallOverrides): Promise<void>;
 
     updateCommissionPercentage(
-      _newCommissionPercentage: BigNumberish,
+      newPercentage: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    withdraw(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    updateNFTContract(
+      newContract: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    withdrawFunds(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
-    "CommissionPercentageUpdated(uint256)"(
-      newCommissionPercentage?: null
-    ): TypedEventFilter<[BigNumber], { newCommissionPercentage: BigNumber }>;
-
-    CommissionPercentageUpdated(
-      newCommissionPercentage?: null
-    ): TypedEventFilter<[BigNumber], { newCommissionPercentage: BigNumber }>;
-
-    "NFTContractUpdated(address)"(
-      newNFTContractAddress?: string | null
-    ): TypedEventFilter<[string], { newNFTContractAddress: string }>;
-
-    NFTContractUpdated(
-      newNFTContractAddress?: string | null
-    ): TypedEventFilter<[string], { newNFTContractAddress: string }>;
-
-    "NFTListed(uint256,address,uint256,uint256,uint256,string)"(
+    "ListingUpdated(uint256,string)"(
       listingId?: BigNumberish | null,
-      seller?: string | null,
-      tokenId?: BigNumberish | null,
-      amount?: null,
-      price?: null,
       status?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string],
+      { listingId: BigNumber; status: string }
     >;
 
-    NFTListed(
+    ListingUpdated(
       listingId?: BigNumberish | null,
-      seller?: string | null,
-      tokenId?: BigNumberish | null,
-      amount?: null,
-      price?: null,
       status?: null
     ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
-    >;
-
-    "NFTListingCancelled(uint256,address,uint256,uint256,uint256,string)"(
-      listingId?: BigNumberish | null,
-      seller?: string | null,
-      tokenId?: BigNumberish | null,
-      amount?: null,
-      price?: null,
-      status?: null
-    ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
-    >;
-
-    NFTListingCancelled(
-      listingId?: BigNumberish | null,
-      seller?: string | null,
-      tokenId?: BigNumberish | null,
-      amount?: null,
-      price?: null,
-      status?: null
-    ): TypedEventFilter<
-      [BigNumber, string, BigNumber, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
-    >;
-
-    "NFTPurchased(uint256,address,address,uint256,uint256,uint256,string)"(
-      listingId?: BigNumberish | null,
-      buyer?: string | null,
-      seller?: string | null,
-      tokenId?: null,
-      amount?: null,
-      price?: null,
-      status?: null
-    ): TypedEventFilter<
-      [BigNumber, string, string, BigNumber, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        buyer: string;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
-    >;
-
-    NFTPurchased(
-      listingId?: BigNumberish | null,
-      buyer?: string | null,
-      seller?: string | null,
-      tokenId?: null,
-      amount?: null,
-      price?: null,
-      status?: null
-    ): TypedEventFilter<
-      [BigNumber, string, string, BigNumber, BigNumber, BigNumber, string],
-      {
-        listingId: BigNumber;
-        buyer: string;
-        seller: string;
-        tokenId: BigNumber;
-        amount: BigNumber;
-        price: BigNumber;
-        status: string;
-      }
+      [BigNumber, string],
+      { listingId: BigNumber; status: string }
     >;
 
     "OwnershipTransferred(address,address)"(
@@ -795,14 +628,6 @@ export class AssetsMarketplace extends BaseContract {
 
     Paused(account?: null): TypedEventFilter<[string], { account: string }>;
 
-    "SiliquaCoinUpdated(address)"(
-      newSiliquaCoinAddress?: string | null
-    ): TypedEventFilter<[string], { newSiliquaCoinAddress: string }>;
-
-    SiliquaCoinUpdated(
-      newSiliquaCoinAddress?: string | null
-    ): TypedEventFilter<[string], { newSiliquaCoinAddress: string }>;
-
     "Unpaused(address)"(
       account?: null
     ): TypedEventFilter<[string], { account: string }>;
@@ -812,7 +637,7 @@ export class AssetsMarketplace extends BaseContract {
 
   estimateGas: {
     cancelListing(
-      _listingId: BigNumberish,
+      listingId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -820,14 +645,17 @@ export class AssetsMarketplace extends BaseContract {
 
     getActiveListings(overrides?: CallOverrides): Promise<BigNumber>;
 
-    listNFT(
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _price: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    getListingById(
+      listingId: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    listingId(overrides?: CallOverrides): Promise<BigNumber>;
+    listNFT(
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      price: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     listings(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -860,16 +688,11 @@ export class AssetsMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
     purchaseNFT(
-      _listingId: BigNumberish,
+      listingId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setNFTContract(
-      _nftContractAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -890,11 +713,16 @@ export class AssetsMarketplace extends BaseContract {
     ): Promise<BigNumber>;
 
     updateCommissionPercentage(
-      _newCommissionPercentage: BigNumberish,
+      newPercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    withdraw(
+    updateNFTContract(
+      newContract: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    withdrawFunds(
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -902,7 +730,7 @@ export class AssetsMarketplace extends BaseContract {
 
   populateTransaction: {
     cancelListing(
-      _listingId: BigNumberish,
+      listingId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -912,14 +740,17 @@ export class AssetsMarketplace extends BaseContract {
 
     getActiveListings(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    listNFT(
-      _tokenId: BigNumberish,
-      _amount: BigNumberish,
-      _price: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    getListingById(
+      listingId: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    listingId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    listNFT(
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      price: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     listings(
       arg0: BigNumberish,
@@ -955,16 +786,11 @@ export class AssetsMarketplace extends BaseContract {
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     purchaseNFT(
-      _listingId: BigNumberish,
+      listingId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setNFTContract(
-      _nftContractAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -987,11 +813,16 @@ export class AssetsMarketplace extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     updateCommissionPercentage(
-      _newCommissionPercentage: BigNumberish,
+      newPercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    withdraw(
+    updateNFTContract(
+      newContract: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdrawFunds(
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
