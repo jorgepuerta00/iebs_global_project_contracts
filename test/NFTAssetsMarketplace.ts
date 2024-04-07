@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Signer } from 'ethers';
+import { BigNumber, Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import { AssetsMarketplace, AssetsNFT } from '../typechain';
 
@@ -8,21 +8,22 @@ describe('AssetsMarketplace', () => {
   let addr1: Signer;
   let addr2: Signer;
   let addr3: Signer;
-  let nftContract: AssetsNFT;
+  let nftToken: AssetsNFT;
   let marketplace: AssetsMarketplace;
   let assets: any[] = [];
+  let bundlePrice: BigNumber;
 
   beforeEach(async () => {
     [owner, addr1, addr2, addr3] = await ethers.getSigners();
 
     // Deploy the AssetsNFT token
     const AssetsNFT = await ethers.getContractFactory('AssetsNFT');
-    nftContract = await AssetsNFT.deploy('https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53');
-    await nftContract.deployed();
+    nftToken = await AssetsNFT.deploy('https://ipfs/QmUPC5rEe8sYZkRcazmhAtjkv1WbfGzr76kkRrbZgKGW53');
+    await nftToken.deployed();
 
     // Deploy the AssetsMarketplace contract
     marketplace = await ethers.getContractFactory('AssetsMarketplace', owner)
-      .then(factory => factory.deploy(nftContract.address, 10)) // 10% commission
+      .then(factory => factory.deploy(nftToken.address, 10)) // 10% commission
       .then(contract => contract.deployed());
 
     assets = [
@@ -63,12 +64,19 @@ describe('AssetsMarketplace', () => {
 
     // Mint NFTs and transfer ownership to owner contract
     for (const asset of assets) {
-      await nftContract.connect(owner).mint(
+      await nftToken.connect(owner).mint(
         await owner.getAddress(),
         asset.id,
         asset.amount
       );
     }
+
+    // Set the bundle price
+    bundlePrice = await marketplace.bundlePrice();
+
+    // Grant the marketplace contract the MINTER_ROLE
+    const MINTER_ROLE = await nftToken.MINTER_ROLE();
+    await nftToken.grantRole(MINTER_ROLE, marketplace.address);
   });
 
   describe('listNFT', () => {
@@ -78,10 +86,10 @@ describe('AssetsMarketplace', () => {
       const sellerAddress = await addr1.getAddress();
 
       // Mint NFTs and transfer ownership to the contract or other accounts
-      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 1000);
+      await nftToken.connect(owner).mint(await addr1.getAddress(), tokenId, 1000);
 
       // Approve the contract to spend the seller's NFTs
-      await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
+      await nftToken.connect(addr1).setApprovalForAll(marketplace.address, true);
 
       // active listings initially should be 0
       const initialListings = await marketplace.getActiveListings();
@@ -106,10 +114,10 @@ describe('AssetsMarketplace', () => {
       const tokenId = 33;
 
       // Mint a new NFT for a different address
-      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 200);
+      await nftToken.connect(owner).mint(await addr1.getAddress(), tokenId, 200);
 
       // Approve the marketplace contract to spend the NFTs
-      await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
+      await nftToken.connect(addr1).setApprovalForAll(marketplace.address, true);
 
       // Try to list the NFT from a different address
       await expect(marketplace.connect(addr1).listNFT(32, 1, 150)).to.be.revertedWith("Insufficient balance");
@@ -123,10 +131,10 @@ describe('AssetsMarketplace', () => {
       const tokenId = 33;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(await addr1.getAddress(), tokenId, 200);
+      await nftToken.connect(owner).mint(await addr1.getAddress(), tokenId, 200);
 
       // Approve the marketplace contract to spend the seller's NFTs
-      await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
+      await nftToken.connect(addr1).setApprovalForAll(marketplace.address, true);
 
       // Try to list more NFTs than the seller owns
       await expect(marketplace.connect(addr1).listNFT(tokenId, 300, 2500)).to.be.revertedWith("Insufficient balance");
@@ -145,10 +153,10 @@ describe('AssetsMarketplace', () => {
       const amount = 1;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 400);
+      await nftToken.connect(owner).mint(sellerAddress, tokenId, 400);
 
       // Approve the marketplace contract to spend the seller's NFTs
-      await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
+      await nftToken.connect(addr1).setApprovalForAll(marketplace.address, true);
       //await marketplace.connect(owner).approveSeller(sellerAddress);
 
       // List the NFT
@@ -178,10 +186,10 @@ describe('AssetsMarketplace', () => {
       const amount = 1;
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 400);
+      await nftToken.connect(owner).mint(sellerAddress, tokenId, 400);
 
       // Approve the marketplace contract to spend the seller's NFTs
-      await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
+      await nftToken.connect(addr1).setApprovalForAll(marketplace.address, true);
       //await marketplace.connect(owner).approveSeller(sellerAddress);
 
       // List the NFT
@@ -209,10 +217,10 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100);
+      await nftToken.connect(owner).mint(sellerAddress, tokenId, 100);
 
       // Approve the marketplace contract to spend the seller's NFTs
-      await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
+      await nftToken.connect(addr1).setApprovalForAll(marketplace.address, true);
       //await marketplace.connect(owner).approveSeller(buyerAddress);
 
       // List the NFT for sale
@@ -232,7 +240,7 @@ describe('AssetsMarketplace', () => {
       expect(finalActiveListings.length).to.equal(0);
 
       // Verify the buyer received the NFT
-      const buyerBalance = await nftContract.balanceOf(buyerAddress, tokenId);
+      const buyerBalance = await nftToken.balanceOf(buyerAddress, tokenId);
       expect(buyerBalance).to.equal(1);
 
       // Try to cancel the inactive listing
@@ -260,10 +268,10 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100);
+      await nftToken.connect(owner).mint(sellerAddress, tokenId, 100);
 
       // Approve the marketplace contract to spend the seller's NFTs
-      await nftContract.connect(addr1).setApprovalForAll(marketplace.address, true);
+      await nftToken.connect(addr1).setApprovalForAll(marketplace.address, true);
       //await marketplace.connect(owner).approveSeller(buyerAddress);
 
       // List the NFT for sale
@@ -283,7 +291,7 @@ describe('AssetsMarketplace', () => {
       expect(finalActiveListings.length).to.equal(0);
 
       // Verify the buyer received the NFT
-      const buyerBalance = await nftContract.balanceOf(buyerAddress, tokenId);
+      const buyerBalance = await nftToken.balanceOf(buyerAddress, tokenId);
       expect(buyerBalance).to.equal(1);
     });
 
@@ -295,10 +303,10 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 80);
+      await nftToken.connect(owner).mint(sellerAddress, tokenId, 80);
 
       // Approve the marketplace contract to spend the seller's NFTs
-      await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
+      await nftToken.connect(owner).setApprovalForAll(marketplace.address, true);
 
       // List the NFT for sale
       await marketplace.connect(owner).listNFT(tokenId, 1, tokenPriceInWei);
@@ -322,10 +330,10 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 80);
+      await nftToken.connect(owner).mint(sellerAddress, tokenId, 80);
 
       // Approve the marketplace contract to spend the seller's NFTs
-      await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
+      await nftToken.connect(owner).setApprovalForAll(marketplace.address, true);
 
       // List the NFT for sale
       await marketplace.connect(owner).listNFT(tokenId, 1, tokenPriceInWei);
@@ -349,10 +357,10 @@ describe('AssetsMarketplace', () => {
       const tokenPriceInWei = ethers.utils.parseUnits(tokenPrice.toString(), 'ether');
 
       // Mint a new NFT for the seller
-      await nftContract.connect(owner).mint(sellerAddress, tokenId, 100);
+      await nftToken.connect(owner).mint(sellerAddress, tokenId, 100);
 
       // Approve the marketplace contract to spend the seller's NFTs
-      await nftContract.connect(owner).setApprovalForAll(marketplace.address, true);
+      await nftToken.connect(owner).setApprovalForAll(marketplace.address, true);
 
       // List the NFT for sale
       await marketplace.connect(owner).listNFT(tokenId, 1, tokenPriceInWei);
@@ -378,7 +386,7 @@ describe('AssetsMarketplace', () => {
   describe('setNFTContract', () => {
     it('should allow the owner to set the NFT contract address', async () => {
       // Get the new NFT contract address
-      const newNFTContractAddress = nftContract.connect(owner).address;
+      const newNFTContractAddress = nftToken.connect(owner).address;
 
       // Call the setNFTContract function by the owner
       marketplace.connect(owner).updateNFTContract(newNFTContractAddress);
@@ -390,7 +398,7 @@ describe('AssetsMarketplace', () => {
 
     it('should not allow non-owner to set the NFT contract address', async () => {
       // Get the new NFT contract address
-      const newNFTContractAddress = await nftContract.connect(addr2).address;
+      const newNFTContractAddress = await nftToken.connect(addr2).address;
 
       // Call the setNFTContract function by a non-owner
       await expect(marketplace.connect(addr2).updateNFTContract(newNFTContractAddress)).to.be.revertedWith("Ownable: caller is not the owner");
@@ -435,4 +443,54 @@ describe('AssetsMarketplace', () => {
     });
   });
 
+  describe('purchaseSingleNFT', () => {
+    it('should allow purchasing a single NFT at bundle price', async () => {
+      const tokenId = 0; // valid tokenId that has been minted
+      const buyer = addr2; // buyer address
+      const bundlePriceInWei = await marketplace.bundlePrice();
+
+      // Ensure buyer has enough Ether for the transaction
+      const buyerBalanceBefore = await ethers.provider.getBalance(await buyer.getAddress());
+      expect(buyerBalanceBefore).to.be.above(bundlePriceInWei);
+
+      // Execute purchaseSingleNFT transaction
+      await expect(marketplace.connect(buyer).purchaseSingleNFT(tokenId, { value: bundlePriceInWei }))
+        .to.emit(marketplace, 'BundleMinted')
+        .withArgs(await buyer.getAddress(), [tokenId], [1], bundlePriceInWei);
+
+      // Verify that the buyer now owns the NFT
+      const ownerOfToken = await nftToken.balanceOf(await buyer.getAddress(), tokenId);
+      expect(ownerOfToken).to.equal(1);
+    });
+
+    it('should fail if incorrect value is sent', async () => {
+      const tokenId = 0; // valid tokenId that has been minted
+      const buyer = addr2; // buyer address
+      const incorrectValue = ethers.utils.parseUnits('0.5', 'ether'); // Less than bundle price
+
+      // Attempt to purchase with incorrect value
+      await expect(marketplace.connect(buyer).purchaseSingleNFT(tokenId, { value: incorrectValue }))
+        .to.be.revertedWith("Incorrect value for single NFT");
+    });
+  });
+
+  describe('purchaseNFTBundle', () => {
+    it('should allow purchasing a bundle of NFTs at the specified price', async () => {
+      const buyer = addr2; // buyer address
+      const bundlePriceInWei = await marketplace.bundlePrice();
+
+      // Execute purchaseNFTBundle transaction
+      await expect(marketplace.connect(buyer).purchaseNFTBundle({ value: bundlePriceInWei }))
+        .to.emit(marketplace, 'BundleMinted');
+    });
+
+    it('should fail if incorrect value is sent for a bundle', async () => {
+      const buyer = addr2; // buyer address
+      const incorrectValue = ethers.utils.parseUnits('0.0001', 'ether'); // Less than bundle price
+
+      // Attempt to purchase a bundle with incorrect value
+      await expect(marketplace.connect(buyer).purchaseNFTBundle({ value: incorrectValue }))
+        .to.be.revertedWith("Incorrect value for bundle");
+    });
+  });
 });
