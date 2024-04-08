@@ -1464,8 +1464,8 @@
       ]
     },
     "/Users/jorgepuerta/Public/repos/iebs_sprint_3/contracts/assetsMarket/NFTMarketplace.sol": {
-      "lastModificationDate": 1712485049984,
-      "contentHash": "1efd5a0feaadffb361e450e1163c2ddc",
+      "lastModificationDate": 1712589948083,
+      "contentHash": "da86797d9e23b315bc5bb1958d6a493e",
       "sourceName": "contracts/assetsMarket/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.23",

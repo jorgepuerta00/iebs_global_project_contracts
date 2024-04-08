@@ -220,6 +220,7 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
     "ListingUpdated(uint256,string)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
+    "SingleMinted(address,uint256,uint256,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
   };
 
@@ -227,6 +228,7 @@ interface AssetsMarketplaceInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ListingUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SingleMinted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
@@ -248,6 +250,15 @@ export type OwnershipTransferredEvent = TypedEvent<
 >;
 
 export type PausedEvent = TypedEvent<[string] & { account: string }>;
+
+export type SingleMintedEvent = TypedEvent<
+  [string, BigNumber, BigNumber, BigNumber] & {
+    account: string;
+    tokenId: BigNumber;
+    amount: BigNumber;
+    price: BigNumber;
+  }
+>;
 
 export type UnpausedEvent = TypedEvent<[string] & { account: string }>;
 
@@ -750,6 +761,36 @@ export class AssetsMarketplace extends BaseContract {
     ): TypedEventFilter<[string], { account: string }>;
 
     Paused(account?: null): TypedEventFilter<[string], { account: string }>;
+
+    "SingleMinted(address,uint256,uint256,uint256)"(
+      account?: string | null,
+      tokenId?: null,
+      amount?: null,
+      price?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, BigNumber],
+      {
+        account: string;
+        tokenId: BigNumber;
+        amount: BigNumber;
+        price: BigNumber;
+      }
+    >;
+
+    SingleMinted(
+      account?: string | null,
+      tokenId?: null,
+      amount?: null,
+      price?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, BigNumber],
+      {
+        account: string;
+        tokenId: BigNumber;
+        amount: BigNumber;
+        price: BigNumber;
+      }
+    >;
 
     "Unpaused(address)"(
       account?: null

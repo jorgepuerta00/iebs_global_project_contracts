@@ -38,6 +38,12 @@ contract AssetsMarketplace is
     uint256[] amounts,
     uint256 price
   );
+  event SingleMinted(
+    address indexed account,
+    uint256 tokenId,
+    uint256 amount,
+    uint256 price
+  );
 
   constructor(address _nftContractAddress, uint256 _commissionPercentage) {
     nftToken = AssetsNFT(_nftContractAddress);
@@ -126,13 +132,8 @@ contract AssetsMarketplace is
   function purchaseSingleNFT(uint256 tokenId) external payable whenNotPaused {
     require(msg.value == bundlePrice, "Incorrect value for single NFT");
 
-    uint256[] memory ids = new uint256[](1);
-    uint256[] memory amounts = new uint256[](1);
-    ids[0] = tokenId;
-    amounts[0] = 1;
-
-    nftToken.mintBatch(msg.sender, ids, amounts);
-    emit BundleMinted(msg.sender, ids, amounts, bundlePrice);
+    nftToken.mint(msg.sender, tokenId, 1);
+    emit SingleMinted(msg.sender, tokenId, 1, bundlePrice);
   }
 
   // Function to get all active listings

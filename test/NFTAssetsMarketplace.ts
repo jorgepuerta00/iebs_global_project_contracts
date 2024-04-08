@@ -455,12 +455,21 @@ describe('AssetsMarketplace', () => {
 
       // Execute purchaseSingleNFT transaction
       await expect(marketplace.connect(buyer).purchaseSingleNFT(tokenId, { value: bundlePriceInWei }))
-        .to.emit(marketplace, 'BundleMinted')
-        .withArgs(await buyer.getAddress(), [tokenId], [1], bundlePriceInWei);
+        .to.emit(marketplace, 'SingleMinted')
+        .withArgs(await buyer.getAddress(), tokenId, 1, bundlePriceInWei);
 
       // Verify that the buyer now owns the NFT
-      const ownerOfToken = await nftToken.balanceOf(await buyer.getAddress(), tokenId);
+      let ownerOfToken = await nftToken.balanceOf(await buyer.getAddress(), tokenId);
       expect(ownerOfToken).to.equal(1);
+
+      // Execute again purchaseSingleNFT transaction
+      await expect(marketplace.connect(buyer).purchaseSingleNFT(tokenId, { value: bundlePriceInWei }))
+        .to.emit(marketplace, 'SingleMinted')
+        .withArgs(await buyer.getAddress(), tokenId, 1, bundlePriceInWei);
+
+      // Verify that the buyer now owns two NFT
+      ownerOfToken = await nftToken.balanceOf(await buyer.getAddress(), tokenId);
+      expect(ownerOfToken).to.equal(2);
     });
 
     it('should fail if incorrect value is sent', async () => {
